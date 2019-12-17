@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
-from admin import SetupAdmin
+# from admin import SetupAdmin
 from utils import APIException, generate_sitemap
 from models import db, Casinos, Tournaments, Flights
 
@@ -15,7 +15,11 @@ MIGRATE = Migrate(app, db)
 db.init_app(app)
 CORS(app)
 
-SetupAdmin(app)
+# SetupAdmin(app)
+
+@app.route('/')
+def home():
+    return 'hello world'
 
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
