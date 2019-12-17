@@ -64,7 +64,7 @@ class Tournaments(db.Model):
     __tablename__ = 'tournaments'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
-    casino_id = db.Column(db.Integer, db.ForeignKey('casino.id'))
+    casino_id = db.Column(db.Integer, db.ForeignKey('casinos.id'))
     buy_in = db.Column(db.String(20))
     blinds = db.Column(db.Integer)
     starting_stack = db.Column(db.Integer)
