@@ -4,6 +4,26 @@ from datetime import datetime
 db = SQLAlchemy()
 
 
+class Users(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(256), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Users {self.email}>'
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
+
+
 class Casinos(db.Model):
     __tablename__ = 'casinos'
     id = db.Column(db.Integer, primary_key=True)
