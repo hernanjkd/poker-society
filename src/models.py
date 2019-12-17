@@ -14,6 +14,7 @@ class Casinos(db.Model):
     zip_code = db.Column(db.String(14))
     longitude = db.Column(db.Float)
     latitude = db.Column(db.Float)
+    website = db.Column(db.String(100))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -32,6 +33,7 @@ class Casinos(db.Model):
             'zip_code': self.zip_code,
             'longitude': self.longitude,
             'latitude': self.latitude,
+            'website': self.website,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
             'tournaments': [x.serialize() for x in self.tournaments]
@@ -48,7 +50,6 @@ class Tournaments(db.Model):
     starting_stack = db.Column(db.Integer)
     results_link = db.Column(db.String(500))
     start_at = db.Column(db.DateTime)
-    end_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -68,7 +69,6 @@ class Tournaments(db.Model):
             'starting_stack': self.starting_stack,
             'results_link': self.results_link,
             'start_at': self.start_at,
-            'end_at': self.end_at,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
             'flights': [x.serialize() for x in self.flights]
