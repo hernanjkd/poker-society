@@ -1,7 +1,15 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import enum
 
 db = SQLAlchemy()
+
+
+class UserStatus(enum.Enum):
+    valid = 'valid'
+    pending = 'pending'
+    unclaimed = 'unclaimed'
+    pending_claim = 'pending_claim'
 
 
 class Users(db.Model):
@@ -9,6 +17,10 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
+    status = db.Column(db.Enum(UserStatus), default=UserStatus.unclaimed)
+    first_name = db.Column(db.String(100), nullable=False)
+    middle_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -19,6 +31,10 @@ class Users(db.Model):
         return {
             'id': self.id,
             'email': self.email,
+            'status': self.status,
+            'first_name': self.first_name,
+            'middle_name': self.middle_name,
+            'last_name': self.last_name,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
         }
