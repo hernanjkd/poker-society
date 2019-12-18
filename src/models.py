@@ -1,15 +1,15 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-import enum
+# import enum
 
 db = SQLAlchemy()
 
 
-class UserStatus(enum.Enum):
-    valid = 'valid'
-    pending = 'pending'
-    unclaimed = 'unclaimed'
-    pending_claim = 'pending_claim'
+# class UserStatus(enum.Enum):
+#     valid = 'valid'
+#     pending = 'pending'
+#     unclaimed = 'unclaimed'
+#     pending_claim = 'pending_claim'
 
 
 class Users(db.Model):
@@ -17,7 +17,8 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
-    status = db.Column(db.Enum(UserStatus), default=UserStatus.unclaimed)
+    # status = db.Column(db.Enum(UserStatus), default=UserStatus.unclaimed)
+    status = db.Column(db.String(20), default='pending')
     first_name = db.Column(db.String(100), nullable=False)
     middle_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100), nullable=False)
