@@ -6,6 +6,8 @@ from flask_cors import CORS
 from admin import SetupAdmin
 from utils import APIException, check_params, update_table, sha256
 from models import db, Users, Casinos, Tournaments, Flights
+from datetime import datetime, timedelta
+from sqlalchemy import asc, desc
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -26,6 +28,7 @@ def home():
 def add_user():
 
     req = request.get_json()
+    check_params(req, 'email', 'password', 'first_name', 'last_name')
 
     db.session.add( Users(
         email = req['email'],
@@ -38,6 +41,41 @@ def add_user():
 
     return jsonify([x.serialize() for x in Users.query.all()])
 
+
+@app.route('/casinos/<id>', methods=['GET'])
+def get_casinos(id):
+
+    if id == 'all':
+        return jsonify([x.serialize() for x in Casinos.query.all()])
+
+    if not id.isnumeric():
+        raise APIException('Invalid id', 400)
+
+    casino = Casinos.query.get(int(id))
+    if casino is None:
+        raise APIException('Casino not found', 404)
+
+    return jsonify( casino.serialize() )
+
+
+@app.route('/tournaments/<id>', methods=['GET'])
+def get_tournaments(id):
+
+    if id == 'all':
+        now = datetime.utcnow() - timedelta(days=1)
+        
+        if request.args.get('history') == 'true':
+            trmnts = Tournaments.query \
+                        .filter( Tournaments.start_at < now ) \
+                        .order_by( Tournaments.start_at.desc() )
+        else:
+            trmnts = Tournaments.query \
+                        .filter( Tournaments.start_at > now ) \
+                        .order_by( Tournaments.start_at.asc() )
+
+        return jsonify([x.serialize() for x in trmnts])
+
+        
 
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))

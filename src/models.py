@@ -4,6 +4,10 @@ import enum
 
 db = SQLAlchemy()
 
+# association_table = db.Table('association', Base.metadata,
+#     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+#     db.Column('flight_id', db.Integer, db.ForeignKey('flight.id')))
+
 
 class UserStatus(enum.Enum):
     valid = 'valid'
@@ -24,6 +28,8 @@ class Users(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     results = db.relationship('Results', back_populates='user')
+    buy_ins = db.relationship('Buy_ins', back_populates='user')
+    # flights = db.relationship('Flights', secondary='Buy_ins', back_populates='users')
 
     def __repr__(self):
         return f'<Users {self.email}>'
@@ -80,8 +86,8 @@ class Casinos(db.Model):
 class Tournaments(db.Model):
     __tablename__ = 'tournaments'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(500), nullable=False)
     casino_id = db.Column(db.Integer, db.ForeignKey('casinos.id'))
+    name = db.Column(db.String(500), nullable=False)
     buy_in = db.Column(db.String(20))
     blinds = db.Column(db.Integer)
     starting_stack = db.Column(db.Integer)
@@ -124,6 +130,8 @@ class Flights(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     tournament = db.relationship('Tournaments', back_populates='flights')
+    buy_ins = db.relationship('Buy_ins', back_populates='flight')
+    # users = db.relationship('Users', secondary='Buy_ins', back_populates='flights')
 
     def __repr__(self):
         return f'<Flights tournament:{self.tournament.name} {self.start_at} - {self.end_at}>'
@@ -138,6 +146,16 @@ class Flights(db.Model):
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
+
+
+class Buy_ins(db.Model):
+    __tablename__ = 'buy_ins'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    flight_id = db.Column(db.Integer, db.ForeignKey('flights.id'))
+
+    user = db.relationship('Users', back_populates='buy_ins')
+    flight = db.relationship('Flights', back_populates='buy_ins')
 
 
 class Results(db.Model):
@@ -166,4 +184,3 @@ class Results(db.Model):
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
-
