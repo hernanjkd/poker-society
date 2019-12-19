@@ -1,29 +1,29 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-# import enum
+import enum
 
 db = SQLAlchemy()
 
 
-# class UserStatus(enum.Enum):
-#     valid = 'valid'
-#     pending = 'pending'
-#     unclaimed = 'unclaimed'
-#     pending_claim = 'pending_claim'
-
+class UserStatus(enum.Enum):
+    valid = 'valid'
+    pending = 'pending'
+    unclaimed = 'unclaimed'
+    pending_claim = 'pending_claim'
 
 class Users(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
-    # status = db.Column(db.Enum(UserStatus), default=UserStatus.unclaimed)
-    status = db.Column(db.String(20), default='pending')
+    status = db.Column(db.Enum(UserStatus), default=UserStatus.unclaimed)
     first_name = db.Column(db.String(100), nullable=False)
     middle_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    results = db.relationship('Results', back_populates='user')
 
     def __repr__(self):
         return f'<Users {self.email}>'
@@ -32,7 +32,7 @@ class Users(db.Model):
         return {
             'id': self.id,
             'email': self.email,
-            'status': self.status,
+            'status': self.status._value_,
             'first_name': self.first_name,
             'middle_name': self.middle_name,
             'last_name': self.last_name,
@@ -92,6 +92,7 @@ class Tournaments(db.Model):
 
     casino = db.relationship('Casinos', back_populates='tournaments')
     flights = db.relationship('Flights', back_populates='tournament')
+    results = db.relationship('Results', back_populates='tournament')
 
     def __repr__(self):
         return f'<Tournament {self.name}>'
@@ -137,3 +138,32 @@ class Flights(db.Model):
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
+
+
+class Results(db.Model):
+    __tablename__ = 'results'
+    id = db.Column(db.Integer, primary_key=True)
+    tournament_id = db.Column(db.Integer, db.ForeignKey('tournaments.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    position = db.Column(db.Integer)
+    winning_prize = db.Column(db.String(100))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    tournament = db.relationship('Tournaments', back_populates='results')
+    user = db.relationship('Users', back_populates='results')
+
+    def __repr__(self):
+        return f'<Results user:{self.user.last_name} tournament:{self.tournament.name}>'
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'tournament_id': self.tournament_id,
+            'user_id': self.user_id,
+            'position': self.position,
+            'winning_prize': self.winning_prize,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
+        }
+

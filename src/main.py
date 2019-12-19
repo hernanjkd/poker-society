@@ -4,11 +4,12 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from admin import SetupAdmin
-from utils import APIException, generate_sitemap
+from utils import APIException, check_params, update_table, sha256
 from models import db, Users, Casinos, Tournaments, Flights
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+app.secret_key = os.environ.get('FLASK_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db)
@@ -21,7 +22,7 @@ SetupAdmin(app)
 def home():
     return 'hello world'
 
-@app.route('/user', methods=['POST'])
+@app.route('/users', methods=['POST'])
 def add_user():
 
     req = request.get_json()
@@ -30,9 +31,10 @@ def add_user():
         email = req['email'],
         password = req['password'],
         first_name = req['first_name'],
-        last_name = req['last_name'],
-        status = req.get('status', 'x')
+        last_name = req['last_name']
     ))
+
+    db.session.commit()
 
     return jsonify([x.serialize() for x in Users.query.all()])
 
