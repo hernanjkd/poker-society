@@ -2,9 +2,7 @@ import os
 import re
 import hashlib
 from flask import jsonify, url_for
-# from flask_jwt_simple import create_jwt, jwt_required, get_jwt
 from datetime import datetime
-from models import Users
 
 class APIException(Exception):
     status_code = 400
@@ -45,6 +43,15 @@ def sha256(string):
     m = hashlib.sha256()
     m.update(string.encode('utf-8'))
     return m.hexdigest()
+
+def resolve_pagination(request_args, limit_default=10):
+    page = request_args.get('page', '0')
+    offset = int(page) - 1 if page.isnumeric() and int(page) > 0 else 0
+    
+    limit = request_args.get('limit', '10')
+    limit = int(limit) if limit.isnumeric() and int(limit) > 0 else limit_default
+    
+    return offset, limit
 
 # Notes: 'admin' will have access even if arg not passed
 # def role_jwt_required(valid_roles=['invalid']):

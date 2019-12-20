@@ -4,7 +4,7 @@ from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
 from admin import SetupAdmin
-from utils import APIException, check_params, update_table, sha256
+from utils import APIException, check_params, update_table, sha256, resolve_pagination
 from models import db, Users, Casinos, Tournaments, Flights
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
@@ -20,9 +20,10 @@ CORS(app)
 
 SetupAdmin(app)
 
-@app.route('/')
+@app.route('/testing')
 def home():
-    return 'hello world'
+    return jsonify([x.serialize() for x in Users.query.all()])
+
 
 @app.route('/users', methods=['POST'])
 def add_user():
@@ -30,16 +31,29 @@ def add_user():
     req = request.get_json()
     check_params(req, 'email', 'password', 'first_name', 'last_name')
 
-    db.session.add( Users(
-        email = req['email'],
-        password = req['password'],
-        first_name = req['first_name'],
-        last_name = req['last_name']
-    ))
-
+    db.session.add( Users( **req ))
     db.session.commit()
 
-    return jsonify([x.serialize() for x in Users.query.all()])
+    return jsonify({'message':'User added successfully'})
+
+
+@app.route('/users/<int:id>', methods=['GET','PUT'])
+def get_update_user(id):
+
+    user = Users.query.get(id)
+    if user is None:
+        raise APIException('User not found', 404)
+    
+    if request.method == 'GET':
+        return jsonify(user.serialize())
+
+    req = request.get_json()
+    check_params(req)
+
+    update_table(user, req, ignore=['email','password'])
+    db.session.commit()
+
+    return jsonify(user.serialize())
 
 
 @app.route('/casinos/<id>', methods=['GET'])
@@ -73,9 +87,20 @@ def get_tournaments(id):
                         .filter( Tournaments.start_at > now ) \
                         .order_by( Tournaments.start_at.asc() )
 
+        if trmnts.count() == 0:
+            raise APIException('No tournaments for this query', 404)
+
         return jsonify([x.serialize() for x in trmnts])
 
-        
+    if not id.isnumeric():
+        raise APIException('Invalid id', 400)
+
+    trmnt = Tournaments.query.get(int(id))
+    if trmnt is None:
+        raise APIException('Tournament not found', 404)
+
+    return jsonify(trmnt.serialize())
+
 
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
