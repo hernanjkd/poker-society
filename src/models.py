@@ -92,6 +92,7 @@ class Tournaments(db.Model):
     blinds = db.Column(db.Integer)
     starting_stack = db.Column(db.Integer)
     results_link = db.Column(db.String(500))
+    structure_link = db.Column(db.String(500))
     start_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

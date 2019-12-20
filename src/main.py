@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt
@@ -51,17 +51,13 @@ def add_claims_to_access_token(kwargs={}):
 
 
 
-@app.route('/testing')
-def home():
-    return jsonify(
-        error='Some mistake',
-        other='how many',
-        can='i do'
-    )
-    l = ['z','c']
-    if 'z' not in l:
-        return 'good'
-    return jsonify([x.serialize() for x in Users.query.all()])
+@app.route('/file_upload', methods=['GET','POST'])
+def file_upload():
+    
+    if request.method == 'GET':
+        return render_template('file_upload.html', 
+                    host = os.environ.get('API_HOST'),
+                    email = 'hernanjkd@gmail.comasdfasdfasdfasd')
 
 
 
