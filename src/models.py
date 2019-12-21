@@ -185,3 +185,24 @@ class Results(db.Model):
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
+
+class Zip_Codes(db.Model):
+    __tablename__ = 'zip_codes'
+    zip_code = db.Column(db.String(14), primary_key=True)
+    longitude = db.Column(db.Float)
+    latitude = db.Column(db.Float)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Zip_Codes {self.zip_code}>'
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'zip_code': self.zip_code,
+            'longitude': self.longitude,
+            'latitude': self.latitude,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
+        }

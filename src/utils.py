@@ -33,6 +33,7 @@ def check_params(body, *args):
         raise Exception('You must specify the ' + msg, 400)
 
 def update_table(table, body, ignore=[]):
+    ignore = [*ignore, 'created_at', 'updated_at']
     for attr, value in body.items():
         if attr not in ignore:
             if not hasattr(table, attr):
