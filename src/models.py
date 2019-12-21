@@ -199,7 +199,6 @@ class Zip_Codes(db.Model):
 
     def serialize(self):
         return {
-            'id': self.id,
             'zip_code': self.zip_code,
             'longitude': self.longitude,
             'latitude': self.latitude,

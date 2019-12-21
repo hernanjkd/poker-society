@@ -20,7 +20,7 @@
             function submit() {
                 const div = (msg) => `<div class="text-center">${msg}</div>`;
                 const page = document.querySelector('#page');
-                delete options.headers['Content-Type'];
+                // delete options.headers['Content-Type'];
                 let file = document.querySelector('#csv').files[0];
                 let data = new FormData();
                 data.append('csv', file);

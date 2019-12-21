@@ -1,12 +1,13 @@
 import os
 import csv
+import requests
 from flask import Flask, request, jsonify, render_template
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt
 from admin import SetupAdmin
 from utils import APIException, check_params, update_table, sha256, resolve_pagination
-from models import db, Users, Casinos, Tournaments, Flights
+from models import db, Users, Casinos, Tournaments, Flights, Buy_ins, Results, Zip_Codes
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
 from io import TextIOWrapper
@@ -51,6 +52,25 @@ def add_claims_to_access_token(kwargs={}):
         'sub': id,
         'role': role
     }
+
+
+
+@app.route('/fetch_zipcodes')
+def fetch_zipcodes():
+
+    req = requests.get('https://assets.breatheco.de/apis/fake/zips.php')
+    data = req.json()
+
+    for zip in data:
+        db.session.add( Zip_Codes(
+            zip_code = zip['_id'],
+            longitude = zip['loc'][0],
+            latitude = zip['loc'][1]
+        ))
+
+    db.session.commit()
+
+    return jsonify([x.serialize() for x in Zip_Codes.query.all()])
 
 
 
