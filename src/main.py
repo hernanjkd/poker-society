@@ -56,26 +56,34 @@ def add_claims_to_access_token(kwargs={}):
 
 @app.route('/file_upload', methods=['GET','POST'])
 def file_upload():
-    
+
+    # GET    
     if request.method == 'GET':
         return render_template('file_upload.html', 
                     host = os.environ.get('API_HOST'))
 
+    # POST
+    f = request.files['csv']
 
-    opened_file = StringIO(request.files['csv'].read())
+    f = StringIO( f.read().decode() )
+    csv_reader = csv.reader( f, delimiter=',' )
 
-    csv_reader = csv.reader(opened_file, delimiter=',')
-    line_count = 0
+    lst = []
+    header = True
     for row in csv_reader:
-        if line_count == 0:
-            print(f'Column names are {", ".join(row)}')
-            line_count += 1
-        else:
-            print(f'\t{row[0]} works in the {row[1]} department, and was born in {row[2]}.')
-            line_count += 1
-    print(f'Processed {line_count} lines.')
+        json = {}
+        for i, val in enumerate(row):
+            if header:
+                json['h'+str(i)] = val.lower()
+            else:
+                h = lst[0]['h'+str(i)]
+                json[h] = val
+        lst.append(json)
+        if header:
+            header = False
 
-    return 'ok', 200
+    return jsonify(lst)
+
 
 
 @app.route('/users', methods=['POST'])
