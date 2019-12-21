@@ -1,4 +1,5 @@
 import os
+import csv
 from flask import Flask, request, jsonify, render_template
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -8,6 +9,8 @@ from utils import APIException, check_params, update_table, sha256, resolve_pagi
 from models import db, Users, Casinos, Tournaments, Flights
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
+from io import TextIOWrapper
+from io import StringIO
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -56,9 +59,23 @@ def file_upload():
     
     if request.method == 'GET':
         return render_template('file_upload.html', 
-                    host = os.environ.get('API_HOST'),
-                    email = 'hernanjkd@gmail.comasdfasdfasdfasd')
+                    host = os.environ.get('API_HOST'))
 
+
+    opened_file = StringIO(request.files['csv'].read())
+
+    csv_reader = csv.reader(opened_file, delimiter=',')
+    line_count = 0
+    for row in csv_reader:
+        if line_count == 0:
+            print(f'Column names are {", ".join(row)}')
+            line_count += 1
+        else:
+            print(f'\t{row[0]} works in the {row[1]} department, and was born in {row[2]}.')
+            line_count += 1
+    print(f'Processed {line_count} lines.')
+
+    return 'ok', 200
 
 
 @app.route('/users', methods=['POST'])

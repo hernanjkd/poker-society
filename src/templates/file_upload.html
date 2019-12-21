@@ -9,7 +9,7 @@
     <body>
         <div id="page" class="mx-auto p-5" style="width:350px">
             <div class="pt-4">
-                <input id="password" class="form-control" placeholder="Password" type="file" />
+                <input id="csv" class="form-control" placeholder=".csv" type="file" />
             </div>
             <div class="pt-4">
                 <button class="btn-success py-2 px-3 border rounded" onclick="submit()">Submit</button>
@@ -17,19 +17,30 @@
             <div id="warning" class="bg-warning text-center mt-4 border rounded p-2 d-none" />
         </div>
         <script type="text/javascript">
-            fetch('{{ host }}/file_upload', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                },
-                body: JSON.stringify({
-                    'email': document.querySelector('#email').value,
-                    'password': password
+            function submit() {
+                const div = (msg) => `<div class="text-center">${msg}</div>`;
+                const page = document.querySelector('#page');
+                
+                let file = document.querySelector('#csv').files[0]
+                let data = new FormData();
+                data.append('csv', file)
+                fetch('{{ host }}/file_upload', {
+                    method: 'POST',
+                    body: data
                 })
-            })
-            .then(resp => resp.json())
-            .then(data => document.querySelector('#page').innerHTML = `<div class="text-center">${data.message}</div>`)
-            .catch(err => console.log('ERROR', err))
+                // fetch('{{host}}/file_upload', {
+                //     method: 'POST',
+                //     headers: {
+                //         "Content-Type": "application/json"
+                //     },
+                //     body: JSON.stringify({'csv':'message from the other side'})
+                // })
+                // .then(d=>console.log(d))
+                
+                .then(resp => resp.json())
+                .then(data => page.innerHTML = div(data.message))
+                .catch(err => page.innerHTML = div(err))
+            }
         </script>
     </body>
 </html>
