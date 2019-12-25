@@ -20,25 +20,18 @@
             function submit() {
                 const div = (msg) => `<div class="text-center">${msg}</div>`;
                 const page = document.querySelector('#page');
-                // delete options.headers['Content-Type'];
+                
                 let file = document.querySelector('#csv').files[0];
                 let data = new FormData();
+                
                 data.append('csv', file);
+                
                 fetch('{{ host }}/file_upload', {
                     method: 'POST',
                     body: data
                 })
-                // fetch('{{host}}/file_upload', {
-                //     method: 'POST',
-                //     headers: {
-                //         "Content-Type": "application/json"
-                //     },
-                //     body: JSON.stringify({'csv':'message from the other side'})
-                // })
-                // .then(d=>console.log(d))
-                
                 .then(resp => resp.json())
-                .then(data => page.innerHTML = div(data.message))
+                .then(data => console.log(data))
                 .catch(err => page.innerHTML = div(err))
             }
         </script>

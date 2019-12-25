@@ -7,7 +7,7 @@ from flask_cors import CORS
 from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt
 from admin import SetupAdmin
 from utils import APIException, check_params, update_table, sha256, resolve_pagination
-from models import db, Users, Casinos, Tournaments, Flights, Buy_ins, Results, Zip_Codes
+from models import db, Users, Casinos, Tournaments, Flights, Results, Zip_Codes
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
 from io import TextIOWrapper
@@ -70,7 +70,7 @@ def fetch_zipcodes():
 
     db.session.commit()
 
-    return jsonify([x.serialize() for x in Zip_Codes.query.all()])
+    return 'ok'
 
 
 
@@ -184,6 +184,14 @@ def get_tournaments(id):
         raise APIException('Tournament not found', 404)
 
     return jsonify(trmnt.serialize())
+
+
+
+@app.route('/zipcode/<id>')
+def get_zipcodes(id):
+    
+    z = Zip_Codes.query.get( id )
+    return jsonify(z.serialize()) if z else jsonify(None)
 
 
 
