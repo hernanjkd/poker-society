@@ -10,7 +10,6 @@ from utils import APIException, check_params, update_table, sha256, resolve_pagi
 from models import db, Users, Casinos, Tournaments, Flights, Results, Zip_Codes
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
-from io import TextIOWrapper
 from io import StringIO
 
 app = Flask(__name__)
@@ -57,7 +56,7 @@ def add_claims_to_access_token(kwargs={}):
 
 @app.route('/fetch_zipcodes')
 def fetch_zipcodes():
-    return 'ok';import time; time.sleep(40); return 'ok'
+    
     req = requests.get('https://assets.breatheco.de/apis/fake/zips.php')
     data = req.json()
 
@@ -184,6 +183,19 @@ def get_tournaments(id):
         raise APIException('Tournament not found', 404)
 
     return jsonify(trmnt.serialize())
+
+
+
+@app.route('/results/tournament/<int:id>')
+def get_results(id):
+
+    result = Results.query.filter_by( tournament_id = id) \
+                        .order_by( Tournaments.position.asc() )
+    
+    if result is None:
+        raise APIException('This tournament has no results yet', 404)
+    
+    return jsonify([x.serialize() for x in result])
 
 
 
