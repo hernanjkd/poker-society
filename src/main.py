@@ -57,7 +57,7 @@ def add_claims_to_access_token(kwargs={}):
 
 @app.route('/fetch_zipcodes')
 def fetch_zipcodes():
-
+    import time; time.sleep(40); return 'ok'
     req = requests.get('https://assets.breatheco.de/apis/fake/zips.php')
     data = req.json()
 
