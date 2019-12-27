@@ -7,40 +7,47 @@
         <title>Poker Society File Upload</title>
     </head>
     <body>
-        <div id="page" class="mx-auto p-5" style="width:400px">
-            <div id="drop-area" class="pt-4" style="width:400px;height:250px;border:solid black 1px" />
-            <!-- <div class="pt-4">
-                <button class="btn-success py-2 px-3 border rounded" onclick="submit()">Submit</button>
-            </div> -->
+        <div id="page" class="p-5 d-flex justify-content-center">
+            <div id="drop-area" class="mt-5 d-flex align-items-center justify-content-center" 
+                style="width:400px;height:250px;border:dashed black 1px">
+                <h2 style="color:rgb(181, 181, 181)">DRAG AND DROP</h2>
+            </div>
+            <div id="message" class="bg-warning text-center mt-4 border rounded p-2 d-none" />
             <div id="warning" class="bg-warning text-center mt-4 border rounded p-2 d-none" />
         </div>
         <script type="text/javascript">
-            // function submit() {
-                let dropArea = document.querySelector('#drop-area');
+            let dropArea = document.querySelector('#drop-area');
+            let message = document.querySelector('#message');
 
-                ['dragenter','dragover','dragleave','drop'].forEach(event => {
-                    dropArea.addEventListener(event, e => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }, false)
-                })
-                
-                dropArea.addEventListener('drop', e => {
-                    console.log(e);
-                    let files = e.dataTransfer.files;
-                    let data = new FormData();
-                    
-                    [...files].forEach((file, i) => data.append(`file${i}`, file))
-                    
-                    fetch('{{ host }}/upload_files', {
-                        method: 'POST',
-                        body: data
-                    })
-                    .then(resp => resp.json())
-                    .then(data => console.log(data))
-                    .catch(err => console.error(err))
+            ['dragenter','dragover','dragleave','drop'].forEach(event => {
+                dropArea.addEventListener(event, e => {
+                    e.preventDefault();
+                    e.stopPropagation();
                 }, false)
-            // }
+            })
+            
+            dropArea.addEventListener('drop', e => {
+                let files = [...e.dataTransfer.files];
+                let data = new FormData();
+                
+                files.forEach((file, i) => data.append(`file${i}`, file))
+                
+                dropArea.classList.remove('d-none');
+                dropArea.innerHTML = `
+                    Uploading ${files.length} files
+                    <ul class="text-left">
+                        ${files.map(e => `<li>${e.name}</li>`).join('')}
+                    </ul>
+                `;
+
+                fetch('{{ host }}/upload_files', {
+                    method: 'POST',
+                    body: data
+                })
+                .then(resp => resp.json())
+                .then(data => console.log(data))
+                .catch(err => console.error(err))
+            }, false)
         </script>
     </body>
 </html>
