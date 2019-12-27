@@ -7,10 +7,8 @@
         <title>Poker Society File Upload</title>
     </head>
     <body>
-        <div id="page" class="mx-auto p-5" style="width:350px">
-            <div class="pt-4">
-                <input id="csv" class="form-control" placeholder=".csv" type="file" />
-            </div>
+        <div id="page" class="mx-auto p-5" style="width:400px">
+            <div id="drop-area" class="pt-4" style="width:400px;height:250px;border:solid black 1px" />
             <div class="pt-4">
                 <button class="btn-success py-2 px-3 border rounded" onclick="submit()">Submit</button>
             </div>
@@ -18,21 +16,30 @@
         </div>
         <script type="text/javascript">
             function submit() {
-                const div = (msg) => `<div class="text-center">${msg}</div>`;
-                const page = document.querySelector('#page');
+                let dropArea = document.querySelector('#drop-area');
+
+                // ['dragenter','dragover','dragleave','drop'].forEach(event => {
+                //     dropArea.addEventListener(event, e => {
+                //         e.preventDefault();
+                //         e.stopPropagation();
+                //     }, false)
+                // })
                 
-                let file = document.querySelector('#csv').files[0];
-                let data = new FormData();
-                
-                data.append('csv', file);
-                
-                fetch('{{ host }}/file_upload', {
-                    method: 'POST',
-                    body: data
-                })
-                .then(resp => resp.json())
-                .then(data => console.log(data))
-                .catch(err => page.innerHTML = div(err))
+                dropArea.addEventListener('drop', e => {
+                    console.log(e);
+                    // let files = e.dataTransfer.files;
+                    // let data = new FormData();
+                    
+                    // [...files].forEach((file, i) => data.append(`file${i}`, file))
+                    
+                    // fetch('{{ host }}/upload_files', {
+                    //     method: 'POST',
+                    //     body: data
+                    // })
+                    // .then(resp => resp.json())
+                    // .then(data => console.log(data))
+                    // .catch(err => console.error(err))
+                }, false)
             }
         </script>
     </body>

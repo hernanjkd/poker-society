@@ -73,7 +73,7 @@ def fetch_zipcodes():
 
 
 
-@app.route('/file_upload', methods=['GET','POST'])
+@app.route('/upload_files', methods=['GET','POST'])
 def file_upload():
 
     # GET    
