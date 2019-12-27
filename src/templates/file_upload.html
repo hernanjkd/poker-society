@@ -5,11 +5,21 @@
         <meta charset="UTF-8">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <title>Poker Society File Upload</title>
+        <style>
+            .highlight {
+                box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+                border: 1px solid rgba(81, 203, 238, 1);
+            }
+            .un-highlight {
+                box-shadow: none;
+                border: 1px dashed black;
+            }
+        </style>
     </head>
     <body>
         <div id="page" class="p-5 d-flex justify-content-center">
-            <div id="drop-area" class="mt-5 d-flex align-items-center justify-content-center" 
-                style="width:400px;height:250px;border:dashed black 1px">
+            <div id="drop-area" class="mt-5 d-flex align-items-center justify-content-center un-highlight" 
+                style="width:400px;height:250px;">
                 <h2 style="color:rgb(181, 181, 181)">DRAG AND DROP</h2>
             </div>
             <div id="message" class="bg-warning text-center mt-4 border rounded p-2 d-none" />
@@ -25,6 +35,13 @@
                     e.stopPropagation();
                 }, false)
             })
+
+            dropArea.addEventListener('dragover', e => {
+                dropArea.classList.replace('un-highlight', 'highlight');
+            }, false);
+            dropArea.addEventListener('dragleave', e => {
+                dropArea.classList.replace('highlight', 'un-highlight');
+            }, false);
             
             dropArea.addEventListener('drop', e => {
                 let files = [...e.dataTransfer.files];
