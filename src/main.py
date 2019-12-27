@@ -82,7 +82,9 @@ def file_upload():
                     host = os.environ.get('API_HOST'))
 
     # POST
-    f = request.files['csv']
+    f = request.files
+
+    return str(len([*f]))
 
     f = StringIO( f.read().decode() )
     csv_reader = csv.reader( f, delimiter=',' )
