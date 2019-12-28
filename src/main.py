@@ -54,21 +54,8 @@ def add_claims_to_access_token(kwargs={}):
 
 
 
-@app.route('/fetch_zipcodes')
-def fetch_zipcodes():
-    
-    req = requests.get('https://assets.breatheco.de/apis/fake/zips.php')
-    data = req.json()
-
-    for zip in data:
-        db.session.add( Zip_Codes(
-            zip_code = zip['_id'],
-            longitude = zip['loc'][0],
-            latitude = zip['loc'][1]
-        ))
-
-    db.session.commit()
-
+@app.route('/testing')
+def testing():
     return 'ok'
 
 
@@ -207,18 +194,6 @@ def get_zipcodes(id):
     z = Zip_Codes.query.get( id )
     return jsonify(z.serialize()) if z else jsonify(None)
 
-
-
-@app.route('/testing')
-def test():
-
-    import json
-
-    with open('src/json_test.json') as j:
-        data = json.load(j)     
-        
-
-    return jsonify(data[1]['one'])
 
 
 
