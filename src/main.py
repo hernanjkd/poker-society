@@ -7,7 +7,7 @@ from flask_cors import CORS
 from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt
 from admin import SetupAdmin
 from utils import APIException, check_params, update_table, sha256, resolve_pagination
-from models import db, Users, Casinos, Tournaments, Flights, Results, Zip_Codes
+from models import db, Users, Casinos, Tournaments, Flights, Results
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
 from io import StringIO
@@ -83,7 +83,7 @@ def file_upload():
 
     # POST
     f = request.files
-
+    import time;time.sleep(1)
     return 'File processed successfully'
 
     f = StringIO( f.read().decode() )
@@ -206,6 +206,19 @@ def get_zipcodes(id):
     
     z = Zip_Codes.query.get( id )
     return jsonify(z.serialize()) if z else jsonify(None)
+
+
+
+@app.route('/testing')
+def test():
+
+    import json
+
+    with open('src/json_test.json') as j:
+        data = json.load(j)     
+        
+
+    return jsonify(data[1]['one'])
 
 
 
