@@ -84,7 +84,7 @@ def file_upload():
     # POST
     f = request.files
 
-    return str(len([*f]))
+    return 'File processed successfully'
 
     f = StringIO( f.read().decode() )
     csv_reader = csv.reader( f, delimiter=',' )
