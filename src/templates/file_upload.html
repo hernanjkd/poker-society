@@ -17,17 +17,32 @@
         </style>
     </head>
     <body>
-        <div id="page" class="p-5 d-flex justify-content-center">
-            <div id="drop-area" class="mt-5 d-flex align-items-center justify-content-center un-highlight" 
-                style="width:400px;height:250px;">
-                <h2 style="color:rgb(181, 181, 181)">DRAG AND DROP</h2>
+        <div id="page" class="mt-5 p-5 d-flex justify-content-center">
+            <div class="text-right">
+                <div id="drop-area" class="d-flex align-items-center justify-content-center un-highlight" 
+                    style="width:400px;height:250px;">
+                    <h2 style="color:rgb(181, 181, 181)">DRAG AND DROP</h2>
+                </div>
+                <button id="submit" class="mt-3 mr-5 py-2 px-3 btn btn-info" 
+                    onclick="submit()">
+                    SUBMIT
+                </button>
             </div>
-            <div id="message" class="bg-warning text-center mt-4 border rounded p-2 d-none" />
-            <div id="warning" class="bg-warning text-center mt-4 border rounded p-2 d-none" />
+            <div id="info" style="width:400px;min-height:250px" 
+                class="border mx-5 d-flex align-items-center justify-content-center">
+                <h2 style="color:rgb(181, 181, 181)">FILE INFO</h2>
+            </div>
+            <div id="log" style="width:400px;min-height:250px" 
+                class="border d-flex align-items-center justify-content-center">
+                <h2 style="color:rgb(181, 181, 181)">LOG</h2>
+            </div>
         </div>
         <script type="text/javascript">
-            let dropArea = document.querySelector('#drop-area');
-            let message = document.querySelector('#message');
+            const dropArea = document.querySelector('#drop-area');
+            const info = document.querySelector('#info');
+            const log = document.querySelector('#log'); 
+            let files = [];
+            let data = new FormData();
 
             ['dragenter','dragover','dragleave','drop'].forEach(event => {
                 dropArea.addEventListener(event, e => {
@@ -44,19 +59,18 @@
             }, false);
             
             dropArea.addEventListener('drop', e => {
-                let files = [...e.dataTransfer.files];
-                let data = new FormData();
+                files = [...files, ...e.dataTransfer.files];
                 
                 files.forEach((file, i) => data.append(`file${i}`, file))
                 
                 dropArea.classList.remove('d-none');
-                dropArea.innerHTML = `
-                    Uploading ${files.length} files
-                    <ul class="text-left">
-                        ${files.map(e => `<li>${e.name}</li>`).join('')}
-                    </ul>
-                `;
+                dropArea.innerHTML = `Uploading ${files.length} files`;
+                log.innerHTML = `<ul class="text-left">
+                    ${files.map(e => `<li>${e.name}</li>`).join('')}
+                </ul>`;
+            }, false)
 
+            function submit() {
                 fetch('{{ host }}/upload_files', {
                     method: 'POST',
                     body: data
@@ -64,7 +78,7 @@
                 .then(resp => resp.json())
                 .then(data => console.log(data))
                 .catch(err => console.error(err))
-            }, false)
+            }
         </script>
     </body>
 </html>
