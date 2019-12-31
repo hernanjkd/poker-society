@@ -77,7 +77,9 @@
             function upload() {
 
                 if (files.length > 0) {
+                    
                     let file = files.shift();
+                    displayFileData();
 
                     let data = new FormData();
                     data.append('csv', file);
@@ -98,8 +100,9 @@
                         upload();
                     })
                     .catch(err => {
+                        console.log(err);
                         log.className = 'border p-2';
-                        logContent += `<span class="text-danger" style="cursor:pointer">${err}</span><br />`;
+                        logContent += `<span class="text-danger">${err}</span><br />`;
                         log.innerHTML = logContent;
                     })
                 }
@@ -115,7 +118,8 @@
                         <ul class="text-left">
                             ${files.map((e,i) => `
                                 <li>
-                                    ${e.name} <span class="border px-1 bg-secondary text-light" onclick="removeFile(${i})">x</span>
+                                    ${e.name} <span class="border px-1 bg-secondary text-light" 
+                                    onclick="removeFile(${i})"  style="cursor:pointer">x</span>
                                 </li>`
                             ).join('')}
                         </ul>`;

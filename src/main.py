@@ -59,7 +59,7 @@ def testing():
     return 'ok'
 
 
-
+x = 0
 @app.route('/upload_files', methods=['GET','POST'])
 def file_upload():
 
@@ -71,6 +71,10 @@ def file_upload():
     # POST
     f = request.files
     import time;time.sleep(1)
+    global x
+    x += 1
+    if x == 4:
+        raise Exception('asdf')
     return 'File processed successfully'
 
     f = StringIO( f.read().decode() )
