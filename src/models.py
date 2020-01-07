@@ -162,6 +162,7 @@ class Results(db.Model):
             'id': self.id,
             'tournament_id': self.tournament_id,
             'user_id': self.user_id,
+            'email': self.user.email,
             'position': self.position,
             'winning_prize': self.winning_prize,
             'created_at': self.created_at,
