@@ -88,6 +88,7 @@ class Tournaments(db.Model):
     results_link = db.Column(db.String(500))
     structure_link = db.Column(db.String(500))
     start_at = db.Column(db.DateTime)
+    notes = db.Column(db.String(3000))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

@@ -69,32 +69,102 @@ def file_upload():
                     host = os.environ.get('API_HOST'))
 
     # POST
-    f = request.files
-    import time;time.sleep(1)
-    global x
-    x += 1
-    if x == 4:
-        raise Exception('asdf')
-    return 'File processed successfully'
+    f = request.files['csv']
 
+    # import time;time.sleep(1)
+    # global x
+    # x += 1
+    # if x == 4:
+    #     raise Exception('asdf')
+    # return 'File processed successfully'
+    
     f = StringIO( f.read().decode() )
     csv_reader = csv.reader( f, delimiter=',' )
 
+    headers = {}
     lst = []
     header = True
     for row in csv_reader:
         json = {}
         for i, val in enumerate(row):
             if header:
-                json['h'+str(i)] = val.lower()
+                # date comes out like this: "﻿date"
+                if i == 0 and 'Date' in val:
+                    val = 'Date'
+                json[str(i)] = val.lower().strip()
             else:
-                h = lst[0]['h'+str(i)]
-                json[h] = val
-        lst.append(json)
+                h = headers[str(i)]
+                json[h] = val.strip()
         if header:
             header = False
+            headers = json
+        else:
+            lst.append(json)
 
-    return jsonify(lst)
+
+
+    csv_headers = headers.values()
+
+    # Tournaments
+    tournament = True
+    for header in ['tournament','buy-in','starting stack','blinds','structure link']:
+        if header not in csv_headers:
+            tournament = False
+            break
+    
+    if tournament:
+        
+        for entry in lst:
+            trmnt = Tournaments.query.filter_by( name=entry['tournament'] ).first()
+            
+            if trmnt is None:
+                db.session.add( Tournaments(
+                    casino_id = entry['casino_id'],
+                    name = entry['tournament'],
+                    buy_in = entry['buy-in'],
+                    blinds = entry['blinds'],
+                    starting_stack = entry['starting stack'],
+                    results_link = entry['results link'],
+                    structure_link = entry['structure link'],
+                    # date goes here
+                    notes = entry['notes']
+                ))
+        
+            else:
+                if trmnt.casino_id != entry['casino_id']:
+                    trmnt.casino_id = entry['casino_id']
+                if trmnt.name != entry['tournament']:
+                    trmnt.name = entry['tournament']
+                if trmnt.buy_in != entry['buy-in']:
+                    trmnt.buy_in = entry['buy-in']
+                if trmnt.blinds != entry['blinds']:
+                    trmnt.blinds = entry['blinds']
+                if trmnt.starting_stack != entry['starting stack']:
+                    trmnt.starting_stack = entry['starting stack']
+                if trmnt.results_link != entry['results link']:
+                    trmnt.results_link = entry['results link']
+                if trmnt.structure_link != entry['structure link']:
+                    trmnt.structure_link = entry['structure link']
+                # date goes here
+                if trmnt.notes != entry['notes']:
+                    trmnt.notes = entry['notes']
+
+            db.session.commit()
+
+    
+    # Venue
+    else:
+        venue = True
+        for header in []:
+            if header not in csv_headers:
+                venue = False
+                break
+        
+        if venue:
+            
+
+
+    return jsonify({'headers': headers, 'entries': lst})
 
 
 
