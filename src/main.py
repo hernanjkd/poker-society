@@ -131,28 +131,24 @@ def file_upload():
                 ))
         
             else:
-                if trmnt.casino_id != entry['casino_id']:
-                    trmnt.casino_id = entry['casino_id']
-                if trmnt.name != entry['tournament']:
-                    trmnt.name = entry['tournament']
-                if trmnt.buy_in != entry['buy-in']:
-                    trmnt.buy_in = entry['buy-in']
-                if trmnt.blinds != entry['blinds']:
-                    trmnt.blinds = entry['blinds']
-                if trmnt.starting_stack != entry['starting stack']:
-                    trmnt.starting_stack = entry['starting stack']
-                if trmnt.results_link != entry['results link']:
-                    trmnt.results_link = entry['results link']
-                if trmnt.structure_link != entry['structure link']:
-                    trmnt.structure_link = entry['structure link']
-                # date goes here
-                if trmnt.notes != entry['notes']:
-                    trmnt.notes = entry['notes']
+                ref = {
+                    'casino_id': 'casino_id',   'name': 'tournament',
+                    'buy_in': 'buy-in',         'blinds': 'blinds',
+                    'notes': 'notes',           # date goes here
+                    'starting_stack': 'starting stack',
+                    'results_link': 'results link',
+                    'structure_link': 'structure link'
+                }
+                for obj_name, entry_name in ref.items():
+                    if getattr(trmnt, obj_name) != entry[entry_name]:
+                        setattr(trmnt, obj_name, entry[entry_name])
+
 
             db.session.commit()
+            return 'Tournament csv has been proccessed successfully', 200
 
     
-    # Venue
+    # Venues
     else:
         venue = True
         for header in []:
@@ -161,9 +157,48 @@ def file_upload():
                 break
         
         if venue:
-            
+            for entry in lst:
+                casino = Casino.query.filter_by( name=entry['name'] ).first()
 
+                if casino is not None:
+                    Casinos.query.delete()
+                    db.session.execute("ALTER SEQUENCE casinos_id_seq RESTART")
+                
+                db.session.add( Casinos(
+                    name = entry['name'],
+                    address = entry['address'],
+                    city = entry['city'],
+                    state = entry['state'],
+                    zip_code = entry['zip_code'],
+                    longitude = entry['longitude'],
+                    latitude = entry['latitude'],
+                    website = entry['website']
+                ))
+                db.session.commit()
+                return 'Venue csv has been proccessed successfully', 200
 
+    # Results
+    if results:
+        data = {
+            "tournament_id": 45,
+            "tournament_buy_in": 150,
+            "tournament_date": "23 Aug, 2020",
+            "tournament_name": "Las Vegas Live Night Hotel",
+            "results_link": "https://poker-society.herokuapp.com/results_link/234"
+            "users": {
+                "sdfoij@yahoo.com": {
+                    "position": 11,
+                    "winning_prize": 200
+                }
+            }
+        }
+
+        requests.post( os.environ.get('SWAP_PROFIT_API')+ '/results',
+            data={ **data })
+
+        return 'Results csv has been processed successfully', 200
+
+    # return 'Unrecognized file'
     return jsonify({'headers': headers, 'entries': lst})
 
 
