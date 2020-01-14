@@ -6,7 +6,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt
 from admin import SetupAdmin
-from utils import APIException, check_params, update_table, sha256, resolve_pagination
+from utils import APIException, check_params, update_table, sha256, role_jwt_required
 from models import db, Users, Casinos, Tournaments, Flights, Results
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
@@ -58,6 +58,35 @@ def add_claims_to_access_token(kwargs={}):
 def testing():
     return 'ok'
 
+
+@app.route('/user', methods=['GET','POST'])
+def login():
+
+    if request.method == 'GET':
+        return render_template('login.html',
+                    host = os.environ.get('API_HOST'))
+
+    json = request.get_json()
+    check_params(json, 'email')
+
+    if 'password' in json:
+        # verify password and email and log in the user
+        return jsonify({
+            'jwt': create_jwt({
+                'id': user.id,
+                'role': 'user',
+                'exp': 600
+            })
+        }), 200
+
+    else:
+        # verify email and then data
+        
+
+@app.route('/user/data')
+@role_jwt_required(['user'])
+def get_user(user_id):
+    pass
 
 x = 0
 @app.route('/upload_files', methods=['GET','POST'])
@@ -143,7 +172,6 @@ def file_upload():
                     if getattr(trmnt, obj_name) != entry[entry_name]:
                         setattr(trmnt, obj_name, entry[entry_name])
 
-
             db.session.commit()
             return 'Tournament csv has been proccessed successfully', 200
 
@@ -206,10 +234,10 @@ def file_upload():
 @app.route('/users', methods=['POST'])
 def add_user():
 
-    req = request.get_json()
-    check_params(req, 'email', 'password', 'first_name', 'last_name')
+    json = request.get_json()
+    check_params(json, 'email', 'password', 'first_name', 'last_name')
 
-    db.session.add( Users( **req ))
+    db.session.add( Users( **json ))
     db.session.commit()
 
     return jsonify({'message':'User added successfully'})
