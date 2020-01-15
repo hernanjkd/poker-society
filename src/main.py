@@ -54,11 +54,6 @@ def add_claims_to_access_token(kwargs={}):
 
 
 
-@app.route('/testing')
-def testing():
-    return 'ok'
-
-
 @app.route('/user', methods=['GET','POST'])
 def login():
 
@@ -70,7 +65,13 @@ def login():
     check_params(json, 'email')
 
     if 'password' in json:
-        # verify password and email and log in the user
+        user = Users.query.filter_by(
+            email = json['email'],
+            password = sha256( json['passowrd'] )
+        )
+        if user is None:
+            raise APIException('User not found', 404)
+
         return jsonify({
             'jwt': create_jwt({
                 'id': user.id,
@@ -80,13 +81,23 @@ def login():
         }), 200
 
     else:
-        # verify email and then data
         
+
+
 
 @app.route('/user/data')
 @role_jwt_required(['user'])
 def get_user(user_id):
-    pass
+    
+    user = Users.query.get( user_id )
+    if user is None:
+        return render_template('login.html',
+                    host = os.environ.get('API_HOST'))
+
+    return render_template('dashboard.html',
+        data={})
+
+
 
 x = 0
 @app.route('/upload_files', methods=['GET','POST'])
@@ -175,35 +186,6 @@ def file_upload():
             db.session.commit()
             return 'Tournament csv has been proccessed successfully', 200
 
-    
-    # Venues
-    else:
-        venue = True
-        for header in []:
-            if header not in csv_headers:
-                venue = False
-                break
-        
-        if venue:
-            for entry in lst:
-                casino = Casino.query.filter_by( name=entry['name'] ).first()
-
-                if casino is not None:
-                    Casinos.query.delete()
-                    db.session.execute("ALTER SEQUENCE casinos_id_seq RESTART")
-                
-                db.session.add( Casinos(
-                    name = entry['name'],
-                    address = entry['address'],
-                    city = entry['city'],
-                    state = entry['state'],
-                    zip_code = entry['zip_code'],
-                    longitude = entry['longitude'],
-                    latitude = entry['latitude'],
-                    website = entry['website']
-                ))
-                db.session.commit()
-                return 'Venue csv has been proccessed successfully', 200
 
     # Results
     if results:
@@ -226,21 +208,38 @@ def file_upload():
 
         return 'Results csv has been processed successfully', 200
 
+
+    # Venues
+    venue = True
+    for header in []:
+        if header not in csv_headers:
+            venue = False
+            break
+    
+    if venue:
+        for entry in lst:
+            casino = Casino.query.filter_by( name=entry['name'] ).first()
+
+            if casino is not None:
+                Casinos.query.delete()
+                db.session.execute("ALTER SEQUENCE casinos_id_seq RESTART")
+            
+            db.session.add( Casinos(
+                name = entry['name'],
+                address = entry['address'],
+                city = entry['city'],
+                state = entry['state'],
+                zip_code = entry['zip_code'],
+                longitude = entry['longitude'],
+                latitude = entry['latitude'],
+                website = entry['website']
+            ))
+            db.session.commit()
+            return 'Venue csv has been proccessed successfully', 200
+
+
     # return 'Unrecognized file'
     return jsonify({'headers': headers, 'entries': lst})
-
-
-
-@app.route('/users', methods=['POST'])
-def add_user():
-
-    json = request.get_json()
-    check_params(json, 'email', 'password', 'first_name', 'last_name')
-
-    db.session.add( Users( **json ))
-    db.session.commit()
-
-    return jsonify({'message':'User added successfully'})
 
 
 
@@ -324,12 +323,6 @@ def get_results(id):
     return jsonify([x.serialize() for x in result])
 
 
-
-@app.route('/zipcode/<id>')
-def get_zipcodes(id):
-    
-    z = Zip_Codes.query.get( id )
-    return jsonify(z.serialize()) if z else jsonify(None)
 
 
 
