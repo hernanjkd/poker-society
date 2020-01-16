@@ -54,12 +54,8 @@ def add_claims_to_access_token(kwargs={}):
 
 
 
-@app.route('/user', methods=['GET','POST'])
+@app.route('/user', methods=['POST'])
 def login():
-
-    if request.method == 'GET':
-        return render_template('login.html',
-                    host = os.environ.get('API_HOST'))
 
     json = request.get_json()
     check_params(json, 'email')
@@ -80,12 +76,12 @@ def login():
             })
         }), 200
 
-    else:
+    # else:
         
 
 
 
-@app.route('/user/data')
+@app.route('/user')
 @role_jwt_required(['user'])
 def get_user(user_id):
     
@@ -101,6 +97,7 @@ def get_user(user_id):
 
 x = 0
 @app.route('/upload_files', methods=['GET','POST'])
+@role_jwt_required(['admin'])
 def file_upload():
 
     # GET    
@@ -194,7 +191,7 @@ def file_upload():
             "tournament_buy_in": 150,
             "tournament_date": "23 Aug, 2020",
             "tournament_name": "Las Vegas Live Night Hotel",
-            "results_link": "https://poker-society.herokuapp.com/results_link/234"
+            "results_link": "https://poker-society.herokuapp.com/results_link/234",
             "users": {
                 "sdfoij@yahoo.com": {
                     "position": 11,
