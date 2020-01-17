@@ -1,3 +1,4 @@
+import re
 import os
 import csv
 import requests
@@ -95,9 +96,9 @@ def get_user(user_id):
 
 
 
-x = 0
+# x = 0
 @app.route('/upload_files', methods=['GET','POST'])
-@role_jwt_required(['admin'])
+# @role_jwt_required(['admin'])
 def file_upload():
 
     # GET    
@@ -107,7 +108,7 @@ def file_upload():
 
     # POST
     f = request.files['csv']
-
+    
     # import time;time.sleep(1)
     # global x
     # x += 1
@@ -144,12 +145,15 @@ def file_upload():
 
     # Tournaments
     tournament = True
-    for header in ['tournament','buy-in','starting stack','blinds','structure link']:
+    for header in ['date','day','time','where','tournament','buy-in','starting stack','blinds',
+                    'structure link','notes','results','entrants']:
         if header not in csv_headers:
             tournament = False
             break
     
     if tournament:
+        casino = re.search(r'([a-zA-Z ]+) -', f.filename)
+        casino = casino and casino.group(1)    
         
         for entry in lst:
             trmnt = Tournaments.query.filter_by( name=entry['tournament'] ).first()
@@ -207,13 +211,14 @@ def file_upload():
 
 
     # Venues
-    venue = True
-    for header in []:
+    file_has_headers = True
+    for header in ['name','address','city','state','zip_code','longitude',
+                    'latitude','website']:
         if header not in csv_headers:
-            venue = False
+            file_has_headers = False
             break
     
-    if venue:
+    if 'venues' in f.filename and file_has_headers:
         for entry in lst:
             casino = Casino.query.filter_by( name=entry['name'] ).first()
 
@@ -321,13 +326,13 @@ def get_results(id):
 
 
 
-@app.route('/roi/data/<email>')
+@app.route('/roi/winning_swaps/<email>')
 def get_roi_data(email): 
     
     user = Users.query.filter_by( email=email )
     if user is None:
         raise APIException('User not found', 404)
-        
+
     won_trmnts = Results.query.filter( user_id=user.id ) \
                     .filter( Results.earnings != None )
     
