@@ -148,7 +148,7 @@ class Results(db.Model):
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournaments.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     position = db.Column(db.Integer)
-    earnings = db.Column(db.Integer, default=0)
+    winnings = db.Column(db.String(30), default=None)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -165,7 +165,7 @@ class Results(db.Model):
             'user_id': self.user_id,
             'email': self.user.email,
             'position': self.position,
-            'earnings': self.earnings,
+            'winnings': self.winnings,
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
