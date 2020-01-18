@@ -56,7 +56,7 @@ def add_claims_to_access_token(kwargs={}):
 
 
 @app.route('/user', methods=['POST'])
-def login():
+def register():
 
     json = request.get_json()
     check_params(json, 'email')
@@ -77,8 +77,26 @@ def login():
             })
         }), 200
 
-    # else:
-        
+@app.route('/user/token')
+def login():
+
+    json = request.get_json()
+    check_params(json, 'email', 'password')
+    
+    user = Users.query.filter_by( 
+        email = json['email'],
+        password = sha256( json['password'] )
+    )
+    if user is None:
+        raise APIException('User not found', 404)
+
+    return jsonify({
+        'jwt': create_jwt({
+            'id': user.id,
+            'role': 'user',
+            'exp': 600
+        })
+    }), 200
 
 
 
@@ -119,8 +137,8 @@ def file_upload():
     f = StringIO( f.read().decode() )
     csv_reader = csv.reader( f, delimiter=',' )
 
-    headers = {}
-    lst = []
+    csv_headers = {}
+    csv_entries = []
     header = True
     for row in csv_reader:
         json = {}
@@ -131,11 +149,11 @@ def file_upload():
                     val = 'Date'
                 json[str(i)] = val.lower().strip()
             else:
-                h = headers[str(i)]
+                h = csv_headers[str(i)]
                 json[h] = val.strip()
         if header:
             header = False
-            headers = json
+            csv_headers = json
         else:
             lst.append(json)
 
@@ -144,18 +162,18 @@ def file_upload():
     csv_headers = headers.values()
 
     # Tournaments
-    tournament = True
+    file_has_headers = True
     for header in ['date','day','time','where','tournament','buy-in','starting stack','blinds',
                     'structure link','notes','results','entrants']:
         if header not in csv_headers:
-            tournament = False
+            file_has_headers = False
             break
     
-    if tournament:
+    if file_has_headers:
         casino = re.search(r'([a-zA-Z ]+) -', f.filename)
         casino = casino and casino.group(1)    
         
-        for entry in lst:
+        for entry in csv_entries:
             trmnt = Tournaments.query.filter_by( name=entry['tournament'] ).first()
             
             if trmnt is None:
@@ -189,20 +207,51 @@ def file_upload():
 
 
     # Results
-    if results:
+    file_has_headers = True
+    for header in ['place','nationality','first_name','middle_name',
+                    'last_name','winnings','tps points']:
+        if header not in csv_headers:
+            file_has_headers = False
+            break
+
+    if 'results' in f.filename.lower() and file_has_headers:
+        tournament_name = None # get tournament name somehow
+        trmnt = Tournaments.query.filter_by( name=tournament_name ).first()
+        
         data = {
-            "tournament_id": 45,
-            "tournament_buy_in": 150,
-            "tournament_date": "23 Aug, 2020",
-            "tournament_name": "Las Vegas Live Night Hotel",
-            "results_link": "https://poker-society.herokuapp.com/results_link/234",
+            "tournament_id": trmnt.id,
+            "tournament_buy_in": trmnt.buy_in,
+            "tournament_date": trmnt.start_at,
+            "tournament_name": trmnt.name,
+            "results_link": '', # find out how to get the results link
             "users": {
                 "sdfoij@yahoo.com": {
                     "position": 11,
-                    "winning_prize": 200
+                    "winnings": 200,
+                    "total_winning_swaps": 234
                 }
             }
         }
+
+        for player in csv_entries:
+            
+            user = Users.query.filter_by( 
+                        first_name = palyer['first_name'],
+                        middle_name = player['middle_name'],
+                        last_name = player['last_name']
+                    ).first()
+            
+            if user is not None:
+                won_swaps = Results.query.filter( user_id=user.id ) \
+                                        .filter( Results.earnings != None )
+                won_swaps = won_swaps.count() if won_swaps is not None else 0
+                
+                data['users'][user.email] = {
+                    'position': player['position'],
+                    'winnings': player['winnings'],
+                    'total_winning_swaps': won_swaps
+                }
+
 
         requests.post( os.environ.get('SWAP_PROFIT_API')+ '/results',
             data={ **data })
@@ -218,8 +267,8 @@ def file_upload():
             file_has_headers = False
             break
     
-    if 'venues' in f.filename and file_has_headers:
-        for entry in lst:
+    if 'venues' in f.filename.lower() and file_has_headers:
+        for entry in csv_entries:
             casino = Casino.query.filter_by( name=entry['name'] ).first()
 
             if casino is not None:
