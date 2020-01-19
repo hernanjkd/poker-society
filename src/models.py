@@ -52,6 +52,7 @@ class Casinos(db.Model):
     longitude = db.Column(db.Float)
     latitude = db.Column(db.Float)
     website = db.Column(db.String(100))
+    h1 = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
