@@ -156,7 +156,17 @@ def file_upload():
 
     # POST
     f = request.files['csv']
-        
+    
+    import os
+    
+    f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) ) 
+
+    return jsonify({
+        'full new path': os.path.join(os.getcwd(),'csv_uploads/tournaments/',f.filename),
+        'dirname': os.path.dirname( os.path.realpath(__file__) ),
+        'realpath': os.path.realpath(__file__),
+        'cwd': os.getcwd()
+    })
     f = StringIO( f.read().decode() )
     file_rows = csv.reader( f, delimiter=',' )
 
@@ -230,7 +240,8 @@ def file_upload():
                         setattr(trmnt, obj_name, entry[entry_name])
 
             db.session.commit()
-            return 'Tournament csv has been proccessed successfully', 200
+            return jsonify({'message':'Tournament csv has been proccessed successfully'}), 200
+            
 
 
     # Results
@@ -283,7 +294,7 @@ def file_upload():
         requests.post( os.environ.get('SWAP_PROFIT_API')+ '/results',
             data={ **data })
 
-        return 'Results csv has been processed successfully', 200
+        return jsonify({'message':'Results csv has been processed successfully'}), 200
 
 
     # Venues
@@ -302,22 +313,28 @@ def file_upload():
                 address = entry['address']
             )    
             
-            db.session.add( Casinos(
-                name = entry['name'],
-                address = entry['address'],
-                city = entry['city'],
-                state = entry['state'],
-                zip_code = entry['zip_code'],
-                longitude = entry['longitude'],
-                latitude = entry['latitude'],
-                website = entry['website']
-            ))
+            if casino is None:
+                db.session.add( Casinos(
+                    name = entry['name'],
+                    address = entry['address'],
+                    city = entry['city'],
+                    state = entry['state'],
+                    zip_code = entry['zip_code'],
+                    longitude = entry['longitude'],
+                    latitude = entry['latitude'],
+                    website = entry['website']
+                ))
+
+            else:
+                for attr, val in entry:
+                    if getattr(casino, attr) != val:
+                        setattr(casino, attr, val)
+
             db.session.commit()
-            return 'Venue csv has been proccessed successfully', 200
+            return jsonify({'message':'Venue csv has been proccessed successfully'}), 200
 
 
-    # return 'Unrecognized file'
-    return jsonify({'headers': headers, 'entries': lst})
+    return jsonify({'message':'Unrecognized file'}), 200
 
 
 

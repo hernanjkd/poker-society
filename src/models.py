@@ -20,6 +20,7 @@ class Users(db.Model):
     first_name = db.Column(db.String(100), nullable=False)
     middle_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100), nullable=False)
+    nationality = db.Column(db.String(30))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -36,6 +37,7 @@ class Users(db.Model):
             'first_name': self.first_name,
             'middle_name': self.middle_name,
             'last_name': self.last_name,
+            'nationality': self.nationality,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
         }
@@ -72,6 +74,7 @@ class Casinos(db.Model):
             'longitude': self.longitude,
             'latitude': self.latitude,
             'website': self.website,
+            'h1': self.h1,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
             'tournaments': [x.serialize() for x in self.tournaments]
@@ -148,6 +151,10 @@ class Results(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournaments.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    first_name = db.Column(db.String(20))
+    middle_name = db.Column(db.String(20))
+    last_name = db.Column(db.String(20))
+    nationality = db.Column(db.String(30))
     position = db.Column(db.Integer)
     winnings = db.Column(db.String(30), default=None)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -164,6 +171,10 @@ class Results(db.Model):
             'id': self.id,
             'tournament_id': self.tournament_id,
             'user_id': self.user_id,
+            'first_name': self.first_name,
+            'middle_name': self.middle_name,
+            'last_name': self.last_name,
+            'nationality': self.nationality,
             'email': self.user.email,
             'position': self.position,
             'winnings': self.winnings,
