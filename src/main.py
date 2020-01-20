@@ -12,6 +12,7 @@ from models import db, Users, Casinos, Tournaments, Flights, Results
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
 from io import StringIO
+from datetime import datetime
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -55,6 +56,33 @@ def add_claims_to_access_token(kwargs={}):
 
 
 
+@app.route('/testing')
+def testing():
+
+    from run_seeds import run_seeds
+    # run_seeds()
+
+    trmnts = Tournaments.query.get(1)
+
+    t1 = Tournaments(
+        casino_id = 1,
+        name = 'Testing',
+        buy_in = '',
+        blinds = 0,
+        starting_stack = 0,
+        results_link = '',
+        structure_link = '',
+        start_at = datetime.strptime('1-Dec-19 9:00 AM', '%d-%b-%y %I:%M %p'),
+        notes = ''
+    )
+    db.session.add(t1)
+    db.session.flush()
+    return str(t1.id)
+
+    return jsonify(trmnts.start_at == datetime.strptime('1-Dec-19 9:00 AM', '%d-%b-%y %I:%M %p'))
+
+
+
 @app.route('/user', methods=['POST'])
 def register():
 
@@ -76,6 +104,8 @@ def register():
                 'exp': 600
             })
         }), 200
+
+
 
 @app.route('/user/token')
 def login():
@@ -114,7 +144,7 @@ def get_user(user_id):
 
 
 
-# x = 0
+
 @app.route('/upload_files', methods=['GET','POST'])
 # @role_jwt_required(['admin'])
 def file_upload():
@@ -126,56 +156,49 @@ def file_upload():
 
     # POST
     f = request.files['csv']
-    
-    # import time;time.sleep(1)
-    # global x
-    # x += 1
-    # if x == 4:
-    #     raise Exception('asdf')
-    # return 'File processed successfully'
-    
+        
     f = StringIO( f.read().decode() )
-    csv_reader = csv.reader( f, delimiter=',' )
+    file_rows = csv.reader( f, delimiter=',' )
 
-    csv_headers = {}
+    csv_headers = []
     csv_entries = []
     header = True
-    for row in csv_reader:
+    for row in file_rows:
         json = {}
         for i, val in enumerate(row):
             if header:
-                # date comes out like this: "﻿date"
-                if i == 0 and 'Date' in val:
-                    val = 'Date'
-                json[str(i)] = val.lower().strip()
+                if i == 0:
+                    val = val[1:] # first header comes out like this: "﻿date"
+                csv_headers.append( val.lower().strip() )
             else:
-                h = csv_headers[str(i)]
-                json[h] = val.strip()
-        if header:
+                json[ csv_headers[i] ] = val.strip()
+        if header: 
             header = False
-            csv_headers = json
-        else:
+        else: 
             lst.append(json)
 
 
 
-    csv_headers = headers.values()
-
     # Tournaments
-    file_has_headers = True
-    for header in ['date','day','time','where','tournament','buy-in','starting stack','blinds',
-                    'structure link','notes','results','entrants']:
+    file_has_tournament_headers = True
+    for header in ['date','day','time','where','tournament','buy-in','starting stack',
+                'blinds','structure link','notes','results','entrants','h1','casino id']:
         if header not in csv_headers:
-            file_has_headers = False
+            file_has_tournament_headers = False
             break
     
-    if file_has_headers:
-        casino = re.search(r'([a-zA-Z ]+) -', f.filename)
-        casino = casino and casino.group(1)    
+    if file_has_tournament_headers:
         
         for entry in csv_entries:
-            trmnt = Tournaments.query.filter_by( name=entry['tournament'] ).first()
-            
+            trmnt = Tournaments.query.filter_by(
+                        name = entry['tournament'],
+                        date = entry['date'],
+                        time = entry['time'] 
+                    ).first()
+            timestamp = datetime.strptime(
+                f"{entry['date']} {entry['time']}",
+                '%d-%b-%y %I:%M %p')
+
             if trmnt is None:
                 db.session.add( Tournaments(
                     casino_id = entry['casino_id'],
@@ -185,20 +208,24 @@ def file_upload():
                     starting_stack = entry['starting stack'],
                     results_link = entry['results link'],
                     structure_link = entry['structure link'],
-                    # date goes here
+                    start_at = timestamp,
                     notes = entry['notes']
                 ))
         
             else:
                 ref = {
-                    'casino_id': 'casino_id',   'name': 'tournament',
-                    'buy_in': 'buy-in',         'blinds': 'blinds',
-                    'notes': 'notes',           # date goes here
+                    'casino_id': 'casino_id',     'name': 'tournament',
+                    'buy_in': 'buy-in',           'blinds': 'blinds',
+                    'notes': 'notes', 'h1': 'h1', 'date': 'timestamp',
                     'starting_stack': 'starting stack',
                     'results_link': 'results link',
                     'structure_link': 'structure link'
                 }
                 for obj_name, entry_name in ref.items():
+                    if obj_name == 'date':
+                        entry[entry_name] = datetime.strptime(
+                            f"{entry['date']} {entry['time']}",
+                            '%d-%b-%y %I:%M %p')
                     if getattr(trmnt, obj_name) != entry[entry_name]:
                         setattr(trmnt, obj_name, entry[entry_name])
 
@@ -207,14 +234,14 @@ def file_upload():
 
 
     # Results
-    file_has_headers = True
+    file_has_results_headers = True
     for header in ['place','nationality','first_name','middle_name',
                     'last_name','winnings','tps points']:
         if header not in csv_headers:
-            file_has_headers = False
+            file_has_results_headers = False
             break
 
-    if 'results' in f.filename.lower() and file_has_headers:
+    if file_has_results_headers:
         tournament_name = None # get tournament name somehow
         trmnt = Tournaments.query.filter_by( name=tournament_name ).first()
         
@@ -260,20 +287,20 @@ def file_upload():
 
 
     # Venues
-    file_has_headers = True
+    file_has_venue_headers = True
     for header in ['name','address','city','state','zip_code','longitude',
                     'latitude','website']:
         if header not in csv_headers:
-            file_has_headers = False
+            file_has_venue_headers = False
             break
     
-    if 'venues' in f.filename.lower() and file_has_headers:
+    if file_has_venue_headers:
+        
         for entry in csv_entries:
-            casino = Casino.query.filter_by( name=entry['name'] ).first()
-
-            if casino is not None:
-                Casinos.query.delete()
-                db.session.execute("ALTER SEQUENCE casinos_id_seq RESTART")
+            casino = Casinos.query.filter_by(
+                name = entry['name'],
+                address = entry['address']
+            )    
             
             db.session.add( Casinos(
                 name = entry['name'],
