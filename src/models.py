@@ -175,7 +175,7 @@ class Results(db.Model):
             'middle_name': self.middle_name,
             'last_name': self.last_name,
             'nationality': self.nationality,
-            'email': self.user.email,
+            'email': user and self.user.email,
             'position': self.position,
             'winnings': self.winnings,
             'created_at': self.created_at,

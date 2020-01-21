@@ -107,42 +107,42 @@ def register():
 
 
 
-@app.route('/user/token')
+@app.route('/user/login', methods=['GET','POST'])
 def login():
+
+    if request.method == 'GET':
+        return render_template('login.html',
+            host=os.environ.get('API_HOST'))
 
     json = request.get_json()
     check_params(json, 'email', 'password')
-    
+
     user = Users.query.filter_by( 
         email = json['email'],
         password = sha256( json['password'] )
-    )
-    if user is None:
-        raise APIException('User not found', 404)
-
-    return jsonify({
-        'jwt': create_jwt({
-            'id': user.id,
-            'role': 'user',
-            'exp': 600
-        })
-    }), 200
-
-
-
-@app.route('/user')
-@role_jwt_required(['user'])
-def get_user(user_id):
-    
-    user = Users.query.get( user_id )
+    ).first()
     if user is None:
         return render_template('login.html',
-                    host = os.environ.get('API_HOST'))
+            host=os.environ.get('API_HOST'),
+            message='Email and password are incorrect.')
+    return 'ok'
+    # return render_template('dashboard.html')
 
-    return render_template('dashboard.html',
-        data={})
+    # return jsonify({
+    #     'jwt': create_jwt({
+    #         'id': user.id,
+    #         'role': 'user',
+    #         'exp': 600
+    #     })
+    # }), 200
 
 
+
+@app.route('/dashboard')
+@role_jwt_required(['user'])
+def get_user(user_id):
+    pass
+    
 
 
 @app.route('/upload_files', methods=['GET','POST'])
@@ -156,17 +156,7 @@ def file_upload():
 
     # POST
     f = request.files['csv']
-    
-    import os
-    
-    f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) ) 
 
-    return jsonify({
-        'full new path': os.path.join(os.getcwd(),'csv_uploads/tournaments/',f.filename),
-        'dirname': os.path.dirname( os.path.realpath(__file__) ),
-        'realpath': os.path.realpath(__file__),
-        'cwd': os.getcwd()
-    })
     f = StringIO( f.read().decode() )
     file_rows = csv.reader( f, delimiter=',' )
 
@@ -240,6 +230,8 @@ def file_upload():
                         setattr(trmnt, obj_name, entry[entry_name])
 
             db.session.commit()
+            f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) )
+
             return jsonify({'message':'Tournament csv has been proccessed successfully'}), 200
             
 
@@ -254,7 +246,7 @@ def file_upload():
 
     if file_has_results_headers:
         tournament_name = None # get tournament name somehow
-        trmnt = Tournaments.query.filter_by( name=tournament_name ).first()
+        trmnt = Tournaments.query.filter_by( name = tournament_name ).first()
         
         data = {
             "tournament_id": trmnt.id,
@@ -271,28 +263,43 @@ def file_upload():
             }
         }
 
-        for player in csv_entries:
+        for entry in csv_entries:
             
+            user_id = None
             user = Users.query.filter_by( 
-                        first_name = palyer['first_name'],
-                        middle_name = player['middle_name'],
-                        last_name = player['last_name']
+                        first_name = entry['first_name'],
+                        middle_name = entry['middle_name'],
+                        last_name = entry['last_name']
                     ).first()
             
             if user is not None:
+                user_id = user.id
+
                 won_swaps = Results.query.filter( user_id=user.id ) \
                                         .filter( Results.earnings != None )
                 won_swaps = won_swaps.count() if won_swaps is not None else 0
                 
                 data['users'][user.email] = {
-                    'position': player['position'],
-                    'winnings': player['winnings'],
+                    'position': entry['position'],
+                    'winnings': entry['winnings'],
                     'total_winning_swaps': won_swaps
                 }
+
+            db.session.add( Results(
+                tournament_id = trmnt.id,
+                user_id = user_id,
+                first_name = entry['first_name'],
+                middle_name = entry['middle_name'],
+                last_name = entry['last_name'],
+                nationality = entry['nationality'],
+                position = entry['position'],
+                winnings = entry['winnings']
+            ))
 
 
         requests.post( os.environ.get('SWAP_PROFIT_API')+ '/results',
             data={ **data })
+        f.save( os.path.join(os.getcwd(),'src/csv_uploads/results/',f.filename) )
 
         return jsonify({'message':'Results csv has been processed successfully'}), 200
 
@@ -331,6 +338,8 @@ def file_upload():
                         setattr(casino, attr, val)
 
             db.session.commit()
+            f.save( os.path.join(os.getcwd(),'src/csv_uploads/venues/',f.filename) )
+
             return jsonify({'message':'Venue csv has been proccessed successfully'}), 200
 
 

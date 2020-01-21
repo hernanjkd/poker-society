@@ -6,23 +6,48 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <title>Poker Society Log In</title>
         <style>
-            .highlight {
-                box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-                border: 1px solid rgba(81, 203, 238, 1);
-            }
-            .un-highlight {
-                box-shadow: none;
-                border: 1px dashed black;
-            }
+            
         </style>
     </head>
     <body>
-        <div id="page" class="mt-5 p-5 d-flex justify-content-center">
-            <input type="text" id="email" placeholder="Email" />
-            <input type="password" id="password" placeholder="Password" />
+        <div class="d-flex justify-content-center">
+            <div id="page" class="mt-5 p-5">
+                <div class="text-warning">{{ message }}</div>
+                <div style="width:300px">
+                    <input class="form-control" 
+                        type="text" id="email" placeholder="Email" />
+                </div>
+                <div class="my-3" style="width:300px">
+                    <input class="form-control" 
+                        type="password" id="password" placeholder="Password" />
+                </div>
+                <div class="text-center">
+                    <button class="py-2 px-3 btn btn-info" 
+                        onclick="login()">
+                        LOG IN
+                    </button>
+                </div>
+            </div>
         </div>
         <script type="text/javascript">
-            
+            function login() {
+                let email = document.querySelector('#email').value;
+                let password = document.querySelector('#password').value;
+                
+                fetch('{{ host }}/user/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                })
+                .then(resp => resp.text())
+                .then(resp => console.log(resp))
+                .catch(err => console.error(err))
+            }
         </script>
     </body>
 </html>
