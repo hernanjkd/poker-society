@@ -188,6 +188,8 @@ def file_upload():
             break
     
     if file_has_tournament_headers:
+
+        swapprofit_json = []
         
         for entry in csv_entries:
             trmnt = Tournaments.query.filter_by(
@@ -200,6 +202,11 @@ def file_upload():
                 '%d-%b-%y %I:%M %p')
 
             if trmnt is None:
+                swapprofit_json.append({
+                    **entry,
+                    'new': True
+                })
+
                 db.session.add( Tournaments(
                     casino_id = entry['casino_id'],
                     name = entry['tournament'],
@@ -214,25 +221,35 @@ def file_upload():
         
             else:
                 ref = {
-                    'casino_id': 'casino_id',     'name': 'tournament',
+                    'casino_id': 'casino id',     'name': 'tournament',
                     'buy_in': 'buy-in',           'blinds': 'blinds',
                     'notes': 'notes', 'h1': 'h1', 'date': 'timestamp',
                     'starting_stack': 'starting stack',
                     'results_link': 'results link',
                     'structure_link': 'structure link'
                 }
-                for obj_name, entry_name in ref.items():
-                    if obj_name == 'date':
+                for db_name, entry_name in ref.items():
+                    trmnt_json = {
+                        'id': trmnt.id
+                        'new': False
+                    }
+                    if db_name == 'date':
                         entry[entry_name] = datetime.strptime(
                             f"{entry['date']} {entry['time']}",
                             '%d-%b-%y %I:%M %p')
-                    if getattr(trmnt, obj_name) != entry[entry_name]:
-                        setattr(trmnt, obj_name, entry[entry_name])
+                    if getattr(trmnt, db_name) != entry[entry_name]:
+                        setattr(trmnt, db_name, entry[entry_name])
+                        trmnt_json[db_name] = entry[entry_name]
+                
+                swapprofit_json.append( trmnt_json )
 
             db.session.commit()
             f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) )
 
-            return jsonify({'message':'Tournament csv has been proccessed successfully'}), 200
+        requests.post( os.environ.get('SWAP_PROFIT_API')+ '/tournaments',
+            data = swapprofit_json)
+
+        return jsonify({'message':'Tournament csv has been proccessed successfully'}), 200
             
 
 
@@ -248,7 +265,7 @@ def file_upload():
         tournament_name = None # get tournament name somehow
         trmnt = Tournaments.query.filter_by( name = tournament_name ).first()
         
-        data = {
+        swapprofit_json = {
             "tournament_id": trmnt.id,
             "tournament_buy_in": trmnt.buy_in,
             "tournament_date": trmnt.start_at,
@@ -265,21 +282,18 @@ def file_upload():
 
         for entry in csv_entries:
             
-            user_id = None
-            user = Users.query.filter_by( 
+            user = Users.query.filter_by(
                         first_name = entry['first_name'],
                         middle_name = entry['middle_name'],
                         last_name = entry['last_name']
                     ).first()
             
             if user is not None:
-                user_id = user.id
-
                 won_swaps = Results.query.filter( user_id=user.id ) \
                                         .filter( Results.earnings != None )
                 won_swaps = won_swaps.count() if won_swaps is not None else 0
                 
-                data['users'][user.email] = {
+                swapprofit_json['users'][user.email] = {
                     'position': entry['position'],
                     'winnings': entry['winnings'],
                     'total_winning_swaps': won_swaps
@@ -287,7 +301,7 @@ def file_upload():
 
             db.session.add( Results(
                 tournament_id = trmnt.id,
-                user_id = user_id,
+                user_id = user.id if user is not None else None,
                 first_name = entry['first_name'],
                 middle_name = entry['middle_name'],
                 last_name = entry['last_name'],
@@ -298,7 +312,7 @@ def file_upload():
 
 
         requests.post( os.environ.get('SWAP_PROFIT_API')+ '/results',
-            data={ **data })
+            data = jsonify(swapprofit_json) )
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/results/',f.filename) )
 
         return jsonify({'message':'Results csv has been processed successfully'}), 200
