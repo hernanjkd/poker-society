@@ -209,6 +209,7 @@ def file_upload():
                 db.session.add( Tournaments(
                     casino_id = 1,#entry['casino id'],
                     name = entry['tournament'],
+                    h1 = entry['h1'],
                     buy_in = entry['buy-in'],
                     blinds = entry['blinds'],
                     starting_stack = entry['starting stack'],
@@ -227,23 +228,22 @@ def file_upload():
                     'results_link': 'results link',
                     'structure_link': 'structure link'
                 }
-                entry['starting stack'] = '000'
+                
+                trmnt_json = {
+                    'id': trmnt.id,
+                    'new': False
+                }
                 for db_name, entry_name in ref.items():
-                    trmnt_json = {
-                        'id': trmnt.id,
-                        'new': False
-                    }
-                    if db_name == 'date':
+                    if db_name == 'start_at':
                         entry[entry_name] = datetime.strptime(
                             f"{entry['date']} {entry['time']}",
                             '%d-%b-%y %I:%M %p')
                     if getattr(trmnt, db_name) != entry[entry_name]:
                         setattr(trmnt, db_name, entry[entry_name])
-                        trmnt_json[db_name] = entry[entry_name]
-                
+                        
                 swapprofit_json.append( trmnt_json )
             db.session.commit()
-            return jsonify(swapprofit_json)
+
         
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) )
         requests.post( os.environ.get('SWAP_PROFIT_API')+ '/tournaments',
