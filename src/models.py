@@ -54,7 +54,6 @@ class Casinos(db.Model):
     longitude = db.Column(db.Float)
     latitude = db.Column(db.Float)
     website = db.Column(db.String(100))
-    h1 = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -74,7 +73,6 @@ class Casinos(db.Model):
             'longitude': self.longitude,
             'latitude': self.latitude,
             'website': self.website,
-            'h1': self.h1,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
             'tournaments': [x.serialize() for x in self.tournaments]
@@ -86,9 +84,10 @@ class Tournaments(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     casino_id = db.Column(db.Integer, db.ForeignKey('casinos.id'))
     name = db.Column(db.String(500), nullable=False)
+    h1 = db.Column(db.String(200))
     buy_in = db.Column(db.String(20))
-    blinds = db.Column(db.Integer)
-    starting_stack = db.Column(db.Integer)
+    blinds = db.Column(db.String(10))
+    starting_stack = db.Column(db.String(10))
     results_link = db.Column(db.String(500))
     structure_link = db.Column(db.String(500))
     start_at = db.Column(db.DateTime)
@@ -106,13 +105,16 @@ class Tournaments(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'name': self.name,
             'casino_id': self.casino_id,
+            'name': self.name,
+            'h1': self.h1,
             'buy_in': self.buy_in,
             'blinds': self.blinds,
             'starting_stack': self.starting_stack,
             'results_link': self.results_link,
+            'structure_link': self.structure_link,
             'start_at': self.start_at,
+            'notes': self.notes,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
             'flights': [x.serialize() for x in self.flights]

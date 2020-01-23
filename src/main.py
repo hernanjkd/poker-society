@@ -153,7 +153,7 @@ def file_upload():
     if request.method == 'GET':
         return render_template('file_upload.html', 
                     host = os.environ.get('API_HOST'))
-
+    
     # POST
     f = request.files['csv']
 
@@ -175,40 +175,39 @@ def file_upload():
         if header: 
             header = False
         else: 
-            lst.append(json)
+            csv_entries.append(json)
 
-
-
+    
+    
     # Tournaments
     file_has_tournament_headers = True
     for header in ['date','day','time','where','tournament','buy-in','starting stack',
-                'blinds','structure link','notes','results','entrants','h1','casino id']:
+                'blinds','structure link','notes','results link','h1','casino id']:
         if header not in csv_headers:
             file_has_tournament_headers = False
             break
-    
+            
     if file_has_tournament_headers:
-
+        
         swapprofit_json = []
         
         for entry in csv_entries:
-            trmnt = Tournaments.query.filter_by(
-                        name = entry['tournament'],
-                        date = entry['date'],
-                        time = entry['time'] 
-                    ).first()
             timestamp = datetime.strptime(
                 f"{entry['date']} {entry['time']}",
                 '%d-%b-%y %I:%M %p')
+            trmnt = Tournaments.query.filter_by(
+                        name = entry['tournament'],
+                        start_at = timestamp
+                    ).first()
 
             if trmnt is None:
                 swapprofit_json.append({
                     **entry,
                     'new': True
                 })
-
+                
                 db.session.add( Tournaments(
-                    casino_id = entry['casino_id'],
+                    casino_id = 1,#entry['casino id'],
                     name = entry['tournament'],
                     buy_in = entry['buy-in'],
                     blinds = entry['blinds'],
@@ -223,14 +222,15 @@ def file_upload():
                 ref = {
                     'casino_id': 'casino id',     'name': 'tournament',
                     'buy_in': 'buy-in',           'blinds': 'blinds',
-                    'notes': 'notes', 'h1': 'h1', 'date': 'timestamp',
+                    'notes': 'notes', 'h1': 'h1', 'start_at': 'timestamp',
                     'starting_stack': 'starting stack',
                     'results_link': 'results link',
                     'structure_link': 'structure link'
                 }
+                entry['starting stack'] = '000'
                 for db_name, entry_name in ref.items():
                     trmnt_json = {
-                        'id': trmnt.id
+                        'id': trmnt.id,
                         'new': False
                     }
                     if db_name == 'date':
@@ -242,16 +242,16 @@ def file_upload():
                         trmnt_json[db_name] = entry[entry_name]
                 
                 swapprofit_json.append( trmnt_json )
-
             db.session.commit()
-            f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) )
-
+            return jsonify(swapprofit_json)
+        
+        f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) )
         requests.post( os.environ.get('SWAP_PROFIT_API')+ '/tournaments',
             data = swapprofit_json)
 
         return jsonify({'message':'Tournament csv has been proccessed successfully'}), 200
             
-
+    
 
     # Results
     file_has_results_headers = True
@@ -311,9 +311,9 @@ def file_upload():
             ))
 
 
+        f.save( os.path.join(os.getcwd(),'src/csv_uploads/results/',f.filename) )
         requests.post( os.environ.get('SWAP_PROFIT_API')+ '/results',
             data = jsonify(swapprofit_json) )
-        f.save( os.path.join(os.getcwd(),'src/csv_uploads/results/',f.filename) )
 
         return jsonify({'message':'Results csv has been processed successfully'}), 200
 
@@ -352,9 +352,9 @@ def file_upload():
                         setattr(casino, attr, val)
 
             db.session.commit()
-            f.save( os.path.join(os.getcwd(),'src/csv_uploads/venues/',f.filename) )
 
-            return jsonify({'message':'Venue csv has been proccessed successfully'}), 200
+        f.save( os.path.join(os.getcwd(),'src/csv_uploads/venues/',f.filename) )
+        return jsonify({'message':'Venue csv has been proccessed successfully'}), 200
 
 
     return jsonify({'message':'Unrecognized file'}), 200
