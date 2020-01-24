@@ -157,8 +157,13 @@ def file_upload():
     # POST
     f = request.files['csv']
 
-    f = StringIO( f.read().decode() )
-    file_rows = csv.reader( f, delimiter=',' )
+    r = requests.post( 'http://127.0.0.1:3000/tournaments',
+            # headers = {'Content-Type':'application/json'},
+            data = 'ok')#{'list':'[9,8,7,6]'} )
+    return jsonify(r.text)
+    
+    f_read = StringIO( f.read().decode() )
+    file_rows = csv.reader( f_read, delimiter=',' )
 
     csv_headers = []
     csv_entries = []
@@ -192,6 +197,9 @@ def file_upload():
         swapprofit_json = []
         
         for entry in csv_entries:
+            if entry['tournament'] == '':
+                break
+
             timestamp = datetime.strptime(
                 f"{entry['date']} {entry['time']}",
                 '%d-%b-%y %I:%M %p')
@@ -199,11 +207,19 @@ def file_upload():
                         name = entry['tournament'],
                         start_at = timestamp
                     ).first()
+            entry['casino id'] = 1
+            casino = Casinos.query.get( entry['casino id'] )
+            if casino is None:
+                raise APIException('Casino not found with id: '+entry['casino id'], 404)
+            casino_data = {}
+            for prop in ['address','city','state','zip_code','longitude','latitude']:
+                casino_data[prop] = getattr(casino, prop)
 
             if trmnt is None:
                 swapprofit_json.append({
+                    'new': True,
                     **entry,
-                    'new': True
+                    **casino_data
                 })
                 
                 db.session.add( Tournaments(
@@ -228,10 +244,11 @@ def file_upload():
                     'results_link': 'results link',
                     'structure_link': 'structure link'
                 }
-                
+                entry['casino id'] = 1
                 trmnt_json = {
+                    'new': False,
                     'id': trmnt.id,
-                    'new': False
+                    **casino_data
                 }
                 for db_name, entry_name in ref.items():
                     if db_name == 'start_at':
@@ -246,9 +263,9 @@ def file_upload():
 
         
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) )
-        requests.post( os.environ.get('SWAP_PROFIT_API')+ '/tournaments',
+        r = requests.post( os.environ.get('SWAP_PROFIT_API')+ '/tournaments',
             data = swapprofit_json)
-
+        return jsonify(r)
         return jsonify({'message':'Tournament csv has been proccessed successfully'}), 200
             
     
