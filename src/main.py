@@ -156,11 +156,6 @@ def file_upload():
     
     # POST
     f = request.files['csv']
-
-    r = requests.post( 'http://127.0.0.1:3000/tournaments',
-            # headers = {'Content-Type':'application/json'},
-            data = 'ok')#{'list':'[9,8,7,6]'} )
-    return jsonify(r.text)
     
     f_read = StringIO( f.read().decode() )
     file_rows = csv.reader( f_read, delimiter=',' )
@@ -182,7 +177,6 @@ def file_upload():
         else: 
             csv_entries.append(json)
 
-    
     
     # Tournaments
     file_has_tournament_headers = True
@@ -264,8 +258,8 @@ def file_upload():
         
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) )
         r = requests.post( os.environ.get('SWAP_PROFIT_API')+ '/tournaments',
-            data = swapprofit_json)
-        return jsonify(r)
+            json=swapprofit_json)
+        return r.text
         return jsonify({'message':'Tournament csv has been proccessed successfully'}), 200
             
     
