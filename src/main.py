@@ -149,7 +149,7 @@ def get_user(user_id):
 @app.route('/upload_files', methods=['GET','POST'])
 # @role_jwt_required(['admin'])
 def file_upload():
-
+    
     # GET    
     if request.method == 'GET':
         return render_template('file_upload.html', 
@@ -188,13 +188,13 @@ def file_upload():
             if entry['tournament'] == '':
                 break
 
-            timestamp = datetime.strptime(
+            entry['start_at'] = datetime.strptime(
                 f"{entry['date']} {entry['time']}",
                 '%d-%b-%y %I:%M %p')
                 
             trmnt = Tournaments.query.filter_by(
                         name = entry['tournament'],
-                        start_at = timestamp
+                        start_at = entry['start_at']
                     ).first()
 
             entry['casino id'] = 1
@@ -220,7 +220,7 @@ def file_upload():
                     starting_stack = entry['starting stack'],
                     results_link = entry['results link'],
                     structure_link = entry['structure link'],
-                    start_at = timestamp,
+                    start_at = entry['start_at'],
                     notes = entry['notes']
                 )
                 db.session.add( new_trmnt )
@@ -230,43 +230,31 @@ def file_upload():
         
             else:
                 trmnt_json['id'] = trmnt.id
-                ref = {
-                    'casino_id': 'casino id',     'name': 'tournament',
+                db_fields = {'casino_id': 'casino id',  'name': 'tournament',
                     'buy_in': 'buy-in',           'blinds': 'blinds',
-                    'notes': 'notes', 'h1': 'h1', 'start_at': 'timestamp',
+                    'notes': 'notes', 'h1': 'h1', 'start_at': 'start_at',
                     'starting_stack': 'starting stack',
                     'results_link': 'results link',
-                    'structure_link': 'structure link'
-                }
-                for db_name, entry_name in ref.items():
-                    if db_name == 'start_at':
-                        entry[entry_name] = datetime.strptime(
-                            f"{entry['date']} {entry['time']}",
-                            '%d-%b-%y %I:%M %p')
+                    'structure_link': 'structure link'}
+                for db_name, entry_name in db_fields.items():
                     if getattr(trmnt, db_name) != entry[entry_name]:
                         setattr(trmnt, db_name, entry[entry_name])
                         
             db.session.commit()
+
+            trmnt_json['start_at'] = str( trmnt_json['start_at'] )
             swapprofit_json.append( trmnt_json )
 
         
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) )
         r = requests.post('http://127.0.0.1:3000/tournaments', json=swapprofit_json)
 
-        return r.json()
-        return jsonify({'message':'Tournament csv has been proccessed successfully'}), 200
+        return r.json()['message']
             
     
 
     # Results
-    file_has_results_headers = True
-    for header in ['place','nationality','first_name','middle_name',
-                    'last_name','winnings','tps points']:
-        if header not in csv_headers:
-            file_has_results_headers = False
-            break
-
-    if file_has_results_headers:
+    if utils.are_headers_for('results', csv_headers):
         tournament_name = None # get tournament name somehow
         trmnt = Tournaments.query.filter_by( name = tournament_name ).first()
         
@@ -324,14 +312,7 @@ def file_upload():
 
 
     # Venues
-    file_has_venue_headers = True
-    for header in ['name','address','city','state','zip_code','longitude',
-                    'latitude','website']:
-        if header not in csv_headers:
-            file_has_venue_headers = False
-            break
-    
-    if file_has_venue_headers:
+    if utils.are_headers_for('venues', csv_headers):
         
         for entry in csv_entries:
             casino = Casinos.query.filter_by(
