@@ -188,9 +188,9 @@ def file_upload():
             if entry['tournament'] == '':
                 break
 
-            entry['start_at'] = datetime.strptime(
+            entry['start_at'] = str( datetime.strptime(
                 f"{entry['date']} {entry['time']}",
-                '%d-%b-%y %I:%M %p')
+                '%d-%b-%y %I:%M %p') )
                 
             trmnt = Tournaments.query.filter_by(
                         name = entry['tournament'],
@@ -231,8 +231,8 @@ def file_upload():
             else:
                 trmnt_json['id'] = trmnt.id
                 db_fields = {'casino_id': 'casino id',  'name': 'tournament',
-                    'buy_in': 'buy-in',           'blinds': 'blinds',
-                    'notes': 'notes', 'h1': 'h1', 'start_at': 'start_at',
+                    'buy_in': 'buy-in', 'blinds': 'blinds', 'h1': 'h1',
+                    'notes': 'notes', 'start_at': 'start_at',
                     'starting_stack': 'starting stack',
                     'results_link': 'results link',
                     'structure_link': 'structure link'}
@@ -241,8 +241,6 @@ def file_upload():
                         setattr(trmnt, db_name, entry[entry_name])
                         
             db.session.commit()
-
-            trmnt_json['start_at'] = str( trmnt_json['start_at'] )
             swapprofit_json.append( trmnt_json )
 
         

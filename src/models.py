@@ -183,3 +183,25 @@ class Results(db.Model):
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
+
+
+class Subscribers(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    company_name = db.Column(db.String(100))
+    api_host = db.Column(db.String(100))
+    api_token = db.Column(db.String(300))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Subscribers {self.company_name}>'
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'company_name': self.company_name,
+            'api_host': self.api_host,
+            'api_token': self.api_token,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
+        }
