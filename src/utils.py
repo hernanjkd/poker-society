@@ -55,6 +55,17 @@ def resolve_pagination(request_args, limit_default=10):
     
     return offset, limit
 
+def are_headers_for(table, csv_headers):
+    if table == 'tournament':
+        trmnt_headers = ['date','day','time','where','tournament','buy-in',
+            'starting stack', 'blinds','structure link','notes','results link',
+            'h1','casino id']
+        for header in trmnt_headers:
+            if header not in csv_headers:
+                return False
+        return True
+    return False
+
 # Notes: 'admin' will have access even if arg not passed
 def role_jwt_required(valid_roles=['invalid']):
     def decorator(func):

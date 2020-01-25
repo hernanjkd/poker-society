@@ -2,12 +2,13 @@ import re
 import os
 import csv
 import requests
+import utils
 from flask import Flask, request, jsonify, render_template
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt
 from admin import SetupAdmin
-from utils import APIException, check_params, update_table, sha256, role_jwt_required
+from utils import APIException, role_jwt_required
 from models import db, Users, Casinos, Tournaments, Flights, Results
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
@@ -87,12 +88,12 @@ def testing():
 def register():
 
     json = request.get_json()
-    check_params(json, 'email')
+    utils.check_params(json, 'email')
 
     if 'password' in json:
         user = Users.query.filter_by(
             email = json['email'],
-            password = sha256( json['passowrd'] )
+            password = utils.sha256( json['passowrd'] )
         )
         if user is None:
             raise APIException('User not found', 404)
@@ -115,11 +116,11 @@ def login():
             host=os.environ.get('API_HOST'))
 
     json = request.get_json()
-    check_params(json, 'email', 'password')
+    utils.check_params(json, 'email', 'password')
 
     user = Users.query.filter_by( 
         email = json['email'],
-        password = sha256( json['password'] )
+        password = utils.sha256( json['password'] )
     ).first()
     if user is None:
         return render_template('login.html',
@@ -179,14 +180,7 @@ def file_upload():
 
     
     # Tournaments
-    file_has_tournament_headers = True
-    for header in ['date','day','time','where','tournament','buy-in','starting stack',
-                'blinds','structure link','notes','results link','h1','casino id']:
-        if header not in csv_headers:
-            file_has_tournament_headers = False
-            break
-            
-    if file_has_tournament_headers:
+    if utils.are_headers_for('tournament', csv_headers):
         
         swapprofit_json = []
         
@@ -197,10 +191,12 @@ def file_upload():
             timestamp = datetime.strptime(
                 f"{entry['date']} {entry['time']}",
                 '%d-%b-%y %I:%M %p')
+                
             trmnt = Tournaments.query.filter_by(
                         name = entry['tournament'],
                         start_at = timestamp
                     ).first()
+
             entry['casino id'] = 1
             casino = Casinos.query.get( entry['casino id'] )
             if casino is None:
@@ -208,15 +204,14 @@ def file_upload():
             casino_data = {}
             for prop in ['address','city','state','zip_code','longitude','latitude']:
                 casino_data[prop] = getattr(casino, prop)
-
-            if trmnt is None:
-                swapprofit_json.append({
-                    'new': True,
-                    **entry,
-                    **casino_data
-                })
-                
-                db.session.add( Tournaments(
+            
+            trmnt_json = {
+                **entry,
+                **casino_data
+            }
+            
+            if trmnt is None:  
+                new_trmnt = Tournaments(
                     casino_id = 1,#entry['casino id'],
                     name = entry['tournament'],
                     h1 = entry['h1'],
@@ -227,9 +222,14 @@ def file_upload():
                     structure_link = entry['structure link'],
                     start_at = timestamp,
                     notes = entry['notes']
-                ))
+                )
+                db.session.add( new_trmnt )
+                db.session.flush()
+
+                trmnt_json['id'] = new_trmnt.id
         
             else:
+                trmnt_json['id'] = trmnt.id
                 ref = {
                     'casino_id': 'casino id',     'name': 'tournament',
                     'buy_in': 'buy-in',           'blinds': 'blinds',
@@ -237,12 +237,6 @@ def file_upload():
                     'starting_stack': 'starting stack',
                     'results_link': 'results link',
                     'structure_link': 'structure link'
-                }
-                entry['casino id'] = 1
-                trmnt_json = {
-                    'new': False,
-                    'id': trmnt.id,
-                    **casino_data
                 }
                 for db_name, entry_name in ref.items():
                     if db_name == 'start_at':
@@ -252,14 +246,14 @@ def file_upload():
                     if getattr(trmnt, db_name) != entry[entry_name]:
                         setattr(trmnt, db_name, entry[entry_name])
                         
-                swapprofit_json.append( trmnt_json )
             db.session.commit()
+            swapprofit_json.append( trmnt_json )
 
         
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) )
-        r = requests.post( os.environ.get('SWAP_PROFIT_API')+ '/tournaments',
-            json=swapprofit_json)
-        return r.text
+        r = requests.post('http://127.0.0.1:3000/tournaments', json=swapprofit_json)
+
+        return r.json()
         return jsonify({'message':'Tournament csv has been proccessed successfully'}), 200
             
     
@@ -383,9 +377,9 @@ def get_update_user(id):
         return jsonify(user.serialize())
 
     req = request.get_json()
-    check_params(req)
+    utils.check_params(req)
 
-    update_table(user, req, ignore=['email','password'])
+    utils.update_table(user, req, ignore=['email','password'])
     db.session.commit()
 
     return jsonify(user.serialize())
