@@ -9,7 +9,8 @@ from flask_cors import CORS
 from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt
 from admin import SetupAdmin
 from utils import APIException, role_jwt_required
-from models import db, Users, Casinos, Tournaments, Flights, Results
+from models import db, Users, Casinos, Tournaments, Flights, Results, \
+    Subscribers
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
 from io import StringIO
@@ -245,7 +246,15 @@ def file_upload():
 
         
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) )
-        r = requests.post('http://127.0.0.1:3000/tournaments', json=swapprofit_json)
+        
+        swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
+        if swapprofit is None:
+            raise APIException('Swap Profit not a subscriber', 404)
+        r = requests.post(
+            swapprofit.api_host +'/tournaments',
+            headers={'Authorization': 'Bearer '+ swapprofit.api_token},
+            json=swapprofit_json
+        )
 
         return r.json()['message']
             

@@ -1,6 +1,7 @@
 from flask_admin.contrib.sqla import ModelView
 from flask_admin import Admin, AdminIndexView, expose, BaseView
-from models import db, Users, Casinos, Tournaments, Flights, Results
+from models import db, Users, Casinos, Tournaments, Flights, Results, \
+    Subscribers
 
 
 def SetupAdmin(app):
@@ -33,7 +34,8 @@ def SetupAdmin(app):
         CustomView( Casinos, db.session ),
         CustomView( Tournaments, db.session ),
         CustomView( Flights, db.session ),
-        CustomView( Results, db.session )
+        CustomView( Results, db.session ),
+        CustomView( Subscribers, db.session )
     )
 
     return admin
