@@ -1,8 +1,10 @@
-import re
 import os
+import re
+import io
 import csv
-import requests
 import utils
+import actions
+import requests
 from flask import Flask, request, jsonify, render_template
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -13,8 +15,6 @@ from models import db, Users, Casinos, Tournaments, Flights, Results, \
     Subscribers
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
-from io import StringIO
-from datetime import datetime
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -159,9 +159,9 @@ def file_upload():
     # POST
     f = request.files['csv']
     
-    f_read = StringIO( f.read().decode() )
+    f_read = io.StringIO( f.read().decode() )    
     file_rows = csv.reader( f_read, delimiter=',' )
-
+    
     csv_headers = []
     csv_entries = []
     header = True
@@ -176,74 +176,15 @@ def file_upload():
                 json[ csv_headers[i] ] = val.strip()
         if header: 
             header = False
+            return jsonify(csv_headers)
         else: 
             csv_entries.append(json)
 
     
     # Tournaments
     if utils.are_headers_for('tournament', csv_headers):
-        
-        swapprofit_json = []
-        
-        for entry in csv_entries:
-            if entry['tournament'] == '':
-                break
 
-            entry['start_at'] = str( datetime.strptime(
-                f"{entry['date']} {entry['time']}",
-                '%d-%b-%y %I:%M %p') )
-                
-            trmnt = Tournaments.query.filter_by(
-                        name = entry['tournament'],
-                        start_at = entry['start_at']
-                    ).first()
-
-            entry['casino id'] = 1
-            casino = Casinos.query.get( entry['casino id'] )
-            if casino is None:
-                raise APIException('Casino not found with id: '+entry['casino id'], 404)
-            casino_data = {}
-            for prop in ['address','city','state','zip_code','longitude','latitude']:
-                casino_data[prop] = getattr(casino, prop)
-            
-            trmnt_json = {
-                **entry,
-                **casino_data
-            }
-            
-            if trmnt is None:  
-                new_trmnt = Tournaments(
-                    casino_id = 1,#entry['casino id'],
-                    name = entry['tournament'],
-                    h1 = entry['h1'],
-                    buy_in = entry['buy-in'],
-                    blinds = entry['blinds'],
-                    starting_stack = entry['starting stack'],
-                    results_link = entry['results link'],
-                    structure_link = entry['structure link'],
-                    start_at = entry['start_at'],
-                    notes = entry['notes']
-                )
-                db.session.add( new_trmnt )
-                db.session.flush()
-
-                trmnt_json['id'] = new_trmnt.id
-        
-            else:
-                trmnt_json['id'] = trmnt.id
-                db_fields = {'casino_id': 'casino id',  'name': 'tournament',
-                    'buy_in': 'buy-in', 'blinds': 'blinds', 'h1': 'h1',
-                    'notes': 'notes', 'start_at': 'start_at',
-                    'starting_stack': 'starting stack',
-                    'results_link': 'results link',
-                    'structure_link': 'structure link'}
-                for db_name, entry_name in db_fields.items():
-                    if getattr(trmnt, db_name) != entry[entry_name]:
-                        setattr(trmnt, db_name, entry[entry_name])
-                        
-            db.session.commit()
-            swapprofit_json.append( trmnt_json )
-
+        swapprofit_json = actions.process_tournament_csv( csv_entries )
         
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) )
         
@@ -262,54 +203,8 @@ def file_upload():
 
     # Results
     if utils.are_headers_for('results', csv_headers):
-        tournament_name = None # get tournament name somehow
-        trmnt = Tournaments.query.filter_by( name = tournament_name ).first()
         
-        swapprofit_json = {
-            "tournament_id": trmnt.id,
-            "tournament_buy_in": trmnt.buy_in,
-            "tournament_date": trmnt.start_at,
-            "tournament_name": trmnt.name,
-            "results_link": '', # find out how to get the results link
-            "users": {
-                "sdfoij@yahoo.com": {
-                    "position": 11,
-                    "winnings": 200,
-                    "total_winning_swaps": 234
-                }
-            }
-        }
-
-        for entry in csv_entries:
-            
-            user = Users.query.filter_by(
-                        first_name = entry['first_name'],
-                        middle_name = entry['middle_name'],
-                        last_name = entry['last_name']
-                    ).first()
-            
-            if user is not None:
-                won_swaps = Results.query.filter( user_id=user.id ) \
-                                        .filter( Results.earnings != None )
-                won_swaps = won_swaps.count() if won_swaps is not None else 0
-                
-                swapprofit_json['users'][user.email] = {
-                    'position': entry['position'],
-                    'winnings': entry['winnings'],
-                    'total_winning_swaps': won_swaps
-                }
-
-            db.session.add( Results(
-                tournament_id = trmnt.id,
-                user_id = user.id if user is not None else None,
-                first_name = entry['first_name'],
-                middle_name = entry['middle_name'],
-                last_name = entry['last_name'],
-                nationality = entry['nationality'],
-                position = entry['position'],
-                winnings = entry['winnings']
-            ))
-
+        swapprofit_json = actions.process_results_csv( csv_entries )
 
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/results/',f.filename) )
         requests.post( os.environ.get('SWAP_PROFIT_API')+ '/results',
@@ -321,30 +216,7 @@ def file_upload():
     # Venues
     if utils.are_headers_for('venues', csv_headers):
         
-        for entry in csv_entries:
-            casino = Casinos.query.filter_by(
-                name = entry['name'],
-                address = entry['address']
-            )    
-            
-            if casino is None:
-                db.session.add( Casinos(
-                    name = entry['name'],
-                    address = entry['address'],
-                    city = entry['city'],
-                    state = entry['state'],
-                    zip_code = entry['zip_code'],
-                    longitude = entry['longitude'],
-                    latitude = entry['latitude'],
-                    website = entry['website']
-                ))
-
-            else:
-                for attr, val in entry:
-                    if getattr(casino, attr) != val:
-                        setattr(casino, attr, val)
-
-            db.session.commit()
+        actions.process_venues_csv( csv_entries )
 
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/venues/',f.filename) )
         return jsonify({'message':'Venue csv has been proccessed successfully'}), 200
