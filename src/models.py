@@ -45,7 +45,7 @@ class Users(db.Model):
 
 class Casinos(db.Model):
     __tablename__ = 'casinos'
-    id = db.Column(db.String(10), primary_key=True)
+    id = db.Column(db.String(10), primary_key=True, nullable=False)
     name = db.Column(db.String(500), nullable=False)
     address = db.Column(db.String(200))
     city = db.Column(db.String(50))
@@ -82,7 +82,7 @@ class Casinos(db.Model):
 class Tournaments(db.Model):
     __tablename__ = 'tournaments'
     id = db.Column(db.Integer, primary_key=True)
-    casino_id = db.Column(db.Integer, db.ForeignKey('casinos.id'))
+    casino_id = db.Column(db.String(10), db.ForeignKey('casinos.id'))
     name = db.Column(db.String(500), nullable=False)
     h1 = db.Column(db.String(200))
     buy_in = db.Column(db.String(20))

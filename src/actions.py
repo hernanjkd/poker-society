@@ -84,7 +84,6 @@ def process_results_csv(csv_entries):
             #     "position": 11,
             #     "winnings": 200,
             #     "total_winning_swaps": 234
-            }
         }
     }
 
