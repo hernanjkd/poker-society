@@ -45,7 +45,7 @@ class Users(db.Model):
 
 class Casinos(db.Model):
     __tablename__ = 'casinos'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(10), primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     address = db.Column(db.String(200))
     city = db.Column(db.String(50))

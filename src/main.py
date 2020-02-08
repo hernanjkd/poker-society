@@ -216,10 +216,14 @@ def file_upload():
     # Venues
     if utils.are_headers_for('venues', csv_headers):
         
-        actions.process_venues_csv( csv_entries )
+        id_list = actions.process_venues_csv( csv_entries )
 
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/venues/',f.filename) )
-        return jsonify({'message':'Venue csv has been proccessed successfully'}), 200
+        return jsonify({
+            'message':'Venue csv has been proccessed successfully',
+            'id_list': id_list
+        }), 200
+
 
 
     return jsonify({'message':'Unrecognized file'}), 200

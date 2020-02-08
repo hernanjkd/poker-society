@@ -20,7 +20,6 @@ def process_tournament_csv(csv_entries):
                     start_at = entry['start_at']
                 ).first()
 
-        entry['casino id'] = 1
         casino = Casinos.query.get( entry['casino id'] )
         if casino is None:
             raise APIException('Casino not found with id: '+entry['casino id'], 404)
@@ -35,7 +34,7 @@ def process_tournament_csv(csv_entries):
         
         if trmnt is None:  
             new_trmnt = Tournaments(
-                casino_id = 1,#entry['casino id'],
+                casino_id = entry['casino id'],
                 name = entry['tournament'],
                 h1 = entry['h1'],
                 buy_in = entry['buy-in'],
@@ -118,17 +117,17 @@ def process_results_csv(csv_entries):
             position = entry['position'],
             winnings = entry['winnings']
         ))
+        db.session.commit()
 
     return swapprofit_json
 
 
 def process_venues_csv(csv_entries):
 
+    id_list = []
+
     for entry in csv_entries:
-        casino = Casinos.query.filter_by(
-            name = entry['name'],
-            address = entry['address']
-        )    
+        casino = Casinos.query.get( entry['casino id'] )    
         
         if casino is None:
             db.session.add( Casinos(
@@ -136,7 +135,7 @@ def process_venues_csv(csv_entries):
                 address = entry['address'],
                 city = entry['city'],
                 state = entry['state'],
-                zip_code = entry['zip_code'],
+                zip_code = entry['zip code'],
                 longitude = entry['longitude'],
                 latitude = entry['latitude'],
                 website = entry['website']
@@ -148,5 +147,11 @@ def process_venues_csv(csv_entries):
                     setattr(casino, attr, val)
 
         db.session.commit()
+        id_list.append({
+            'id': casino.id,
+            'name': entry['name'],
+            'city': entry['city'],
+            'state': entry['state']
+        })
 
-    return True
+    return id_list
