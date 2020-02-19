@@ -157,6 +157,9 @@ def file_upload():
                     host = os.environ.get('API_HOST'))
     
     # POST
+    if 'csv' not in request.files:
+        raise APIException('"csv" property missing in the files array', 404)
+    
     f = request.files['csv']
     
     f_read = io.StringIO( f.read().decode() )    
@@ -176,7 +179,6 @@ def file_upload():
                 json[ csv_headers[i] ] = val.strip()
         if header: 
             header = False
-            return jsonify(csv_headers)
         else: 
             csv_entries.append(json)
 

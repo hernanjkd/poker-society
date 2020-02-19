@@ -17,6 +17,3 @@ with open('src/zip_codes.json', 'w') as f:
     
 
 print('ok')
-
-# with open('src/zip_codes.json') as f:
-#     print(json.load(f)['33185'])
