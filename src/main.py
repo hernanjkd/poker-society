@@ -58,30 +58,29 @@ def add_claims_to_access_token(kwargs={}):
 
 
 
-@app.route('/testing')
+@app.route('/testing', methods=['POST'])
 def testing():
 
-    from run_seeds import run_seeds
-    # run_seeds()
+    import pandas as pd
 
-    trmnts = Tournaments.query.get(1)
+    df = pd.read_csv( request.files['csv'] )
 
-    t1 = Tournaments(
-        casino_id = 1,
-        name = 'Testing',
-        buy_in = '',
-        blinds = 0,
-        starting_stack = 0,
-        results_link = '',
-        structure_link = '',
-        start_at = datetime.strptime('1-Dec-19 9:00 AM', '%d-%b-%y %I:%M %p'),
-        notes = ''
-    )
-    db.session.add(t1)
-    db.session.flush()
-    return str(t1.id)
+    headers = list(df)
+    rows = df.shape[0]
+    
+    iter_df = df.iterrows()
+    
+    print( next(iter_df)[1]['Date'] )
 
-    return jsonify(trmnts.start_at == datetime.strptime('1-Dec-19 9:00 AM', '%d-%b-%y %I:%M %p'))
+    # for row in iter_df:
+    #     print(row)
+
+    return jsonify('ok')
+
+    return jsonify({
+        'headers': headers,
+        'rows': rows
+    })
 
 
 
