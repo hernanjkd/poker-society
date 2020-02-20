@@ -5,6 +5,7 @@ import csv
 import utils
 import actions
 import requests
+import pandas as pd
 from flask import Flask, request, jsonify, render_template
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -59,16 +60,17 @@ def add_claims_to_access_token(kwargs={}):
 
 
 @app.route('/testing', methods=['POST'])
-def testing():
-
-    import pandas as pd
+def testing(): 
 
     df = pd.read_csv( request.files['csv'] )
 
-    for row in df.iterrows():
-        return jsonify(row)
-    
+    ref = {'Date':'', 'Day':'', 'Time':'', 'Tournament':'', 'Buy-in':'', 'Starting Stack':'',
+        'Blinds':'', 'Structure Link':'', 'Casino ID':'', 'Tournament ID':''}
 
+    for row in df.iterrows():
+        
+        return row[1]['Notes']
+    
 
 
 @app.route('/user', methods=['POST'])
