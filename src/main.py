@@ -65,22 +65,9 @@ def testing():
 
     df = pd.read_csv( request.files['csv'] )
 
-    headers = list(df)
-    rows = df.shape[0]
+    for row in df.iterrows():
+        return jsonify(row)
     
-    iter_df = df.iterrows()
-    
-    print( next(iter_df)[1]['Date'] )
-
-    # for row in iter_df:
-    #     print(row)
-
-    return jsonify('ok')
-
-    return jsonify({
-        'headers': headers,
-        'rows': rows
-    })
 
 
 
