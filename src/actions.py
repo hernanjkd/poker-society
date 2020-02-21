@@ -11,9 +11,9 @@ def process_tournament_csv(csv_entries):
         if entry['tournament'] == '':
             break
 
-        entry['start_at'] = str( datetime.strptime(
+        entry['start_at'] = datetime.strptime(
             f"{entry['date']} {entry['time']}",
-            '%d-%b-%y %I:%M %p') )
+            '%d-%b-%y %I:%M %p')
             
         trmnt = Tournaments.query.filter_by(
                     name = entry['tournament'],

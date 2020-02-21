@@ -9,7 +9,7 @@ import pandas as pd
 from flask import Flask, request, jsonify, render_template
 from flask_migrate import Migrate
 from flask_cors import CORS
-from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt
+from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt, jwt_required
 from admin import SetupAdmin
 from utils import APIException, role_jwt_required
 from models import db, Users, Casinos, Tournaments, Flights, Results, \
@@ -20,13 +20,14 @@ from sqlalchemy import asc, desc
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.secret_key = os.environ.get('FLASK_KEY')
+app.config['JWT_SECRET_KEY'] = 'super secret key'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db)
 db.init_app(app)
 CORS(app)
 
-jwt = JWTManager(app)
+JWTManager(app)
 SetupAdmin(app)
 
 
@@ -35,27 +36,30 @@ SetupAdmin(app)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
-
+@app.route('/jwt')
+@jwt_required
+def jwt():
+    return jsonify(create_jwt(identity='hello'))
 
 ######################################################################
 # Takes in a dictionary with id, role and expiration date in minutes
 #        create_jwt({ 'id': 100, 'role': 'admin', 'exp': 15 })
 ######################################################################
-@jwt.jwt_data_loader
-def add_claims_to_access_token(kwargs={}):
-    now = datetime.utcnow()
-    kwargs = kwargs if isinstance(kwargs, dict) else {}
-    id = kwargs.get('id')
-    role = kwargs.get('role', 'invalid')
-    exp = kwargs.get('exp', 15)
+# @jwt.jwt_data_loader
+# def add_claims_to_access_token(kwargs={}):
+#     now = datetime.utcnow()
+#     kwargs = kwargs if isinstance(kwargs, dict) else {}
+#     id = kwargs.get('id')
+#     role = kwargs.get('role', 'invalid')
+#     exp = kwargs.get('exp', 15)
 
-    return {
-        'exp': now + timedelta(minutes=exp),
-        'iat': now,
-        'nbf': now,
-        'sub': id,
-        'role': role
-    }
+#     return {
+#         'exp': now + timedelta(minutes=exp),
+#         'iat': now,
+#         'nbf': now,
+#         'sub': id,
+#         'role': role
+#     }
 
 
 
@@ -63,14 +67,39 @@ def add_claims_to_access_token(kwargs={}):
 def testing(): 
 
     df = pd.read_csv( request.files['csv'] )
-
-    ref = {'Date':'', 'Day':'', 'Time':'', 'Tournament':'', 'Buy-in':'', 'Starting Stack':'',
-        'Blinds':'', 'Structure Link':'', 'Casino ID':'', 'Tournament ID':''}
-
-    for row in df.iterrows():
-        
-        return row[1]['Notes']
     
+    ref = {'Tournament':'name', 'Buy-in':'buy_in', 'Starting Stack':'starting_stack',
+        'Blinds':'blinds', 'Structure Link':'structure_link', 'Casino ID':'casino_id', 
+        'Tournament ID':'id', 'H1':'h1', 'Notes - LOU':'notes', 'Results Link':'results_link',
+        'start_at':'start_at'}
+    
+    lst = []
+    for row in df.iterrows():
+        r = row[1]
+        if not isinstance(r['Tournament'], str):
+            continue
+        
+        date = datetime.strptime(
+            f"{r['Date']} {r['Time']}",
+            '%d-%b-%y %I:%M %p')
+
+        trmnt = Tournaments(
+            casino_id = r['Casino ID'],
+            name = r['Tournament'],
+            h1 = r['H1'],
+            buy_in = r['Buy-in'],
+            blinds = r['Blinds'],
+            starting_stack = r['Starting Stack'],
+            results_link = r['Results Link'],
+            structure_link = r['Structure Link'],
+            start_at = r['start_at'],
+            notes = r['Notes - LOU']
+        )
+        db.session.add( trmnt )
+        db.session.flush()
+
+
+    return jsonify(lst)
 
 
 @app.route('/user', methods=['POST'])
