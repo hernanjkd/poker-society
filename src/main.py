@@ -66,37 +66,51 @@ def jwt():
 @app.route('/testing', methods=['POST'])
 def testing(): 
 
-    df = pd.read_csv( request.files['csv'] )
-    
     ref = {'Tournament':'name', 'Buy-in':'buy_in', 'Starting Stack':'starting_stack',
         'Blinds':'blinds', 'Structure Link':'structure_link', 'Casino ID':'casino_id', 
         'Tournament ID':'id', 'H1':'h1', 'Notes - LOU':'notes', 'Results Link':'results_link',
         'start_at':'start_at'}
     
+    df = pd.read_csv( request.files['csv'] )
+    
     lst = []
     for row in df.iterrows():
         r = row[1]
-        if not isinstance(r['Tournament'], str):
+        if not isinstance( r['Tournament'], str ):
             continue
         
-        date = datetime.strptime(
+        start_at = datetime.strptime(
             f"{r['Date']} {r['Time']}",
             '%d-%b-%y %I:%M %p')
 
-        trmnt = Tournaments(
-            casino_id = r['Casino ID'],
-            name = r['Tournament'],
-            h1 = r['H1'],
-            buy_in = r['Buy-in'],
-            blinds = r['Blinds'],
-            starting_stack = r['Starting Stack'],
-            results_link = r['Results Link'],
-            structure_link = r['Structure Link'],
-            start_at = r['start_at'],
-            notes = r['Notes - LOU']
-        )
-        db.session.add( trmnt )
-        db.session.flush()
+
+        # the tournament id hasn't been saved so it is a new tournament
+        if not isinstance( r['Tournament ID'], str ):
+
+            trmnt = Tournaments(
+                casino_id = r['Casino ID'],
+                name = r['Tournament'],
+                h1 = r['H1'],
+                buy_in = r['Buy-in'],
+                blinds = r['Blinds'],
+                starting_stack = r['Starting Stack'],
+                results_link = r['Results Link'],
+                structure_link = r['Structure Link'],
+                start_at = r['start_at'],
+                notes = r['Notes - LOU'],
+                start_at = start_at
+            )
+            db.session.add( trmnt )
+            db.session.commit()
+            
+            r['Tournament ID'] = trmnt.id
+
+        
+        else:
+            trmnt = Tournaments.query.get( r['Tournament ID'] )
+            for file_header, db_column in ref:
+                if r[file_header] != getattr(trmnt, db_column):
+                    setattr(trmnt, db_column, r[file_header])
 
 
     return jsonify(lst)
