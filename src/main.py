@@ -68,12 +68,11 @@ def testing():
 
     ref = {'Tournament':'name', 'Buy-in':'buy_in', 'Starting Stack':'starting_stack',
         'Blinds':'blinds', 'Structure Link':'structure_link', 'Casino ID':'casino_id', 
-        'Tournament ID':'id', 'H1':'h1', 'Notes - LOU':'notes', 'Results Link':'results_link',
-        'start_at':'start_at'}
+        'Tournament ID':'id', 'H1':'h1', 'Notes':'notes', 'Results Link':'results_link'}
     
+
     df = pd.read_csv( request.files['csv'] )
     
-    lst = []
     for row in df.iterrows():
         r = row[1]
         if not isinstance( r['Tournament'], str ):
@@ -88,7 +87,7 @@ def testing():
         if not isinstance( r['Tournament ID'], str ):
 
             trmnt = Tournaments(
-                casino_id = r['Casino ID'],
+                # casino_id = r['Casino ID'],
                 name = r['Tournament'],
                 h1 = r['H1'],
                 buy_in = r['Buy-in'],
@@ -96,8 +95,7 @@ def testing():
                 starting_stack = r['Starting Stack'],
                 results_link = r['Results Link'],
                 structure_link = r['Structure Link'],
-                start_at = r['start_at'],
-                notes = r['Notes - LOU'],
+                notes = r['Notes'],
                 start_at = start_at
             )
             db.session.add( trmnt )
@@ -109,11 +107,15 @@ def testing():
         else:
             trmnt = Tournaments.query.get( r['Tournament ID'] )
             for file_header, db_column in ref:
-                if r[file_header] != getattr(trmnt, db_column):
+                if getattr(trmnt, db_column) != r[file_header]:
                     setattr(trmnt, db_column, r[file_header])
+            if trmnt.start_at != start_at:
+                trmnt.start_at = start_at
+            db.session.commit()
+                
 
 
-    return jsonify(lst)
+    return 'ok'
 
 
 @app.route('/user', methods=['POST'])
