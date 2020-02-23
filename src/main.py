@@ -65,57 +65,8 @@ def jwt():
 
 @app.route('/testing', methods=['POST'])
 def testing(): 
-
-    ref = {'Tournament':'name', 'Buy-in':'buy_in', 'Starting Stack':'starting_stack',
-        'Blinds':'blinds', 'Structure Link':'structure_link', 'Casino ID':'casino_id', 
-        'Tournament ID':'id', 'H1':'h1', 'Notes':'notes', 'Results Link':'results_link'}
     
-
-    df = pd.read_csv( request.files['csv'] )
-    
-    for row in df.iterrows():
-        r = row[1]
-        if not isinstance( r['Tournament'], str ):
-            continue
-        
-        start_at = datetime.strptime(
-            f"{r['Date']} {r['Time']}",
-            '%d-%b-%y %I:%M %p')
-
-
-        # the tournament id hasn't been saved so it is a new tournament
-        if not isinstance( r['Tournament ID'], str ):
-
-            trmnt = Tournaments(
-                # casino_id = r['Casino ID'],
-                name = r['Tournament'],
-                h1 = r['H1'],
-                buy_in = r['Buy-in'],
-                blinds = r['Blinds'],
-                starting_stack = r['Starting Stack'],
-                results_link = r['Results Link'],
-                structure_link = r['Structure Link'],
-                notes = r['Notes'],
-                start_at = start_at
-            )
-            db.session.add( trmnt )
-            db.session.commit()
-            
-            r['Tournament ID'] = trmnt.id
-
-        
-        else:
-            trmnt = Tournaments.query.get( r['Tournament ID'] )
-            for file_header, db_column in ref:
-                if getattr(trmnt, db_column) != r[file_header]:
-                    setattr(trmnt, db_column, r[file_header])
-            if trmnt.start_at != start_at:
-                trmnt.start_at = start_at
-            db.session.commit()
-                
-
-
-    return 'ok'
+    return 'testing'
 
 
 @app.route('/user', methods=['POST'])
@@ -192,28 +143,56 @@ def file_upload():
     # POST
     if 'csv' not in request.files:
         raise APIException('"csv" property missing in the files array', 404)
-    
+    Tournaments.query.delete();db.session.execute('ALTER SEQUENCE tournaments_id_seq RESTART');db.session.commit()
     f = request.files['csv']
+    df = pd.read_csv( f )
     
-    f_read = io.StringIO( f.read().decode() )    
-    file_rows = csv.reader( f_read, delimiter=',' )
+
+    ref = {'Tournament':'name','Buy-in':'buy_in','Starting Stack':'starting_stack',
+        'Blinds':'blinds','Structure Link':'structure_link',#'Casino ID':'casino_id', 
+        'Tournament ID':'id','H1':'h1','NOTES - LOU':'notes','Results Link':'results_link'}
     
-    csv_headers = []
-    csv_entries = []
-    header = True
-    for row in file_rows:
-        json = {}
-        for i, val in enumerate(row):
-            if header:
-                if i == 0:
-                    val = val[1:] # first header comes out like this: "﻿date"
-                csv_headers.append( val.lower().strip() )
-            else:
-                json[ csv_headers[i] ] = val.strip()
-        if header: 
-            header = False
-        else: 
-            csv_entries.append(json)
+    for row in df.iterrows():
+        r = row[1]
+        if not isinstance( r['Tournament'], str ):
+            continue
+        
+        start_at = datetime.strptime(
+            f"{r['Date']} {r['Time']}",
+            '%d-%b-%y %I:%M %p')
+
+        
+        # If the tournament id hasn't been saved, it is a new tournament
+        if not isinstance( r['Tournament ID'], str ) or r['Tournament ID'] == ' ':
+            obj = { db_column: str( r[file_header] ).strip() \
+                    for file_header, db_column in ref.items() }
+            return jsonify(obj)
+            trmnt = Tournaments(
+                # casino_id = r['Casino ID'],
+                start_at = start_at,
+            )
+            db.session.add( trmnt )
+            db.session.commit()
+            
+            r['Tournament ID'] = trmnt.id
+
+            df.to_csv(
+                os.path.join( '/Users/Francine/Desktop/csv/processed csv/', f.filename )
+            )
+
+        
+        else:
+            trmnt = Tournaments.query.get( int(r['Tournament ID']) )
+            for file_header, db_column in ref.items():
+                if getattr(trmnt, db_column) != r[file_header].strip():
+                    setattr( trmnt, db_column, r[file_header].strip() )
+            if trmnt.start_at != start_at:
+                trmnt.start_at = start_at
+            db.session.commit()
+                
+
+
+    return 'Done'
 
     
     # Tournaments

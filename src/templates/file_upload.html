@@ -85,7 +85,7 @@
                     data.append('csv', file);
 
                     log.className = 'border p-2';
-                    logContent += `Uploading... ${file.name}<br />`;
+                    logContent += `Processing... ${file.name}<br />`;
                     log.innerHTML = logContent;
 
                     fetch('{{ host }}/upload_files', {
