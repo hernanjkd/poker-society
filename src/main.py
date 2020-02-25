@@ -2,7 +2,6 @@ import os
 import re
 import io
 import csv
-import math
 import utils
 import actions
 import requests
@@ -151,7 +150,7 @@ def file_upload():
 
     ref = {'Tournament':'name','Buy-in':'buy_in','Starting Stack':'starting_stack',
         'Blinds':'blinds','Structure Link':'structure_link',#'Casino ID':'casino_id', 
-        'Tournament ID':'id','H1':'h1','NOTES - LOU':'notes','Results Link':'results_link'}
+        'H1':'h1','NOTES - LOU':'notes','Results Link':'results_link'}
     
     for row in df.iterrows():
         r = row[1]
@@ -162,15 +161,16 @@ def file_upload():
             f"{r['Date']} {r['Time']}",
             '%d-%b-%y %I:%M %p')
         
-        import math;return str(r['H1'])
+
         # If the tournament id hasn't been saved, it is a new tournament
         if r['Tournament ID'] == ' ':
-            obj = { db_column: r[file_header] if r[file_header] is True else r[file_header]
-                    for file_header, db_column in ref.items() }
-            return jsonify(obj)
+            
             trmnt = Tournaments(
                 # casino_id = r['Casino ID'],
                 start_at = start_at,
+                **{ db_column: r[file_header]
+                    if str(r[file_header]) != 'nan' else None
+                    for file_header, db_column in ref.items() }
             )
             db.session.add( trmnt )
             db.session.commit()
