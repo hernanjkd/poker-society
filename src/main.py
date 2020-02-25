@@ -2,6 +2,7 @@ import os
 import re
 import io
 import csv
+import math
 import utils
 import actions
 import requests
@@ -154,17 +155,17 @@ def file_upload():
     
     for row in df.iterrows():
         r = row[1]
-        if not isinstance( r['Tournament'], str ):
+        if not isinstance( r['Tournament'], str ) or r['Tournament'] == ' ':
             continue
         
         start_at = datetime.strptime(
             f"{r['Date']} {r['Time']}",
             '%d-%b-%y %I:%M %p')
-
         
+        import math;return str(r['H1'])
         # If the tournament id hasn't been saved, it is a new tournament
-        if not isinstance( r['Tournament ID'], str ) or r['Tournament ID'] == ' ':
-            obj = { db_column: str( r[file_header] ).strip() \
+        if r['Tournament ID'] == ' ':
+            obj = { db_column: r[file_header] if r[file_header] is True else r[file_header]
                     for file_header, db_column in ref.items() }
             return jsonify(obj)
             trmnt = Tournaments(
