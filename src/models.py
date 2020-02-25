@@ -124,10 +124,9 @@ class Tournaments(db.Model):
 class Flights(db.Model):
     __tablename__ = 'flights'
     id = db.Column(db.Integer, primary_key=True)
-    start_at = db.Column(db.DateTime)
-    end_at = db.Column(db.DateTime)
-    day = db.Column(db.Integer)
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournaments.id'))
+    start_at = db.Column(db.DateTime)
+    day = db.Column(db.String(5))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -141,7 +140,6 @@ class Flights(db.Model):
             'id': self.id,
             'tournament_id': self.tournament_id,
             'start_at': self.start_at,
-            'end_at': self.end_at,
             'day': self.day,
             'created_at': self.created_at,
             'updated_at': self.updated_at

@@ -178,7 +178,8 @@ def file_upload():
             r['Tournament ID'] = trmnt.id
 
             df.to_csv(
-                os.path.join( '/Users/Francine/Desktop/csv/processed csv/', f.filename )
+                os.path.join( '/Users/Francine/Desktop/csv/processed csv/', f.filename ),
+                index=False
             )
 
         
