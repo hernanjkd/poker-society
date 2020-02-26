@@ -143,7 +143,7 @@ def file_upload():
     # POST
     if 'csv' not in request.files:
         raise APIException('"csv" property missing in the files array', 404)
-    Tournaments.query.delete();db.session.execute('ALTER SEQUENCE tournaments_id_seq RESTART');db.session.commit()
+    # Tournaments.query.delete();db.session.execute('ALTER SEQUENCE tournaments_id_seq RESTART');db.session.commit()
     f = request.files['csv']
     df = pd.read_csv( f )
     
@@ -168,7 +168,7 @@ def file_upload():
             trmnt = Tournaments(
                 # casino_id = r['Casino ID'],
                 start_at = start_at,
-                **{ db_column: r[file_header]
+                **{ db_column: r[file_header].strip()
                     if str(r[file_header]) != 'nan' else None
                     for file_header, db_column in ref.items() }
             )
@@ -184,12 +184,18 @@ def file_upload():
 
         
         else:
-            trmnt = Tournaments.query.get( int(r['Tournament ID']) )
+            trmnt = Tournaments.query.get( r['Tournament ID'] )
+            
             for file_header, db_column in ref.items():
-                if getattr(trmnt, db_column) != r[file_header].strip():
-                    setattr( trmnt, db_column, r[file_header].strip() )
+                entry = r[file_header]
+                if isinstance(entry, str): entry = entry.strip()
+                
+                if getattr(trmnt, db_column) != entry:
+                    setattr( trmnt, db_column, entry )
+            
             if trmnt.start_at != start_at:
                 trmnt.start_at = start_at
+
             db.session.commit()
                 
 
