@@ -142,17 +142,17 @@ def file_upload():
     # POST
     if 'csv' not in request.files:
         raise APIException('"csv" property missing in the files array', 404)
-    # Tournaments.query.delete()
-    # db.session.execute('ALTER SEQUENCE tournaments_id_seq RESTART')
-    # db.session.commit()
+    Tournaments.query.delete()
+    db.session.execute('ALTER SEQUENCE tournaments_id_seq RESTART')
+    db.session.commit()
     # return 'done'
     f = request.files['csv']
     df = pd.read_csv( f )
 
-    # Dictionary to loop and add all entries into table columns
-    ref = {'Tournament':'name','Buy-in':'buy_in','Starting Stack':'starting_stack',
-        'Blinds':'blinds','Structure Link':'structure_link',#'Casino ID':'casino_id', 
-        'H1':'h1','NOTES - LOU':'notes','Results Link':'results_link'}
+    # file_header: db_column
+    ref = {'Buy-in':'buy_in','Starting Stack':'starting_stack','Blinds':'blinds',
+        'H1':'h1','Structure Link':'structure_link',#'Casino ID':'casino_id', 
+        'NOTES - LOU':'notes','Results Link':'results_link'}
     
     # row
     for index, r in df.iterrows():
@@ -160,34 +160,43 @@ def file_upload():
         if isNaN(r['Tournament']) or r['Tournament'] == ' ':
             continue
         
+        # Check to see if it's another flight of the same tournament
+        trmnt_name, flight_day = utils.resolve_name_day( r['Tournament'] )
+        
         # Create datetime object
         start_at = datetime.strptime(
             f"{r['Date']} {r['Time']}",
             '%d-%b-%y %I:%M %p')
-        
 
         # If the tournament id hasn't been saved, it could be a new tournament
         if isNaN(r['Tournament ID']) or r['Tournament ID'] == ' ':
+
+            if flight_day is not None:
+                six_weeks_back = start_at - timedelta(weeks=6, days=1)
+                # Check to see if trmnt has been saved already
+                trmnt = Tournaments.query.filter_by(
+                        # casino_id = r['Casino ID'],
+                        name = trmnt_name  ) \
+                    .filter( Tournaments.start_at > six_weeks_back ).first()
             
-            # Check to see if it's another flight of the same tournament
-            trmnt_name, flight_day = utils.resolve_name_day( r['Tournament'] )
-            
-            trmnt = Tournaments(
-                # casino_id = r['Casino ID'],
-                start_at = start_at,
-                **{ db_column: r[file_header].strip()
-                    if isNaN(r[file_header]) else None
-                    for file_header, db_column in ref.items() }
-            )
-            db.session.add( trmnt )
-            db.session.commit()
+            if flight_day is None or trmnt is None:
+                trmnt = Tournaments(
+                    name = trmnt_name,
+                    start_at = start_at,
+                    **{ db_column: str(r[file_header]).strip()
+                        if isNaN(r[file_header]) else None
+                        for file_header, db_column in ref.items() }
+                )
+                db.session.add( trmnt )
+                db.session.commit()
 
             db.session.add( Flights(
                 tournament_id = trmnt.id,
                 start_at = start_at,
-                day = ''
+                day = flight_day
             ))
-            
+        
+            # add tournament to file row
             r['Tournament ID'] = trmnt.id
 
             df.to_csv(
