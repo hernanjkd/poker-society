@@ -126,7 +126,7 @@ class Flights(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournaments.id'))
     start_at = db.Column(db.DateTime)
-    day = db.Column(db.String(5))
+    day = db.Column(db.String(5), default=None)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

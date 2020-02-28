@@ -11,9 +11,8 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt, jwt_required
 from admin import SetupAdmin
-from utils import APIException, role_jwt_required
-from models import db, Users, Casinos, Tournaments, Flights, Results, \
-    Subscribers
+from utils import APIException, role_jwt_required, isNaN
+from models import db, Users, Casinos, Tournaments, Flights, Results, Subscribers
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
 
@@ -143,37 +142,51 @@ def file_upload():
     # POST
     if 'csv' not in request.files:
         raise APIException('"csv" property missing in the files array', 404)
-    # Tournaments.query.delete();db.session.execute('ALTER SEQUENCE tournaments_id_seq RESTART');db.session.commit()
+    # Tournaments.query.delete()
+    # db.session.execute('ALTER SEQUENCE tournaments_id_seq RESTART')
+    # db.session.commit()
+    # return 'done'
     f = request.files['csv']
     df = pd.read_csv( f )
-    
 
+    # Dictionary to loop and add all entries into table columns
     ref = {'Tournament':'name','Buy-in':'buy_in','Starting Stack':'starting_stack',
         'Blinds':'blinds','Structure Link':'structure_link',#'Casino ID':'casino_id', 
         'H1':'h1','NOTES - LOU':'notes','Results Link':'results_link'}
     
-    for row in df.iterrows():
-        r = row[1]
-        if not isinstance( r['Tournament'], str ) or r['Tournament'] == ' ':
+    # row
+    for index, r in df.iterrows():
+        
+        if isNaN(r['Tournament']) or r['Tournament'] == ' ':
             continue
         
+        # Create datetime object
         start_at = datetime.strptime(
             f"{r['Date']} {r['Time']}",
             '%d-%b-%y %I:%M %p')
         
 
-        # If the tournament id hasn't been saved, it is a new tournament
-        if r['Tournament ID'] == ' ':
+        # If the tournament id hasn't been saved, it could be a new tournament
+        if isNaN(r['Tournament ID']) or r['Tournament ID'] == ' ':
+            
+            # Check to see if it's another flight of the same tournament
+            trmnt_name, flight_day = utils.resolve_name_day( r['Tournament'] )
             
             trmnt = Tournaments(
                 # casino_id = r['Casino ID'],
                 start_at = start_at,
                 **{ db_column: r[file_header].strip()
-                    if str(r[file_header]) != 'nan' else None
+                    if isNaN(r[file_header]) else None
                     for file_header, db_column in ref.items() }
             )
             db.session.add( trmnt )
             db.session.commit()
+
+            db.session.add( Flights(
+                tournament_id = trmnt.id,
+                start_at = start_at,
+                day = ''
+            ))
             
             r['Tournament ID'] = trmnt.id
 
@@ -187,8 +200,7 @@ def file_upload():
             trmnt = Tournaments.query.get( r['Tournament ID'] )
             
             for file_header, db_column in ref.items():
-                entry = r[file_header]
-                if isinstance(entry, str): entry = entry.strip()
+                entry = r[file_header] if isNaN(r[file_header]) else None
                 
                 if getattr(trmnt, db_column) != entry:
                     setattr( trmnt, db_column, entry )

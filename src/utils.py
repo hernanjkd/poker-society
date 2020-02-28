@@ -34,7 +34,7 @@ def check_params(body, *args):
         raise Exception('You must specify the ' + msg, 400)
 
 def update_table(table, body, ignore=[]):
-    ignore = [*ignore, 'created_at', 'updated_at']
+    ignore = [*ignore, 'id', 'created_at', 'updated_at']
     for attr, value in body.items():
         if attr not in ignore:
             if not hasattr(table, attr):
@@ -46,6 +46,9 @@ def sha256(string):
     m.update(string.encode('utf-8'))
     return m.hexdigest()
 
+def isNaN(x):
+    return x != x
+
 def resolve_pagination(request_args, limit_default=10):
     page = request_args.get('page', '0')
     offset = int(page) - 1 if page.isnumeric() and int(page) > 0 else 0
@@ -54,6 +57,12 @@ def resolve_pagination(request_args, limit_default=10):
     limit = int(limit) if limit.isnumeric() and int(limit) > 0 else limit_default
     
     return offset, limit
+
+def resolve_name_day(string):
+    a = re.search(r'(.*) - Day ([\d\w]+)', string)
+    tournament_name = string if a is None else a.group(1)
+    flight_day = a and a.group(2)
+    return [tournament_name, flight_day]
 
 def are_headers_for(table, csv_headers):
     if table == 'results':
