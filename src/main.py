@@ -142,23 +142,23 @@ def file_upload():
     # POST
     if 'csv' not in request.files:
         raise APIException('"csv" property missing in the files array', 404)
-    Flights.query.delete()
-    Tournaments.query.delete()
-    db.session.execute('ALTER SEQUENCE flights_id_seq RESTART')
-    db.session.execute('ALTER SEQUENCE tournaments_id_seq RESTART')
-    db.session.commit()
+    # Flights.query.delete()
+    # Tournaments.query.delete()
+    # db.session.execute('ALTER SEQUENCE flights_id_seq RESTART')
+    # db.session.execute('ALTER SEQUENCE tournaments_id_seq RESTART')
+    # db.session.commit()
     # return 'done'
     f = request.files['csv']
-    df = pd.read_csv( f )
+    df = pd.read_excel( f, keep_default_na=False )
 
-    # file_header: db_column
-    ref = {'Buy-in':'buy_in','Starting Stack':'starting_stack','Blinds':'blinds',
+    # file_header: db_column. Used to loop and check properties quicker
+    trmnt_ref = {'Buy-in':'buy_in','Starting Stack':'starting_stack','Blinds':'blinds',
         'H1':'h1','Structure Link':'structure_link',#'Casino ID':'casino_id', 
-        'NOTES - LOU':'notes','Results Link':'results_link'}
+        'Results Link':'results_link','Multi ID':'multiday_id'}
     
-    # row
+    
     for index, r in df.iterrows():
-        
+        print(r); return 'ok'
         if isNaN(r['Tournament']) or r['Tournament'] == ' ':
             continue
         
@@ -170,16 +170,17 @@ def file_upload():
             f"{r['Date']} {r['Time']}",
             '%d-%b-%y %I:%M %p')
 
+        # Used to loop and check properties quicker
+        flight_ref = { 'start_at': start_at, 'day': flight_day,
+            'notes': r['NOTES - LOU'] if not isNaN(r['NOTES - LOU']) else None }
+
         # If the tournament id hasn't been saved, it could be a new tournament
         if isNaN(r['Tournament ID']) or r['Tournament ID'] == ' ':
 
-            if flight_day is not None:
-                six_weeks_back = start_at - timedelta(weeks=6, days=1)
+            if flight_day is not None:              
                 # Check to see if trmnt has been saved already
                 trmnt = Tournaments.query.filter_by(
-                        # casino_id = r['Casino ID'],
-                        name = trmnt_name  ) \
-                    .filter( Tournaments.start_at > six_weeks_back ).first()
+                    multiday_id = r['Multiday ID']  ).first()
             
             if flight_day is None or trmnt is None:
                 trmnt = Tournaments(
@@ -187,17 +188,16 @@ def file_upload():
                     start_at = start_at,
                     **{ db_column: str(r[file_header]).strip()
                         if not isNaN(r[file_header]) else None
-                        for file_header, db_column in ref.items() }
+                        for file_header, db_column in trmnt_ref.items() }
                 )
                 db.session.add( trmnt )
                 db.session.commit()
-
+            
             db.session.add( Flights(
                 tournament_id = trmnt.id,
-                start_at = start_at,
-                day = flight_day
+                **flight_ref
             ))
-        
+            db.session.commit()
             # add tournament to file row
             r['Tournament ID'] = trmnt.id
 
@@ -209,15 +209,17 @@ def file_upload():
         
         else:
             trmnt = Tournaments.query.get( r['Tournament ID'] )
+            if trmnt is None:
+                raise APIException('Cannot locate Tournament with id: '+r['Tournament ID'], 500)
             
-            for file_header, db_column in ref.items():
-                entry = r[file_header] if not isNaN(r[file_header]) else None
-                
+            for file_header, db_column in trmnt_ref.items():
+                entry = r[file_header] if not isNaN(r[file_header]) else None                
                 if getattr(trmnt, db_column) != entry:
-                    setattr( trmnt, db_column, entry )
-            
+                    setattr( trmnt, db_column, entry )            
             if trmnt.start_at != start_at:
                 trmnt.start_at = start_at
+            if trmnt.name != trmnt_name:
+                trmnt.name = trmnt_name
 
             db.session.commit()
                 

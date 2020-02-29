@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: c1c3909ea332
+Revision ID: 07944dc594ef
 Revises: 
-Create Date: 2020-02-28 16:44:35.275631
+Create Date: 2020-02-29 17:08:20.842049
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'c1c3909ea332'
+revision = '07944dc594ef'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -58,6 +58,7 @@ def upgrade():
     op.create_table('tournaments',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('casino_id', sa.String(length=10), nullable=True),
+    sa.Column('multiday_id', sa.String(length=25), nullable=True),
     sa.Column('name', sa.String(length=500), nullable=False),
     sa.Column('h1', sa.String(length=200), nullable=True),
     sa.Column('buy_in', sa.String(length=20), nullable=True),
@@ -66,7 +67,6 @@ def upgrade():
     sa.Column('results_link', sa.String(length=500), nullable=True),
     sa.Column('structure_link', sa.String(length=500), nullable=True),
     sa.Column('start_at', sa.DateTime(), nullable=True),
-    sa.Column('notes', sa.String(length=3000), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['casino_id'], ['casinos.id'], ),
@@ -77,6 +77,7 @@ def upgrade():
     sa.Column('tournament_id', sa.Integer(), nullable=True),
     sa.Column('start_at', sa.DateTime(), nullable=True),
     sa.Column('day', sa.String(length=5), nullable=True),
+    sa.Column('notes', sa.String(length=3000), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['tournament_id'], ['tournaments.id'], ),

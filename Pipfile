@@ -21,6 +21,7 @@ flask-admin = "*"
 flask-jwt-simple = "*"
 requests = "*"
 pandas = "*"
+xlrd = "*"
 
 [requires]
 python_version = "3.7"
