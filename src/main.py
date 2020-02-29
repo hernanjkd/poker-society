@@ -142,7 +142,9 @@ def file_upload():
     # POST
     if 'csv' not in request.files:
         raise APIException('"csv" property missing in the files array', 404)
+    Flights.query.delete()
     Tournaments.query.delete()
+    db.session.execute('ALTER SEQUENCE flights_id_seq RESTART')
     db.session.execute('ALTER SEQUENCE tournaments_id_seq RESTART')
     db.session.commit()
     # return 'done'
@@ -184,7 +186,7 @@ def file_upload():
                     name = trmnt_name,
                     start_at = start_at,
                     **{ db_column: str(r[file_header]).strip()
-                        if isNaN(r[file_header]) else None
+                        if not isNaN(r[file_header]) else None
                         for file_header, db_column in ref.items() }
                 )
                 db.session.add( trmnt )
@@ -209,7 +211,7 @@ def file_upload():
             trmnt = Tournaments.query.get( r['Tournament ID'] )
             
             for file_header, db_column in ref.items():
-                entry = r[file_header] if isNaN(r[file_header]) else None
+                entry = r[file_header] if not isNaN(r[file_header]) else None
                 
                 if getattr(trmnt, db_column) != entry:
                     setattr( trmnt, db_column, entry )

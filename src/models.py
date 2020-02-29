@@ -83,6 +83,7 @@ class Tournaments(db.Model):
     __tablename__ = 'tournaments'
     id = db.Column(db.Integer, primary_key=True)
     casino_id = db.Column(db.String(10), db.ForeignKey('casinos.id'))
+    multiday_id = db.Column(db.String(15), default=None)
     name = db.Column(db.String(500), nullable=False)
     h1 = db.Column(db.String(200))
     buy_in = db.Column(db.String(20))
@@ -91,7 +92,6 @@ class Tournaments(db.Model):
     results_link = db.Column(db.String(500))
     structure_link = db.Column(db.String(500))
     start_at = db.Column(db.DateTime)
-    notes = db.Column(db.String(3000))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -125,8 +125,10 @@ class Flights(db.Model):
     __tablename__ = 'flights'
     id = db.Column(db.Integer, primary_key=True)
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournaments.id'))
+    multiday_id = db.Column(db.String(15), default=None)
     start_at = db.Column(db.DateTime)
     day = db.Column(db.String(5), default=None)
+    notes = db.Column(db.String(3000))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -141,6 +143,7 @@ class Flights(db.Model):
             'tournament_id': self.tournament_id,
             'start_at': self.start_at,
             'day': self.day,
+            'notes': self.notes,
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
