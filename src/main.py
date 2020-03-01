@@ -11,7 +11,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt, jwt_required
 from admin import SetupAdmin
-from utils import APIException, role_jwt_required, isNaN
+from utils import APIException, role_jwt_required
 from models import db, Users, Casinos, Tournaments, Flights, Results, Subscribers
 from datetime import datetime, timedelta
 from sqlalchemy import asc, desc
@@ -140,54 +140,64 @@ def file_upload():
                     host = os.environ.get('API_HOST'))
     
     # POST
-    if 'csv' not in request.files:
-        raise APIException('"csv" property missing in the files array', 404)
-    # Flights.query.delete()
-    # Tournaments.query.delete()
-    # db.session.execute('ALTER SEQUENCE flights_id_seq RESTART')
-    # db.session.execute('ALTER SEQUENCE tournaments_id_seq RESTART')
-    # db.session.commit()
+    if 'excel' not in request.files:
+        raise APIException('"excel" property missing in the files array', 404)
+    Flights.query.delete()
+    Tournaments.query.delete()
+    db.session.execute('ALTER SEQUENCE flights_id_seq RESTART')
+    db.session.execute('ALTER SEQUENCE tournaments_id_seq RESTART')
+    db.session.commit()
     # return 'done'
-    f = request.files['csv']
-    df = pd.read_excel( f, keep_default_na=False )
+    f = request.files['excel']
+    df = pd.read_excel( f, parse_dates={'start_at':[0,2]}, keep_default_na=False )
+    
+    writer = pd.ExcelWriter(
+        os.path.join( '/Users/Francine/Desktop/csv/processed csv/', f.filename ),
+        engine='openpyxl' )
+
+
+    # df2 = pd.DataFrame({'Tournament ID': [13223434, 2423423423, 3523423423, 4623423432]})
+    # df.update( df2 )
+    # df.to_excel(writer, index=False)
+
+    # writer.save()
+
+    # return 'exquisite'
 
     # file_header: db_column. Used to loop and check properties quicker
     trmnt_ref = {'Buy-in':'buy_in','Starting Stack':'starting_stack','Blinds':'blinds',
         'H1':'h1','Structure Link':'structure_link',#'Casino ID':'casino_id', 
         'Results Link':'results_link','Multi ID':'multiday_id'}
     
-    
+    trmnt_ids = []
+    error_list = []
+
     for index, r in df.iterrows():
-        print(r); return 'ok'
-        if isNaN(r['Tournament']) or r['Tournament'] == ' ':
+        
+        if r['Tournament'].strip() == '':
             continue
         
-        # Check to see if it's another flight of the same tournament
         trmnt_name, flight_day = utils.resolve_name_day( r['Tournament'] )
-        
-        # Create datetime object
-        start_at = datetime.strptime(
-            f"{r['Date']} {r['Time']}",
-            '%d-%b-%y %I:%M %p')
+        start_at = r['start_at'].to_pydatetime()
 
         # Used to loop and check properties quicker
         flight_ref = { 'start_at': start_at, 'day': flight_day,
-            'notes': r['NOTES - LOU'] if not isNaN(r['NOTES - LOU']) else None }
+            'notes': r['NOTES - LOU'].strip() }
+
 
         # If the tournament id hasn't been saved, it could be a new tournament
-        if isNaN(r['Tournament ID']) or r['Tournament ID'] == ' ':
+        if r['Tournament ID'].strip() == '':
 
             if flight_day is not None:              
                 # Check to see if trmnt has been saved already
                 trmnt = Tournaments.query.filter_by(
-                    multiday_id = r['Multiday ID']  ).first()
+                    multiday_id = r['Multi ID'].strip() ).first()
             
             if flight_day is None or trmnt is None:
                 trmnt = Tournaments(
                     name = trmnt_name,
                     start_at = start_at,
                     **{ db_column: str(r[file_header]).strip()
-                        if not isNaN(r[file_header]) else None
                         for file_header, db_column in trmnt_ref.items() }
                 )
                 db.session.add( trmnt )
@@ -198,32 +208,47 @@ def file_upload():
                 **flight_ref
             ))
             db.session.commit()
-            # add tournament to file row
-            r['Tournament ID'] = trmnt.id
-
-            df.to_csv(
-                os.path.join( '/Users/Francine/Desktop/csv/processed csv/', f.filename ),
-                index=False
-            )
+            
+            trmnt_ids.append(trmnt.id)
 
         
         else:
             trmnt = Tournaments.query.get( r['Tournament ID'] )
             if trmnt is None:
-                raise APIException('Cannot locate Tournament with id: '+r['Tournament ID'], 500)
-            
-            for file_header, db_column in trmnt_ref.items():
-                entry = r[file_header] if not isNaN(r[file_header]) else None                
-                if getattr(trmnt, db_column) != entry:
-                    setattr( trmnt, db_column, entry )            
-            if trmnt.start_at != start_at:
-                trmnt.start_at = start_at
-            if trmnt.name != trmnt_name:
-                trmnt.name = trmnt_name
+                error_list.append(f'Can\'t find Tournament id: "{r["Tournament ID"]}"')
+                continue
+            flight = Fllights.query.filter_by( tournament_id=trmnt.id, day=flight_day ).first()
+            if flight is None:
+                error_list.append(
+                    f'Can\'t find Flight tournament_id: {trmnt.id}, day: {flight_day}' )
+                continue
+
+            for db_column, value in flight_ref.items():
+                if getattr(flight, db_column) != value:
+                    setattr( flight, db_column, value )
+
+            first_day = ['1', '1A']
+            if flight_day in first_day:
+                for file_header, db_column in trmnt_ref.items():
+                    entry = r[file_header].strip()
+                    if getattr(trmnt, db_column) != entry:
+                        setattr( trmnt, db_column, entry )            
+                if trmnt.start_at != start_at:
+                    trmnt.start_at = start_at
+                if trmnt.name != trmnt_name:
+                    trmnt.name = trmnt_name
 
             db.session.commit()
                 
+    
 
+    df.update( pd.DataFrame({'Tournament ID': trmnt_ids}) )
+    df.to_excel(writer, index=False)
+
+    writer.save()
+
+    if len(error_list) > 0:
+        return jsonify(error_list)
 
     return 'Done'
 
