@@ -61,21 +61,21 @@ def resolve_name_day(string):
     flight_day = a and a.group(2)
     return [tournament_name, flight_day]
 
-def are_headers_for(table, csv_headers):
+def are_headers_for(table, file_headers):
     if table == 'results':
         headers_to_check = ['place','nationality','first_name','middle_name',
             'last_name','winnings','tps points']
     elif table == 'tournament':
-        headers_to_check = ['date','day','time','where','tournament','buy-in',
-            'starting stack', 'blinds','structure link','notes','results link',
-            'h1','casino id']
+        headers_to_check = ['Date','Day','Time','Where','Tournament','Buy-in',
+            'Starting Stack', 'Blinds','Structure Link','Casino ID',
+            'Tournament ID','Multi ID','H1','NOTES - LOU','Results Link','Entrants']
     elif table == 'venues':
         headers_to_check = ['name','address','city','state','zip_code','longitude',
             'latitude','website']
     else:
         return False
     for header in headers_to_check:
-        if header not in csv_headers:
+        if header not in file_headers:
             return False
     return True
 

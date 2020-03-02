@@ -3,122 +3,95 @@ from models import db, Users, Casinos, Tournaments, Results
 from datetime import datetime
 
 
-def process_tournament_csv(csv_entries):
+def process_tournament_excel(df):
 
-    swapprofit_json = []
+    # file_header: db_column. Used to loop and check properties quicker
+    trmnt_ref = {'Buy-in':'buy_in','Starting Stack':'starting_stack','Blinds':'blinds',
+        'H1':'h1','Structure Link':'structure_link',#'Casino ID':'casino_id', 
+        'Results Link':'results_link','Multi ID':'multiday_id'}
+    
+    added_id_to_file = False
+    error_list = []
 
-    for entry in csv_entries:
-        if entry['tournament'] == '':
-            break
+    for index, r in df.iterrows():
+        
+        if r['Tournament'].strip() == '':
+            continue
 
-        entry['start_at'] = datetime.strptime(
-            f"{entry['date']} {entry['time']}",
-            '%d-%b-%y %I:%M %p')
+        trmnt_name, flight_day = utils.resolve_name_day( r['Tournament'] )
+        start_at = datetime.combine( r['Date'].to_pydatetime(), r['Time'] )
+
+        # Used to loop and check properties quicker
+        flight_ref = { 'start_at': start_at, 'day': flight_day,
+            'notes': r['NOTES - LOU'].strip() }
+
+
+        # If the tournament id hasn't been saved, it could be a new tournament
+        if str(r['Tournament ID']).strip() == '':
+
+            if flight_day is not None:              
+                # Check to see if trmnt has been saved already
+                trmnt = Tournaments.query.filter_by(
+                    multiday_id = r['Multi ID'].strip() ).first()
             
-        trmnt = Tournaments.query.filter_by(
-                    name = entry['tournament'],
-                    start_at = entry['start_at']
-                ).first()
+            if flight_day is None or trmnt is None:
+                trmnt = Tournaments(
+                    name = trmnt_name,
+                    start_at = start_at,
+                    **{ db_column: str(r[file_header]).strip()
+                        for file_header, db_column in trmnt_ref.items() }
+                )
+                db.session.add( trmnt )
+                db.session.commit()
+            
+            db.session.add( Flights(
+                tournament_id = trmnt.id,
+                **flight_ref
+            ))
+            db.session.commit()
+            
+            # save trmnt.id in the file
+            df.at[index,'Tournament ID'] = trmnt.id
+            added_id_to_file = True
 
-        casino = Casinos.query.get( entry['casino id'] )
-        if casino is None:
-            raise APIException('Casino not found with id: '+entry['casino id'], 404)
-        casino_data = {}
-        for prop in ['address','city','state','zip_code','longitude','latitude']:
-            casino_data[prop] = getattr(casino, prop)
         
-        trmnt_json = {
-            **entry,
-            **casino_data
-        }
-        
-        if trmnt is None:  
-            new_trmnt = Tournaments(
-                casino_id = entry['casino id'],
-                name = entry['tournament'],
-                h1 = entry['h1'],
-                buy_in = entry['buy-in'],
-                blinds = entry['blinds'],
-                starting_stack = entry['starting stack'],
-                results_link = entry['results link'],
-                structure_link = entry['structure link'],
-                start_at = entry['start_at'],
-                notes = entry['notes']
-            )
-            db.session.add( new_trmnt )
-            db.session.flush()
-
-            trmnt_json['id'] = new_trmnt.id
-    
         else:
-            trmnt_json['id'] = trmnt.id
-            db_fields = {'casino_id': 'casino id',  'name': 'tournament',
-                'buy_in': 'buy-in', 'blinds': 'blinds', 'h1': 'h1',
-                'notes': 'notes', 'start_at': 'start_at',
-                'starting_stack': 'starting stack',
-                'results_link': 'results link',
-                'structure_link': 'structure link'}
-            for db_name, entry_name in db_fields.items():
-                if getattr(trmnt, db_name) != entry[entry_name]:
-                    setattr(trmnt, db_name, entry[entry_name])
-                    
-        db.session.commit()
-        swapprofit_json.append( trmnt_json )
+            trmnt = Tournaments.query.get( r['Tournament ID'] )
+            if trmnt is None:
+                error_list.append(f'Can\'t find Tournament id: "{r["Tournament ID"]}"')
+                continue
+            flight = Flights.query.filter_by( tournament_id=trmnt.id, day=flight_day ).first()
+            if flight is None:
+                error_list.append(
+                    f'Can\'t find Flight tournament_id: {trmnt.id}, day: {flight_day}' )
+                continue
 
-    return swapprofit_json
+            for db_column, value in flight_ref.items():
+                if getattr(flight, db_column) != value:
+                    setattr( flight, db_column, value )
+
+            first_day = ['1', '1A']
+            if flight_day in first_day:
+                for file_header, db_column in trmnt_ref.items():
+                    entry = str(r[file_header]).strip()
+                    if getattr(trmnt, db_column) != entry:
+                        setattr( trmnt, db_column, entry )            
+                if trmnt.start_at != start_at:
+                    trmnt.start_at = start_at
+                if trmnt.name != trmnt_name:
+                    trmnt.name = trmnt_name
+
+            db.session.commit()
 
 
-def process_results_csv(csv_entries):
+    if added_id_to_file:
+        writer = pd.ExcelWriter(
+            os.path.join('/Users/Francine/Desktop/csv/processed csv/', f.filename) )
+        df.to_excel( writer, index=False )
+        writer.save()
 
-    tournament_name = None # get tournament name somehow
-    trmnt = Tournaments.query.filter_by( name = tournament_name ).first()
-    
-    swapprofit_json = {
-        "tournament_id": trmnt.id,
-        "tournament_buy_in": trmnt.buy_in,
-        "tournament_date": trmnt.start_at,
-        "tournament_name": trmnt.name,
-        "results_link": '', # find out how to get the results link
-        "users": {
-            # "sdfoij@yahoo.com": {
-            #     "position": 11,
-            #     "winnings": 200,
-            #     "total_winning_swaps": 234
-        }
-    }
 
-    for entry in csv_entries:
-        
-        user = Users.query.filter_by(
-                    first_name = entry['first_name'],
-                    middle_name = entry['middle_name'],
-                    last_name = entry['last_name']
-                ).first()
-
-        user_id = user and user.id        
-        won_swaps = Results.query.filter( user_id=user_id ) \
-                                .filter( Results.winnings != None )
-        won_swaps = won_swaps.count() if won_swaps is not None else 0
-
-        swapprofit_json['users'][user.email] = {
-            'position': entry['position'],
-            'winnings': entry['winnings'],
-            'total_winning_swaps': won_swaps
-        }
-
-        db.session.add( Results(
-            tournament_id = trmnt.id,
-            user_id = user.id if user is not None else None,
-            first_name = entry['first_name'],
-            middle_name = entry['middle_name'],
-            last_name = entry['last_name'],
-            nationality = entry['nationality'],
-            position = entry['position'],
-            winnings = entry['winnings']
-        ))
-        db.session.commit()
-
-    return swapprofit_json
+    return [ df, error_list ]
 
 
 def process_venues_csv(csv_entries):

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from utils import sha256
 
 
-def run_seeds():
+def run():
 
     Results.query.delete()
     Flights.query.delete()
