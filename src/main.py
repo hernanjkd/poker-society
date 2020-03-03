@@ -72,21 +72,6 @@ def reset_database():
 
 @app.route('/testing', methods=['POST'])
 def testing(): 
-
-    df = pd.DataFrame([[30, 20, 'Hello'], [None, 50, 'foo'], [10, 30, 'poo']],
-        columns=['A', 'B', 'C'])
-
-    for index, row in df.iterrows():
-        if row['A'] != row['A']:
-            df.at[index,'A'] = 20.0
-
-    print(df)
-    
-    writer = pd.ExcelWriter( '/Users/Francine/Desktop/csv/processed csv/testing.xlsx' )
-    # df.update( pd.DataFrame({'Tournament ID': trmnt_ids}) )
-    df.to_excel(writer, index=False)
-    writer.save()
-
     return 'testing'
 
 
@@ -177,11 +162,14 @@ def file_upload():
         # Update Swap Profit
         swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
         if swapprofit is not None:
-            requests.post(
+            r = requests.post(
                 swapprofit.api_host +'/tournaments',
                 headers = {'Authorization': 'Bearer '+ swapprofit.api_token},
-                json = updated_df.to_json(orient='records')
+                json = df.to_json(orient='records')
             )
+            if not r.ok:
+                error_list.append( r.content.decode("utf-8") )
+
         else: error_list.append('Swap Profit not a subscriber')
 
         if len(error_list) > 0:

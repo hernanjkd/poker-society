@@ -1,5 +1,8 @@
+import os
+import utils
+import pandas as pd
 from utils import APIException
-from models import db, Users, Casinos, Tournaments, Results
+from models import db, Users, Casinos, Tournaments, Flights, Results
 from datetime import datetime
 
 
@@ -10,7 +13,6 @@ def process_tournament_excel(df):
         'H1':'h1','Structure Link':'structure_link',#'Casino ID':'casino_id', 
         'Results Link':'results_link','Multi ID':'multiday_id'}
     
-    added_id_to_file = False
     error_list = []
 
     for index, r in df.iterrows():
@@ -52,7 +54,6 @@ def process_tournament_excel(df):
             
             # save trmnt.id in the file
             df.at[index,'Tournament ID'] = trmnt.id
-            added_id_to_file = True
 
         
         else:
@@ -84,14 +85,9 @@ def process_tournament_excel(df):
             db.session.commit()
 
 
-    if added_id_to_file:
-        writer = pd.ExcelWriter(
-            os.path.join('/Users/Francine/Desktop/csv/processed csv/', f.filename) )
-        df.to_excel( writer, index=False )
-        writer.save()
-
-
     return [ df, error_list ]
+
+
 
 
 def process_venues_csv(csv_entries):
