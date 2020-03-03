@@ -165,7 +165,7 @@ def file_upload():
             r = requests.post(
                 swapprofit.api_host +'/tournaments',
                 headers = {'Authorization': 'Bearer '+ swapprofit.api_token},
-                json = df.to_json(orient='records')
+                json = df.to_json(orient='records', date_format='iso')
             )
             if not r.ok:
                 error_list.append( r.content.decode("utf-8") )
@@ -250,13 +250,7 @@ def get_update_user(id):
 @app.route('/casinos/<id>', methods=['GET'])
 def get_casinos(id):
 
-    if id == 'all':
-        return jsonify([x.serialize() for x in Casinos.query.all()])
-
-    if not id.isnumeric():
-        raise APIException('Invalid id', 400)
-
-    casino = Casinos.query.get(int(id))
+    casino = Casinos.query.get( id )
     if casino is None:
         raise APIException('Casino not found', 404)
 

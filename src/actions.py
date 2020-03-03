@@ -61,10 +61,14 @@ def process_tournament_excel(df):
             if trmnt is None:
                 error_list.append(f'Can\'t find Tournament id: "{r["Tournament ID"]}"')
                 continue
+            
             flight = Flights.query.filter_by( tournament_id=trmnt.id, day=flight_day ).first()
             if flight is None:
+                flight = Flights.query.filter_by( tournament_id=trmnt.id, start_at=start_at ).first()
+            if flight is None:
                 error_list.append(
-                    f'Can\'t find Flight tournament_id: {trmnt.id}, day: {flight_day}' )
+                    f'Can\'t find Flight tournament_id: {trmnt.id}, '
+                    f'day: {flight_day}, start_at: {start_at}' )
                 continue
 
             for db_column, value in flight_ref.items():
