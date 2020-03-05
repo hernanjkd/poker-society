@@ -1,6 +1,7 @@
 import os
 import utils
 import pandas as pd
+from sqlalchemy import or_
 from utils import APIException
 from models import db, Users, Casinos, Tournaments, Flights, Results
 from datetime import datetime
@@ -62,9 +63,9 @@ def process_tournament_excel(df):
                 error_list.append(f'Can\'t find Tournament id: "{r["Tournament ID"]}"')
                 continue
             
-            flight = Flights.query.filter_by( tournament_id=trmnt.id, day=flight_day ).first()
-            if flight is None:
-                flight = Flights.query.filter_by( tournament_id=trmnt.id, start_at=start_at ).first()
+            flight = Flights.query.filter_by( tournament_id=trmnt.id ) \
+                .filter( or_( Flights.day == flight_day, Flights.start_at == start_at )) \
+                .first()
             if flight is None:
                 error_list.append(
                     f'Can\'t find Flight tournament_id: {trmnt.id}, '

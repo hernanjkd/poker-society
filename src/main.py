@@ -157,8 +157,8 @@ def file_upload():
 
     if utils.are_headers_for('tournament', headers):
 
-        updated_df, error_list = actions.process_tournament_excel( df )
-
+        # updated_df, error_list = actions.process_tournament_excel( df )
+        error_list = []
         # Update Swap Profit
         swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
         if swapprofit is not None:
