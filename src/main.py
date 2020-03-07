@@ -154,9 +154,9 @@ def file_upload():
     df = pd.read_excel( f, keep_default_na=False )
     
     headers = list(df)
-    return jsonify(headers)
+    
     # TOURNAMENTS
-    if utils.are_headers_for('tournament', headers):
+    if utils.are_headers_for('tournaments', headers):
 
         updated_df, error_list = actions.process_tournament_excel( df )
         
@@ -181,9 +181,9 @@ def file_upload():
     
 
     # RESULTS
-    if utils.are_headers_for('results', df):
-        
-        swapprofit_json = actions.process_results_csv( csv_entries )
+    if utils.are_headers_for('results', headers):
+            
+        swapprofit_json = actions.process_results_csv( df )
 
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/results/',f.filename) )
         requests.post( os.environ.get('SWAP_PROFIT_API')+ '/results',
@@ -193,9 +193,9 @@ def file_upload():
 
 
     # CASINOS
-    if utils.are_headers_for('casinos', df):
+    if utils.are_headers_for('casinos', headers):
         
-        id_list = actions.process_venues_csv( csv_entries )
+        id_list = actions.process_casinos_excel( df )
 
         f.save( os.path.join(os.getcwd(),'src/csv_uploads/venues/',f.filename) )
         return jsonify({
