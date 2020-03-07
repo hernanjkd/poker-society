@@ -154,18 +154,19 @@ def file_upload():
     df = pd.read_excel( f, keep_default_na=False )
     
     headers = list(df)
-
+    return jsonify(headers)
+    # TOURNAMENTS
     if utils.are_headers_for('tournament', headers):
 
-        # updated_df, error_list = actions.process_tournament_excel( df )
-        error_list = []
+        updated_df, error_list = actions.process_tournament_excel( df )
+        
         # Update Swap Profit
         swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
         if swapprofit is not None:
             r = requests.post(
                 swapprofit.api_host +'/tournaments',
                 headers = {'Authorization': 'Bearer '+ swapprofit.api_token},
-                json = df.to_json(orient='records', date_format='iso')
+                json = updated_df.to_json(orient='records', date_format='iso')
             )
             if not r.ok:
                 error_list.append( r.content.decode("utf-8") )
@@ -176,30 +177,11 @@ def file_upload():
             return jsonify(error_list)
 
         return 'Done'
-
-    
-    # Tournaments
-    if utils.are_headers_for('tournament', csv_headers):
-
-        swapprofit_json = actions.process_tournament_csv( csv_entries )
-        
-        f.save( os.path.join(os.getcwd(),'src/csv_uploads/tournaments/',f.filename) )
-        
-        swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
-        if swapprofit is None:
-            raise APIException('Swap Profit not a subscriber', 404)
-        r = requests.post(
-            swapprofit.api_host +'/tournaments',
-            headers={'Authorization': 'Bearer '+ swapprofit.api_token},
-            json=swapprofit_json
-        )
-
-        return r.json()['message']
             
     
 
-    # Results
-    if utils.are_headers_for('results', csv_headers):
+    # RESULTS
+    if utils.are_headers_for('results', df):
         
         swapprofit_json = actions.process_results_csv( csv_entries )
 
@@ -210,8 +192,8 @@ def file_upload():
         return jsonify({'message':'Results csv has been processed successfully'}), 200
 
 
-    # Venues
-    if utils.are_headers_for('venues', csv_headers):
+    # CASINOS
+    if utils.are_headers_for('casinos', df):
         
         id_list = actions.process_venues_csv( csv_entries )
 

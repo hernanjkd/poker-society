@@ -69,9 +69,9 @@ def are_headers_for(table, file_headers):
         headers_to_check = ['Date','Day','Time','Where','Tournament','Buy-in',
             'Starting Stack', 'Blinds','Structure Link','Casino ID',
             'Tournament ID','Multi ID','H1','NOTES - LOU','Results Link','Entrants']
-    elif table == 'venues':
-        headers_to_check = ['name','address','city','state','zip_code','longitude',
-            'latitude','website']
+    elif table == 'casinos':
+        headers_to_check = ['CASINO','STATE (ABB.)','STATE (FULL)','REGION','TIME ZONE','ADDRESS',
+            'CITY','ZIP CODE','LAT','LONG','WEBSITE']
     else:
         return False
     for header in headers_to_check:
