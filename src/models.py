@@ -53,6 +53,7 @@ class Casinos(db.Model):
     zip_code = db.Column(db.String(14))
     longitude = db.Column(db.Float)
     latitude = db.Column(db.Float)
+    time_zone = db.Column(db.String(50))
     website = db.Column(db.String(100))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -72,6 +73,7 @@ class Casinos(db.Model):
             'zip_code': self.zip_code,
             'longitude': self.longitude,
             'latitude': self.latitude,
+            'time_zone': self.time_zone,
             'website': self.website,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
