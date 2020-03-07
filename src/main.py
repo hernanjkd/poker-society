@@ -150,6 +150,11 @@ def file_upload():
     if 'excel' not in request.files:
         raise APIException('"excel" property missing in the files array', 404)
 
+    swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
+    if swapprofit is None:
+        raise APIException('Swap Profit not a subscriber', 500)
+
+
     f = request.files['excel']
     df = pd.read_excel( f, keep_default_na=False )
     
@@ -161,17 +166,13 @@ def file_upload():
         updated_df, error_list = actions.process_tournament_excel( df )
         
         # Update Swap Profit
-        swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
-        if swapprofit is not None:
-            r = requests.post(
-                swapprofit.api_host +'/tournaments',
-                headers = {'Authorization': 'Bearer '+ swapprofit.api_token},
-                json = updated_df.to_json(orient='records', date_format='iso')
-            )
-            if not r.ok:
-                error_list.append( r.content.decode("utf-8") )
-
-        else: error_list.append('Swap Profit not a subscriber')
+        r = requests.post(
+            swapprofit.api_host +'/tournaments',
+            headers = {'Authorization': 'Bearer '+ swapprofit.api_token},
+            json = updated_df.to_json(orient='records', date_format='iso')
+        )
+        if not r.ok:
+            error_list.append( r.content.decode("utf-8") )
 
         if len(error_list) > 0:
             return jsonify(error_list)
@@ -185,22 +186,30 @@ def file_upload():
             
         swapprofit_json = actions.process_results_csv( df )
 
-        f.save( os.path.join(os.getcwd(),'src/csv_uploads/results/',f.filename) )
         requests.post( os.environ.get('SWAP_PROFIT_API')+ '/results',
             data = jsonify(swapprofit_json) )
 
-        return jsonify({'message':'Results csv has been processed successfully'}), 200
+        return jsonify({'message':'Results excel has been processed successfully'}), 200
+
 
 
     # CASINOS
     if utils.are_headers_for('casinos', headers):
         
-        id_list = actions.process_casinos_excel( df )
-
-        f.save( os.path.join(os.getcwd(),'src/csv_uploads/venues/',f.filename) )
+        updated_casinos = actions.process_casinos_excel( df )
+        
+        if updated_casinos is not None:
+            r = requests.post(
+                swapprofit.api_host +'/casinos',
+                headers = {'Authorization': 'Bearer '+ swapprofit.api_token},
+                json = jsonify( updated_casinos )
+            )
+            if not r.ok:
+                return 
+            
         return jsonify({
-            'message':'Venue csv has been proccessed successfully',
-            'id_list': id_list
+            'message':'Casino excel has been proccessed successfully',
+            'updated_casinos': updated_casinos
         }), 200
 
 

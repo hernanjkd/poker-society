@@ -95,36 +95,52 @@ def process_tournament_excel(df):
 
 
 
-def process_venues_csv(csv_entries):
+def process_casinos_excel(df):
 
-    id_list = []
+    # To update SwapProfit casinos related to this update
+    updated_casinos = {}
 
-    for entry in csv_entries:
-        casino = Casinos.query.get( entry['casino id'] )    
+    ref = {'name':'CASINO','state':'STATE (FULL)','time_zone':'TIME ZONE',
+        'city':'CITY','zip_code':'ZIP CODE','address':'ADDRESS',
+        'website':'WEBSITE' } #,'id':'ID'}
+    
+    id = 0 # DELETE, ONLY FOR TESTING
+
+    for index, r in df.iterrows():
         
+        if '' in [ r['CASINO'].strip(), r['LONG'], r['LAT'] ]:
+            continue
+
+        id += 1 # DELETE, ONLY FOR TESTING
+        # casino = None # DELETE, ONLY FOR TESTING
+        casino = Casinos.query.get( str(id) ) # DELETE, ONLY FOR TESTING
+        # casino = Casinos.query.get( r['ID'] )    
+
+        casino_json = {
+            'latitude': float(r['LAT']),
+            'longitude': float(r['LONG']),
+            **{ db_column: r[file_header].strip()
+                for db_column, file_header in ref.items() }
+        }
+    
         if casino is None:
             db.session.add( Casinos(
-                name = entry['name'],
-                address = entry['address'],
-                city = entry['city'],
-                state = entry['state'],
-                zip_code = entry['zip code'],
-                longitude = entry['longitude'],
-                latitude = entry['latitude'],
-                website = entry['website']
+                id = str(id),
+                **casino_json
             ))
-
         else:
-            for attr, val in entry:
+            updated_casinos[ casino.id ] = {}
+
+            # Check for updates
+            for attr, val in casino_json.items():
                 if getattr(casino, attr) != val:
                     setattr(casino, attr, val)
+            
+                    # Log for SwapProfit updates
+                    updated_casinos[ casino.id ][attr] = val
+            if not updated_casinos[casino.id]:
+                del updated_casinos[casino.id]
 
         db.session.commit()
-        id_list.append({
-            'id': casino.id,
-            'name': entry['name'],
-            'city': entry['city'],
-            'state': entry['state']
-        })
-
-    return id_list
+        
+    return updated_casinos or None

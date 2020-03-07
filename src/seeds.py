@@ -9,6 +9,7 @@ def run():
     Results.query.delete()
     Flights.query.delete()
     Tournaments.query.delete()
+    Casinos.query.delete()
     Users.query.delete()
     Subscribers.query.delete()
 
