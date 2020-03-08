@@ -159,17 +159,15 @@ def file_upload():
     df = pd.read_excel( f, keep_default_na=False )
     
     headers = list(df)
-    cache={}
-    for index, r in df.iterrows():
-        if r['Tournament'].strip() == '':
-            continue
-        cache[r['Where']] = r['Casino ID']
-    return jsonify(cache)
+
  
     # TOURNAMENTS
     if utils.are_headers_for('tournaments', headers):
 
         updated_df, error_list = actions.process_tournament_excel( df )
+        
+        # updated_df = df # DELETE, ONLY FOR TESTING
+        # error_list = [] # DELETE, ONLY FOR TESTING
         
         # Update Swap Profit
         r = requests.post(
@@ -180,7 +178,18 @@ def file_upload():
         if not r.ok:
             error_list.append( r.content.decode("utf-8") )
 
+        # Save file with added Tournament IDs
+        # if added_id_to_file:
+        #     writer = pd.ExcelWriter(
+        #         '/Users/Francine/Desktop/csv/processed csv/'+f.filename )
+        #     df.to_excel( writer, index=False )
+        #     writer.save()
+
         if len(error_list) > 0:
+            
+            for i, e in enumerate(error_list): # DELETE, ONLY FOR TESTING
+                if len(e) > 233: error_list[i] = e[-233:] # DELETE, ONLY FOR TESTING
+
             return jsonify(error_list)
 
         return 'Done'
@@ -202,21 +211,10 @@ def file_upload():
     # CASINOS
     if utils.are_headers_for('casinos', headers):
         
-        updated_casinos = actions.process_casinos_excel( df )
+        actions.process_casinos_excel( df )
         
-        if updated_casinos is not None:
-            r = requests.post(
-                swapprofit.api_host +'/casinos',
-                headers = {'Authorization': 'Bearer '+ swapprofit.api_token},
-                json = jsonify( updated_casinos )
-            )
-            if not r.ok:
-                return 
-            
-        return jsonify({
-            'message':'Casino excel has been proccessed successfully',
-            'updated_casinos': updated_casinos
-        }), 200
+        return jsonify({'message':
+            'Casino excel has been proccessed successfully'}), 200
 
 
 

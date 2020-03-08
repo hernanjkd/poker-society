@@ -79,9 +79,12 @@ class Casinos(db.Model):
             'latitude': self.latitude,
             'time_zone': self.time_zone,
             'website': self.website,
+            'phone': self.phone,
+            'facebook': self.facebook,
+            'twitter': self.twitter,
+            'instagram': self.instagram,
             'created_at': self.created_at,
-            'updated_at': self.updated_at,
-            'tournaments': [x.serialize() for x in self.tournaments]
+            'updated_at': self.updated_at
         }
 
 
@@ -120,7 +123,6 @@ class Tournaments(db.Model):
             'results_link': self.results_link,
             'structure_link': self.structure_link,
             'start_at': self.start_at,
-            'notes': self.notes,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
             'flights': [x.serialize() for x in self.flights]

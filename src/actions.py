@@ -11,7 +11,7 @@ def process_tournament_excel(df):
 
     # file_header: db_column. Used to loop and check properties quicker
     trmnt_ref = {'Buy-in':'buy_in','Starting Stack':'starting_stack','Blinds':'blinds',
-        'H1':'h1','Structure Link':'structure_link',#'Casino ID':'casino_id', 
+        'H1':'h1','Structure Link':'structure_link','Casino ID':'casino_id', 
         'Results Link':'results_link','Multi ID':'multiday_id'}
     
     error_list = []
@@ -22,7 +22,10 @@ def process_tournament_excel(df):
             continue
 
         trmnt_name, flight_day = utils.resolve_name_day( r['Tournament'] )
-        start_at = datetime.combine( r['Date'].to_pydatetime(), r['Time'] )
+        start_at = datetime.strptime( 
+            str(r['Date'])[:10] + str(r['Time']),
+            '%Y-%m-%d%H:%M:%S' )
+        
 
         # Used to loop and check properties quicker
         flight_ref = { 'start_at': start_at, 'day': flight_day,
@@ -51,7 +54,6 @@ def process_tournament_excel(df):
                 tournament_id = trmnt.id,
                 **flight_ref
             ))
-            db.session.commit()
             
             # save trmnt.id in the file
             df.at[index,'Tournament ID'] = trmnt.id
@@ -87,8 +89,8 @@ def process_tournament_excel(df):
                 if trmnt.name != trmnt_name:
                     trmnt.name = trmnt_name
 
-            db.session.commit()
 
+    db.session.commit()
 
     return [ df, error_list ]
 
@@ -97,24 +99,17 @@ def process_tournament_excel(df):
 
 def process_casinos_excel(df):
 
-    # To update SwapProfit casinos related to this update
-    updated_casinos = {}
-
     ref = {'name':'CASINO','state':'STATE (FULL)','time_zone':'TIME ZONE',
         'city':'CITY','zip_code':'ZIP CODE','address':'ADDRESS',
-        'website':'WEBSITE' } #,'id':'ID'}
+        'website':'WEBSITE','phone':'PHONE NUMBER','facebook':'FACEBOOK',
+        'twitter':'TWITTER','instagram':'INSTAGRAM','id':'ID'}
     
-    id = 0 # DELETE, ONLY FOR TESTING
-
     for index, r in df.iterrows():
         
         if '' in [ r['CASINO'].strip(), r['LONG'], r['LAT'] ]:
             continue
 
-        id += 1 # DELETE, ONLY FOR TESTING
-        # casino = None # DELETE, ONLY FOR TESTING
-        casino = Casinos.query.get( str(id) ) # DELETE, ONLY FOR TESTING
-        # casino = Casinos.query.get( r['ID'] )    
+        casino = Casinos.query.get( r['ID'] )    
 
         casino_json = {
             'latitude': float(r['LAT']),
@@ -124,23 +119,14 @@ def process_casinos_excel(df):
         }
     
         if casino is None:
-            db.session.add( Casinos(
-                id = str(id),
-                **casino_json
-            ))
+            db.session.add( Casinos( **casino_json ))
         else:
-            updated_casinos[ casino.id ] = {}
-
             # Check for updates
             for attr, val in casino_json.items():
                 if getattr(casino, attr) != val:
-                    setattr(casino, attr, val)
+                    setattr(casino, attr, 
+                        val.strip() if isinstance(val, str) else val)
             
-                    # Log for SwapProfit updates
-                    updated_casinos[ casino.id ][attr] = val
-            if updated_casinos[casino.id] == {}:
-                del updated_casinos[casino.id]
-
         db.session.commit()
         
-    return updated_casinos or None
+    return None
