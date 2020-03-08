@@ -159,7 +159,13 @@ def file_upload():
     df = pd.read_excel( f, keep_default_na=False )
     
     headers = list(df)
-    
+    cache={}
+    for index, r in df.iterrows():
+        if r['Tournament'].strip() == '':
+            continue
+        cache[r['Where']] = r['Casino ID']
+    return jsonify(cache)
+ 
     # TOURNAMENTS
     if utils.are_headers_for('tournaments', headers):
 

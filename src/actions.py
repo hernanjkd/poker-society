@@ -138,7 +138,7 @@ def process_casinos_excel(df):
             
                     # Log for SwapProfit updates
                     updated_casinos[ casino.id ][attr] = val
-            if not updated_casinos[casino.id]:
+            if updated_casinos[casino.id] == {}:
                 del updated_casinos[casino.id]
 
         db.session.commit()

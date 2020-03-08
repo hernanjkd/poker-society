@@ -55,6 +55,10 @@ class Casinos(db.Model):
     latitude = db.Column(db.Float)
     time_zone = db.Column(db.String(50))
     website = db.Column(db.String(100))
+    phone = db.Column(db.String(15))
+    facebook = db.Column(db.String(50))
+    twitter = db.Column(db.String(50))
+    instagram = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
