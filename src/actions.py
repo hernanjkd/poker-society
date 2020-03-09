@@ -48,7 +48,7 @@ def process_tournament_excel(df):
                         for file_header, db_column in trmnt_ref.items() }
                 )
                 db.session.add( trmnt )
-                db.session.commit()
+                db.session.flush()
             
             db.session.add( Flights(
                 tournament_id = trmnt.id,
