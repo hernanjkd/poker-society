@@ -164,10 +164,10 @@ def file_upload():
     # TOURNAMENTS
     if utils.are_headers_for('tournaments', headers):
 
-        updated_df, error_list = actions.process_tournament_excel( df )
+        # updated_df, error_list = actions.process_tournament_excel( df )
         
-        # updated_df = df # DELETE, ONLY FOR TESTING
-        # error_list = [] # DELETE, ONLY FOR TESTING
+        updated_df = df # DELETE, ONLY FOR TESTING
+        error_list = [] # DELETE, ONLY FOR TESTING
         
         # Update Swap Profit
         r = requests.post(
@@ -179,11 +179,12 @@ def file_upload():
             error_list.append( r.content.decode("utf-8") )
 
         # Save file with added Tournament IDs
-        # if added_id_to_file:
-        #     writer = pd.ExcelWriter(
-        #         '/Users/Francine/Desktop/csv/processed csv/'+f.filename )
-        #     df.to_excel( writer, index=False )
-        #     writer.save()
+        added_id_to_file = False
+        if added_id_to_file:
+            writer = pd.ExcelWriter(
+                '/Users/Francine/Desktop/csv/processed csv/'+f.filename )
+            df.to_excel( writer, index=False )
+            writer.save()
 
         if len(error_list) > 0:
             

@@ -18,7 +18,7 @@ def process_tournament_excel(df):
 
     for index, r in df.iterrows():
         
-        if r['Tournament'].strip() == '':
+        if str(r['Tournament']).strip() in ['','NaT']:
             continue
 
         trmnt_name, flight_day = utils.resolve_name_day( r['Tournament'] )
@@ -114,7 +114,7 @@ def process_casinos_excel(df):
         casino_json = {
             'latitude': float(r['LAT']),
             'longitude': float(r['LONG']),
-            **{ db_column: r[file_header].strip()
+            **{ db_column: str(r[file_header]).strip()
                 for db_column, file_header in ref.items() }
         }
     
