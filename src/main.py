@@ -71,8 +71,15 @@ def reset_database():
 
 
 @app.route('/testing', methods=['POST'])
-def testing(): 
-    return 'testing'
+def testing():
+    t = Tournaments.query.filter(
+        Tournaments.name.ilike('%Hialeah - $50,000 Guaranteed%')
+    ).first()
+    f = [x.start_at for x in t.flights]
+    return jsonify({
+        'trmnt': t.start_at,
+        'flights': f
+    })
 
 
 @app.route('/user', methods=['POST'])
@@ -164,10 +171,10 @@ def file_upload():
     # TOURNAMENTS
     if utils.are_headers_for('tournaments', headers):
 
-        # updated_df, error_list = actions.process_tournament_excel( df )
+        updated_df, error_list = actions.process_tournament_excel( df )
         
-        updated_df = df # DELETE, ONLY FOR TESTING
-        error_list = [] # DELETE, ONLY FOR TESTING
+        # updated_df = df # DELETE, ONLY FOR TESTING
+        # error_list = [] # DELETE, ONLY FOR TESTING
         
         # Update Swap Profit
         r = requests.post(
