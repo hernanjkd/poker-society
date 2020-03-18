@@ -177,13 +177,13 @@ def file_upload():
         # error_list = [] # DELETE, ONLY FOR TESTING
         
         # Update Swap Profit
-        r = requests.post(
-            swapprofit.api_host +'/tournaments',
-            headers = {'Authorization': 'Bearer '+ swapprofit.api_token},
-            json = updated_df.to_json(orient='records', date_format='iso')
-        )
-        if not r.ok:
-            error_list.append( r.content.decode("utf-8") )
+        # r = requests.post(
+        #     swapprofit.api_host +'/tournaments',
+        #     headers = {'Authorization': 'Bearer '+ swapprofit.api_token},
+        #     json = updated_df.to_json(orient='records', date_format='iso')
+        # )
+        # if not r.ok:
+        #     error_list.append( r.content.decode("utf-8") )
 
         # Save file with added Tournament IDs
         added_id_to_file = False
@@ -319,6 +319,18 @@ def get_roi_data(email):
 
 
 
+@app.route('/swapprofit/update')
+def swapprofit_update():
+
+    if request.args.get('all') == 'true':
+        trmnts = Tournaments.query.all()
+    else:
+        _1hr_ago = datetime.utcnow() - timedelta(days=30, minutes=5)
+        trmnts = Tournaments.query.filter( Tournaments.updated_at > _1hr_ago )
+
+    return jsonify([ x.swapprofit_serialize() for x in trmnts ])
+
+
+
 if __name__ == '__main__':
-    PORT = int(os.environ.get('PORT', 3000))
-    app.run(host='0.0.0.0', port=PORT, debug=False)
+    app.run(host='0.0.0.0', port=3333, debug=False)
