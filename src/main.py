@@ -2,7 +2,7 @@ import os; import re; import io; import csv
 import actions; import requests
 import utils; import seeds
 import pandas as pd
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_file
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt, jwt_required
@@ -67,10 +67,7 @@ def reset_database():
 
 @app.route('/testing/<filename>')
 def testing(filename):
-    from flask import send_file
-    path = '/Users/Francine/Desktop/SwapProfit/csv/' + filename
-    
-    return send_file( path, as_attachment=True )
+    return 'testing'
 
 
 @app.route('/user', methods=['POST'])
@@ -162,10 +159,10 @@ def file_upload():
     # TOURNAMENTS
     if utils.are_headers_for('tournaments', headers):
 
-        updated_df, error_list = actions.process_tournament_excel( df )
+        # updated_df, error_list = actions.process_tournament_excel( df )
         
-        # updated_df = df # DELETE, ONLY FOR TESTING
-        # error_list = [] # DELETE, ONLY FOR TESTING
+        updated_df = df # DELETE, ONLY FOR TESTING
+        error_list = [] # DELETE, ONLY FOR TESTING
         
         # Update Swap Profit
         # r = requests.post(
@@ -177,21 +174,18 @@ def file_upload():
         #     error_list.append( r.content.decode("utf-8") )
 
         # Save file with added Tournament IDs
-        added_id_to_file = False
-        if added_id_to_file:
-            writer = pd.ExcelWriter(
-                '/Users/Francine/Desktop/SwapProfit/csv/processed csv/'+f.filename )
-            df.to_excel( writer, index=False )
-            writer.save()
+        writer = pd.ExcelWriter(
+            f"{os.environ['APP_PATH']}/src/excel_downloads/{f.filename}" )
+        df.to_excel( writer, index=False )
+        writer.save()
 
         if len(error_list) > 0:
-            
-            for i, e in enumerate(error_list): # DELETE, ONLY FOR TESTING
-                if len(e) > 233: error_list[i] = e[-233:] # DELETE, ONLY FOR TESTING
-
             return jsonify(error_list)
 
-        return 'Done'
+        return jsonify({
+            'message':'Done. Downloading file',
+            'download': True
+        }), 200
             
     
 
@@ -200,10 +194,11 @@ def file_upload():
             
         swapprofit_json = actions.process_results_csv( df )
 
-        requests.post( os.environ.get('SWAP_PROFIT_API')+ '/results',
+        requests.post( os.environ.get('SWAPPROFIT_HOST')+ '/results',
             data = jsonify(swapprofit_json) )
 
-        return jsonify({'message':'Results excel has been processed successfully'}), 200
+        return jsonify({'message':
+            'Results excel has been processed successfully'}), 200
 
 
 
@@ -218,6 +213,15 @@ def file_upload():
 
 
     return jsonify({'message':'Unrecognized file'}), 200
+
+
+
+@app.route('/downloads/file/<filename>')
+def download_file(filename):
+    return filename
+    path = f"{os.eviron['APP_PATH']}/src/excel_downloads/{filename}"   
+    return send_file( path, cache_timeout=0, as_attachment=True,
+        attachment_filename=filename )
 
 
 

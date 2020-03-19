@@ -92,10 +92,19 @@
                         method: 'POST',
                         body: data
                     })
-                    .then(resp => resp.text())
+                    .then(resp => resp.json())
                     .then(resp => {
-                        logContent += resp + '<br />';
+                        logContent += resp.message + '<br />';
                         log.innerHTML = logContent;
+                        
+                        // Open new tab to download file
+                        if (resp.download) {
+                            window.open(
+                                '{{ host }}/downloads/file/'+ file.name,
+                                'Downloading '+ file.name,
+                                'resizable, height=200px, width=300px'
+                            )
+                        }
                         
                         upload();
                     })
