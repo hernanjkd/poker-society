@@ -99,6 +99,7 @@
                         
                         // Open new tab to download file
                         if (resp.download) {
+                            console.warn('opening window')
                             window.open(
                                 '{{ host }}/downloads/file/'+ file.name,
                                 'Downloading '+ file.name,

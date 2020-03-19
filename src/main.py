@@ -163,15 +163,6 @@ def file_upload():
         
         updated_df = df # DELETE, ONLY FOR TESTING
         error_list = [] # DELETE, ONLY FOR TESTING
-        
-        # Update Swap Profit
-        # r = requests.post(
-        #     swapprofit.api_host +'/tournaments',
-        #     headers = {'Authorization': 'Bearer '+ swapprofit.api_token},
-        #     json = updated_df.to_json(orient='records', date_format='iso')
-        # )
-        # if not r.ok:
-        #     error_list.append( r.content.decode("utf-8") )
 
         # Save file with added Tournament IDs
         writer = pd.ExcelWriter(
@@ -218,8 +209,7 @@ def file_upload():
 
 @app.route('/downloads/file/<filename>')
 def download_file(filename):
-    return filename
-    path = f"{os.eviron['APP_PATH']}/src/excel_downloads/{filename}"   
+    path = f"{os.environ['APP_PATH']}/src/excel_downloads/{filename}"   
     return send_file( path, cache_timeout=0, as_attachment=True,
         attachment_filename=filename )
 
