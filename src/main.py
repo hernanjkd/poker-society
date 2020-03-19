@@ -1,11 +1,6 @@
-import os
-import re
-import io
-import csv
-import utils
-import seeds
-import actions
-import requests
+import os; import re; import io; import csv
+import actions; import requests
+import utils; import seeds
 import pandas as pd
 from flask import Flask, request, jsonify, render_template
 from flask_migrate import Migrate
@@ -70,16 +65,12 @@ def reset_database():
 
 
 
-@app.route('/testing', methods=['POST'])
-def testing():
-    t = Tournaments.query.filter(
-        Tournaments.name.ilike('%Hialeah - $50,000 Guaranteed%')
-    ).first()
-    f = [x.start_at for x in t.flights]
-    return jsonify({
-        'trmnt': t.start_at,
-        'flights': f
-    })
+@app.route('/testing/<filename>')
+def testing(filename):
+    from flask import send_file
+    path = '/Users/Francine/Desktop/SwapProfit/csv/' + filename
+    
+    return send_file( path, as_attachment=True )
 
 
 @app.route('/user', methods=['POST'])

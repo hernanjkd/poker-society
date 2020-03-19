@@ -96,7 +96,6 @@ def process_tournament_excel(df):
 
 
 
-
 def process_casinos_excel(df):
     
     for index, r in df.iterrows():
