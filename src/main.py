@@ -296,13 +296,22 @@ def get_roi_data(email):
 @app.route('/swapprofit/update')
 def swapprofit_update():
 
-    if request.args.get('all') == 'true':
-        trmnts = Tournaments.query.all()
-    else:
-        _1hr_ago = datetime.utcnow() - timedelta(days=30, minutes=5)
-        trmnts = Tournaments.query.filter( Tournaments.updated_at > _1hr_ago )
+    # Defaults to hours=1
+    span = request.args.get('span', 'hours')
+    amount = request.args.get('amount', 1)
 
+    if span not in ['hours','days','all']:
+        raise APIException('Invalid span: '+ span, 400)
+    
+    if span == 'all':
+        trmnt = Tournaments.query.all()
+    else:
+        time_ago = datetime.utcnow() - timedelta( minutes=5, **{span:amount} )
+        trmnts = Tournaments.query.filter( Tournaments.updated_at > time_ago )
+    
     return jsonify([ x.swapprofit_serialize() for x in trmnts ])
+
+
 
 
 
