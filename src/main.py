@@ -107,19 +107,25 @@ def login():
     ).first()
     
     if user is None:
-        return 'Email and password are incorrect'
+        return jsonify({
+            'login': False,
+            'message':'Email and password are incorrect',
+        })
     
-    resp = make_response( redirect('/upload/files') )
-    resp.set_cookie( 'jwt', create_jwt({'id': user.id,'role': 'admin'}) )
-    return resp
+    return jsonify({
+        'login': True,
+        'jwt': create_jwt({'id':user.id, 'role':'admin'})
+    })
     
 
 
 @app.route('/upload/files', methods=['GET','POST'])
 def file_upload():
 
-    jwt = request.cookies.get('pokersociety_jwt')
-    return jwt
+    jwt = request.cookies.get('jwt')
+    
+    print(jwt)
+    return 'jwt'
 
     # GET
     if request.method == 'GET':

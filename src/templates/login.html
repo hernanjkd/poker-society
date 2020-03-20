@@ -48,8 +48,18 @@
                         password: password
                     })
                 })
-                .then(resp => resp.text())
-                .then(resp => document.querySelector('#message').innerHTML = resp)
+                .then(resp => resp.json())
+                .then(resp => {
+                    if (resp.login) {
+                        let now = new Date();
+                        let cookie = 'pokersociety-jwt=' + resp.jwt;
+                        let expires = 'expires=' + now.setDate( now.getDate() + 400 );
+                        document.cookie = `${cookie};${expires};path=/upload/files`;
+                        window.location = '{{ host }}/upload/files';
+                    }
+                    else
+                        document.querySelector('#message').innerHTML = resp.message;
+                })
                 .catch(err => console.error(err))
             }
         </script>
