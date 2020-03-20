@@ -52,6 +52,7 @@ def handle_invalid_usage(error):
 
 
 
+
 @app.route('/reset_database')
 def reset_database():
     seeds.run()
@@ -91,6 +92,7 @@ def register():
 
 
 
+@app.route('/', methods=['GET','POST'])
 @app.route('/users/login', methods=['GET','POST'])
 def login():
     
