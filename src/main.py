@@ -122,10 +122,8 @@ def login():
 @app.route('/upload/files', methods=['GET','POST'])
 def file_upload():
 
-    jwt = request.cookies.get('jwt')
-    
-    print(jwt)
-    return 'jwt'
+    jwt = request.cookies.get('pokersociety-jwt')
+    decode_jwt( jwt )
 
     # GET
     if request.method == 'GET':

@@ -100,8 +100,8 @@
                         // Open new tab to download file
                         if (resp.download) {
                             window.open(
-                                '{{ host }}/downloads/file/'+ file.name,
-                                'Downloading '+ file.name,
+                                '{{ host }}/download/file/'+ file.name,
+                                Date.now(), // 1584681630463 (must be unique for multiple windows to open)
                                 'resizable, height=200px, width=300px'
                             )
                         }
