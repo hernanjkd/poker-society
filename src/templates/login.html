@@ -12,13 +12,15 @@
     <body>
         <div class="d-flex justify-content-center">
             <div id="page" class="mt-5 p-5">
-                <div class="text-warning">{{ message }}</div>
+                <div id="message" class="text-danger my-3"></div>
                 <div style="width:300px">
-                    <input class="form-control" 
+                    <input class="form-control"
+                        onkeypress="listenEnter(event)"
                         type="text" id="email" placeholder="Email" />
                 </div>
                 <div class="my-3" style="width:300px">
-                    <input class="form-control" 
+                    <input class="form-control"
+                        onkeypress="listenEnter(event)"
                         type="password" id="password" placeholder="Password" />
                 </div>
                 <div class="text-center">
@@ -30,22 +32,24 @@
             </div>
         </div>
         <script type="text/javascript">
+            function listenEnter(event) {
+                if (event.key === 'Enter')
+                    login()
+            }
             function login() {
                 let email = document.querySelector('#email').value;
                 let password = document.querySelector('#password').value;
                 
-                fetch('{{ host }}/user/login', {
+                fetch('{{ host }}/users/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         email: email,
                         password: password
                     })
                 })
                 .then(resp => resp.text())
-                .then(resp => console.log(resp))
+                .then(resp => document.querySelector('#message').innerHTML = resp)
                 .catch(err => console.error(err))
             }
         </script>

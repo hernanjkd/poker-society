@@ -2,7 +2,8 @@ import os; import re; import io; import csv
 import actions; import requests
 import utils; import seeds
 import pandas as pd
-from flask import Flask, request, jsonify, render_template, send_file
+from flask import ( Flask, request, jsonify, render_template, send_file, 
+    make_response, redirect )
 from flask_migrate import Migrate
 from flask_cors import CORS
 from flask_jwt_simple import JWTManager, create_jwt, decode_jwt, get_jwt, jwt_required
@@ -22,39 +23,32 @@ MIGRATE = Migrate(app, db)
 db.init_app(app)
 CORS(app)
 
-JWTManager(app)
+jwt = JWTManager(app)
 SetupAdmin(app)
+
+
+
+######################################################################
+# Takes in a dictionary with id, role and expiration date in minutes
+#        create_jwt({ 'id': 100, 'role': 'admin', 'exp': 15 })
+######################################################################
+@jwt.jwt_data_loader
+def add_claims_to_access_token(data):
+    data = data if isinstance(data, dict) else {}
+    now = datetime.utcnow()
+    return {
+        'exp': now + timedelta( days=data.get('exp', 400) ),
+        'sub': data.get('id'),
+        'role': data.get('role'),
+        'iat': now,
+        'nbf': now,
+    }
 
 
 
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
-
-@app.route('/jwt')
-@jwt_required
-def jwt():
-    return jsonify(create_jwt(identity='hello'))
-
-######################################################################
-# Takes in a dictionary with id, role and expiration date in minutes
-#        create_jwt({ 'id': 100, 'role': 'admin', 'exp': 15 })
-######################################################################
-# @jwt.jwt_data_loader
-# def add_claims_to_access_token(kwargs={}):
-#     now = datetime.utcnow()
-#     kwargs = kwargs if isinstance(kwargs, dict) else {}
-#     id = kwargs.get('id')
-#     role = kwargs.get('role', 'invalid')
-#     exp = kwargs.get('exp', 15)
-
-#     return {
-#         'exp': now + timedelta(minutes=exp),
-#         'iat': now,
-#         'nbf': now,
-#         'sub': id,
-#         'role': role
-#     }
 
 
 
@@ -67,10 +61,13 @@ def reset_database():
 
 @app.route('/testing/<filename>')
 def testing(filename):
-    return 'testing'
+    resp = make_response( redirect('/upload/files') )
+    resp.set_cookie( 'pokersociety_jwt', 'hi jwt' )
+    return resp
 
 
-@app.route('/user', methods=['POST'])
+
+@app.route('/users', methods=['POST'])
 def register():
 
     json = request.get_json()
@@ -94,9 +91,9 @@ def register():
 
 
 
-@app.route('/user/login', methods=['GET','POST'])
+@app.route('/users/login', methods=['GET','POST'])
 def login():
-
+    
     if request.method == 'GET':
         return render_template('login.html',
             host=os.environ.get('API_HOST'))
@@ -108,34 +105,22 @@ def login():
         email = json['email'],
         password = utils.sha256( json['password'] )
     ).first()
+    
     if user is None:
-        return render_template('login.html',
-            host=os.environ.get('API_HOST'),
-            message='Email and password are incorrect.')
-    return 'ok'
-    # return render_template('dashboard.html')
-
-    # return jsonify({
-    #     'jwt': create_jwt({
-    #         'id': user.id,
-    #         'role': 'user',
-    #         'exp': 600
-    #     })
-    # }), 200
-
-
-
-@app.route('/dashboard')
-@role_jwt_required(['user'])
-def get_user(user_id):
-    pass
+        return 'Email and password are incorrect'
+    
+    resp = make_response( redirect('/upload/files') )
+    resp.set_cookie( 'jwt', create_jwt({'id': user.id,'role': 'admin'}) )
+    return resp
     
 
 
-@app.route('/upload_files', methods=['GET','POST'])
-# @role_jwt_required(['admin'])
+@app.route('/upload/files', methods=['GET','POST'])
 def file_upload():
-    
+
+    jwt = request.cookies.get('pokersociety_jwt')
+    return jwt
+
     # GET
     if request.method == 'GET':
         return render_template('file_upload.html', 
@@ -185,8 +170,8 @@ def file_upload():
             
         swapprofit_json = actions.process_results_csv( df )
 
-        requests.post( os.environ.get('SWAPPROFIT_HOST')+ '/results',
-            data = jsonify(swapprofit_json) )
+        # requests.post( os.environ.get('SWAPPROFIT_HOST')+ '/results',
+        #     data = jsonify(swapprofit_json) )
 
         return jsonify({'message':
             'Results excel has been processed successfully'}), 200
@@ -207,7 +192,7 @@ def file_upload():
 
 
 
-@app.route('/downloads/file/<filename>')
+@app.route('/download/file/<filename>')
 def download_file(filename):
     path = f"{os.environ['APP_PATH']}/src/excel_downloads/{filename}"   
     return send_file( path, cache_timeout=0, as_attachment=True,

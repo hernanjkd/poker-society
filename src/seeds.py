@@ -20,6 +20,15 @@ def run():
     db.session.execute("ALTER SEQUENCE subscribers_id_seq RESTART")
 
 
+    db.session.add( Users(
+        email = 'loustadler@hotmail.com',
+        password = sha256('iamlou'),
+        first_name = 'Lou',
+        middle_name = '',
+        last_name = 'Stadler',
+        nationality = 'USA'
+    ))
+
     db.session.add( Subscribers(
         company_name = 'Swap Profit',
         api_host = 'http://localhost:3000',
