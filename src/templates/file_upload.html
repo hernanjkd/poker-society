@@ -81,7 +81,10 @@ const errorMessage = msg => `<span class="text-danger">${msg}</span><br />`;
 
 function upload() {
 
-    if (files.length > 0) {
+    if (files.length === 0) 
+        logContent = '';
+
+    else {
         
         let file = files.shift();
         displayFileData();
@@ -110,10 +113,9 @@ function upload() {
                 window.open(
                     '{{ host }}/download/file/'+ file.name,
                     Date.now(), // 1584681630463 (must be unique for multiple windows to open)
-                    'resizable, height=200px, width=300px'
-                )
+                    'resizable, height=200px, width=300px' )
             }
-            
+           
             // Continue uploading
             upload();
         })
@@ -124,7 +126,6 @@ function upload() {
             log.innerHTML = logContent;
         })
     }
-    else logContent='';
 }
 
 function displayFileData() {

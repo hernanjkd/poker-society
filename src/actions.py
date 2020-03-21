@@ -140,3 +140,4 @@ def process_casinos_excel(df):
         db.session.commit()
         
     return
+
