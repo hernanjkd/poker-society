@@ -70,7 +70,6 @@ def process_tournament_excel(df):
             # save trmnt.id in the file
             df.at[index,'Tournament ID'] = trmnt.id
             trmnt_added = True
-            print(start_at, trmnt_name)
 
         
         else:
