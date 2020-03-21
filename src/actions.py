@@ -21,12 +21,18 @@ def process_tournament_excel(df):
             str(r['Date'])[:10] + str(r['Time']),
             '%Y-%m-%d%H:%M:%S' )
 
+        casino_id = r['Casino ID']
+        casino = Casinos.query.get( casino_id )
+        if casino is None:
+            error_list.append(f'Casino with id {casino_id} not found')
+            continue
+
 
         # Used to loop and check properties quicker
         trmntjson = {
             'name': trmnt_name,
             'start_at': start_at,
-            'casino_id': r['Casino ID'],
+            'casino_id': casino_id,
             'multiday_id': r['Multi ID'].strip(),
             'h1': r['H1'].strip(),
             'buy_in': str( r['Buy-in'] ).strip(),
@@ -93,7 +99,6 @@ def process_tournament_excel(df):
     db.session.commit()
 
     return [ df, error_list ]
-
 
 
 def process_casinos_excel(df):

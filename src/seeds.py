@@ -1,4 +1,3 @@
-# from flask_sqlalchemy import SQLAlchemy
 from models import db, Users, Casinos, Tournaments, Flights, Results, Subscribers
 from datetime import datetime, timedelta
 from utils import sha256
@@ -21,8 +20,8 @@ def run():
 
 
     db.session.add( Users(
-        email = 'loustadler@hotmail.com',
-        password = sha256('iamlou'),
+        email = 'lkj',
+        password = sha256('lkj'),
         first_name = 'Lou',
         middle_name = '',
         last_name = 'Stadler',

@@ -48,112 +48,121 @@
             </div>
         </div>
         <script type="text/javascript">
-            const dropArea = document.querySelector('#drop-area');
-            const info = document.querySelector('#info');
-            const log = document.querySelector('#log');
+const dropArea = document.querySelector('#drop-area');
+const info = document.querySelector('#info');
+const log = document.querySelector('#log');
+
+let files = [];
+let logContent = '';
+
+['dragenter','dragover','dragleave','drop'].forEach(event => {
+    dropArea.addEventListener(event, e => {
+        e.preventDefault();
+        e.stopPropagation();
+    }, false)
+})
+
+
+dropArea.addEventListener('dragover', e => {
+    dropArea.classList.replace('un-highlight', 'highlight');
+}, false);
+dropArea.addEventListener('dragleave', e => {
+    dropArea.classList.replace('highlight', 'un-highlight');
+}, false);
+
+dropArea.addEventListener('drop', e => {
+    files = [...files, ...e.dataTransfer.files];                
+    displayFileData();
+}, false)
+
+
+const errorMessage = msg => `<span class="text-danger">${msg}</span><br />`;
+
+function upload() {
+
+    if (files.length > 0) {
+        
+        let file = files.shift();
+        displayFileData();
+
+        let data = new FormData();
+        data.append('excel', file);
+
+        log.className = 'border p-2';
+        logContent += `Processing... ${file.name}<br />`;
+        log.innerHTML = logContent;
+
+        fetch('{{ host }}/upload/files', {
+            method: 'POST',
+            body: data
+        })
+        .then(resp => resp.json())
+        .then(resp => {
+            if (resp.message)
+                logContent += resp.message + '<br />';
+            else if (resp.error)
+                logContent += errorMessage( resp.error.join('<br />') );
             
-            let files = [];
-            let logContent = '';
+            log.innerHTML = logContent;
             
-            ['dragenter','dragover','dragleave','drop'].forEach(event => {
-                dropArea.addEventListener(event, e => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }, false)
-            })
-
-            dropArea.addEventListener('dragover', e => {
-                dropArea.classList.replace('un-highlight', 'highlight');
-            }, false);
-            dropArea.addEventListener('dragleave', e => {
-                dropArea.classList.replace('highlight', 'un-highlight');
-            }, false);
+            // Open new tab to download file
+            if (resp.download) {
+                window.open(
+                    '{{ host }}/download/file/'+ file.name,
+                    Date.now(), // 1584681630463 (must be unique for multiple windows to open)
+                    'resizable, height=200px, width=300px'
+                )
+            }
             
-            dropArea.addEventListener('drop', e => {
-                files = [...files, ...e.dataTransfer.files];                
-                displayFileData();
-            }, false)
+            // Continue uploading
+            upload();
+        })
+        .catch(err => {
+            console.log(err);
+            log.className = 'border p-2';
+            logContent += errorMessage(err);
+            log.innerHTML = logContent;
+        })
+    }
+    else logContent='';
+}
 
-            function upload() {
+function displayFileData() {
+    if (files.length != 0) {
+        dropArea.innerHTML = `${files.length} file${files.length==1?'':'s'} ready to upload`;
 
-                if (files.length > 0) {
-                    
-                    let file = files.shift();
-                    displayFileData();
+        info.classList.remove('justify-content-center');
+        info.innerHTML = `
+            <ul class="text-left">
+                ${files.map((e,i) => `
+                    <li>
+                        ${e.name} <span class="border px-1 bg-secondary text-light" 
+                        onclick="removeFile(${i})"  style="cursor:pointer">x</span>
+                    </li>`
+                ).join('')}
+            </ul>`;
+    }
+    else {
+        dropArea.classList.replace('highlight', 'un-highlight');
+        dropArea.innerHTML = `<h2 style="color:rgb(181, 181, 181)">DRAG AND DROP</h2>`;
 
-                    let data = new FormData();
-                    data.append('excel', file);
+        info.classList.add('justify-content-center');
+        info.innerHTML = `<h2 style="color:rgb(181, 181, 181)">FILE INFO</h2>`;
+    }
+}
 
-                    log.className = 'border p-2';
-                    logContent += `Processing... ${file.name}<br />`;
-                    log.innerHTML = logContent;
+function removeFile(index) {
+    files = files.filter((e,i) => i !== index);
+    displayFileData();
+}
 
-                    fetch('{{ host }}/upload/files', {
-                        method: 'POST',
-                        body: data
-                    })
-                    .then(resp => resp.json())
-                    .then(resp => {
-                        logContent += resp.message + '<br />';
-                        log.innerHTML = logContent;
-                        
-                        // Open new tab to download file
-                        if (resp.download) {
-                            window.open(
-                                '{{ host }}/download/file/'+ file.name,
-                                Date.now(), // 1584681630463 (must be unique for multiple windows to open)
-                                'resizable, height=200px, width=300px'
-                            )
-                        }
-                        
-                        upload();
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        log.className = 'border p-2';
-                        logContent += `<span class="text-danger">${err}</span><br />`;
-                        log.innerHTML = logContent;
-                    })
-                }
-                else logContent='';
-            }
-
-            function displayFileData() {
-                if (files.length != 0) {
-                    dropArea.innerHTML = `${files.length} file${files.length==1?'':'s'} ready to upload`;
-
-                    info.classList.remove('justify-content-center');
-                    info.innerHTML = `
-                        <ul class="text-left">
-                            ${files.map((e,i) => `
-                                <li>
-                                    ${e.name} <span class="border px-1 bg-secondary text-light" 
-                                    onclick="removeFile(${i})"  style="cursor:pointer">x</span>
-                                </li>`
-                            ).join('')}
-                        </ul>`;
-                }
-                else {
-                    dropArea.classList.replace('highlight', 'un-highlight');
-                    dropArea.innerHTML = `<h2 style="color:rgb(181, 181, 181)">DRAG AND DROP</h2>`;
-
-                    info.classList.add('justify-content-center');
-                    info.innerHTML = `<h2 style="color:rgb(181, 181, 181)">FILE INFO</h2>`;
-                }
-            }
-
-            function removeFile(index) {
-                files = files.filter((e,i) => i !== index);
-                displayFileData();
-            }
-
-            function clearData() {
-                files = [];
-                logContent = '';
-                displayFileData();
-                log.className = 'border d-flex align-items-center justify-content-center';
-                log.innerHTML = `<h2 style="color:rgb(181, 181, 181)">LOG</h2>`;
-            }
+function clearData() {
+    files = [];
+    logContent = '';
+    displayFileData();
+    log.className = 'border d-flex align-items-center justify-content-center';
+    log.innerHTML = `<h2 style="color:rgb(181, 181, 181)">LOG</h2>`;
+}
         </script>
     </body>
 </html>

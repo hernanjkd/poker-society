@@ -124,8 +124,12 @@ def login():
 @app.route('/upload/files', methods=['GET','POST'])
 def file_upload():
 
-    jwt = request.cookies.get('pokersociety-jwt')
-    decode_jwt( jwt )
+    # try:
+    #     jwt = request.cookies.get('pokersociety-jwt')
+    #     decode_jwt( jwt )
+    # except: 
+    #     return redirect('/users/login')
+
 
     # GET
     if request.method == 'GET':
@@ -150,10 +154,10 @@ def file_upload():
     # TOURNAMENTS
     if utils.are_headers_for('tournaments', headers):
 
-        # updated_df, error_list = actions.process_tournament_excel( df )
+        updated_df, error_list = actions.process_tournament_excel( df )
         
-        updated_df = df # DELETE, ONLY FOR TESTING
-        error_list = [] # DELETE, ONLY FOR TESTING
+        # updated_df = df # DELETE, ONLY FOR TESTING
+        # error_list = [] # DELETE, ONLY FOR TESTING
 
         # Save file with added Tournament IDs
         writer = pd.ExcelWriter(
@@ -162,7 +166,7 @@ def file_upload():
         writer.save()
 
         if len(error_list) > 0:
-            return jsonify(error_list)
+            return jsonify({'error': error_list})
 
         return jsonify({
             'message':'Done. Downloading file',
