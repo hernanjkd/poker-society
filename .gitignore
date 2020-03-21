@@ -3,9 +3,10 @@
 database.database
 database.db
 diagram.png
-public/*
-dist/*
-excel_downloads/*
+public/
+dist/
+excel_downloads/
+migrations/
 package.json
 
 __pycache__/
