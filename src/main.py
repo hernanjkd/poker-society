@@ -154,23 +154,29 @@ def file_upload():
     # TOURNAMENTS
     if utils.are_headers_for('tournaments', headers):
 
-        updated_df, error_list = actions.process_tournament_excel( df )
-        
+        returned_data = actions.process_tournament_excel( df )
+
+        updated_df, error_list, trmnt_added = returned_data
+
         # updated_df = df # DELETE, ONLY FOR TESTING
         # error_list = [] # DELETE, ONLY FOR TESTING
 
         # Save file with added Tournament IDs
-        writer = pd.ExcelWriter(
-            f"{os.environ['APP_PATH']}/src/excel_downloads/{f.filename}" )
-        df.to_excel( writer, index=False )
-        writer.save()
+        if trmnt_added:
+            writer = pd.ExcelWriter(
+                f"{os.environ['APP_PATH']}/src/excel_downloads/{f.filename}" )
+            df.to_excel( writer, index=False )
+            writer.save()
 
         if len(error_list) > 0:
-            return jsonify({'error': error_list})
+            return jsonify({
+                'download': trmnt_added,
+                'error': error_list
+            })
 
         return jsonify({
-            'message':'Done. Downloading file',
-            'download': True
+            'message': 'Done. Downloading file' if trmnt_added else 'Done',
+            'download': trmnt_added
         }), 200
             
     

@@ -10,6 +10,7 @@ from datetime import datetime
 def process_tournament_excel(df):
 
     error_list = []
+    trmnt_added = False
 
     for index, r in df.iterrows():
         
@@ -68,6 +69,8 @@ def process_tournament_excel(df):
             
             # save trmnt.id in the file
             df.at[index,'Tournament ID'] = trmnt.id
+            trmnt_added = True
+            print(start_at, trmnt_name)
 
         
         else:
@@ -98,7 +101,7 @@ def process_tournament_excel(df):
 
     db.session.commit()
 
-    return [ df, error_list ]
+    return df, error_list, trmnt_added
 
 
 def process_casinos_excel(df):

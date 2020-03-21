@@ -76,6 +76,7 @@ dropArea.addEventListener('drop', e => {
 }, false)
 
 
+const successMessage = msg => `<span class="text-success">${msg}</span><br />`;
 const errorMessage = msg => `<span class="text-danger">${msg}</span><br />`;
 
 function upload() {
@@ -99,10 +100,9 @@ function upload() {
         .then(resp => resp.json())
         .then(resp => {
             if (resp.message)
-                logContent += resp.message + '<br />';
+                logContent += successMessage( resp.message );
             else if (resp.error)
-                logContent += errorMessage( resp.error.join('<br />') );
-            
+                logContent += errorMessage( resp.error.join('<br />') );            
             log.innerHTML = logContent;
             
             // Open new tab to download file
