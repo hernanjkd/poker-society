@@ -124,11 +124,11 @@ def login():
 @app.route('/upload/files', methods=['GET','POST'])
 def file_upload():
 
-    # try:
-    #     jwt = request.cookies.get('pokersociety-jwt')
-    #     decode_jwt( jwt )
-    # except: 
-    #     return redirect('/users/login')
+    try:
+        jwt = request.cookies.get('pokersociety-jwt')
+        decode_jwt( jwt )
+    except: 
+        return redirect('/users/login')
 
 
     # GET
@@ -142,7 +142,7 @@ def file_upload():
 
     swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
     if swapprofit is None:
-        raise APIException('Swap Profit not a subscriber', 500)
+        return jsonify({'error': ['Swap Profit not a subscriber']})
 
 
     f = request.files['excel']
@@ -181,19 +181,6 @@ def file_upload():
             
     
 
-    # RESULTS
-    if utils.are_headers_for('results', headers):
-            
-        swapprofit_json = actions.process_results_csv( df )
-
-        # requests.post( os.environ.get('SWAPPROFIT_HOST')+ '/results',
-        #     data = jsonify(swapprofit_json) )
-
-        return jsonify({'message':
-            'Results excel has been processed successfully'}), 200
-
-
-
     # CASINOS
     if utils.are_headers_for('casinos', headers):
         
@@ -201,6 +188,19 @@ def file_upload():
         
         return jsonify({'message':
             'Casino excel has been proccessed successfully'}), 200
+
+
+    # RESULTS
+    # if utils.are_headers_for('results', headers):
+            
+    #     swapprofit_json = actions.process_results_csv( df )
+
+    #     requests.post( os.environ.get('SWAPPROFIT_HOST')+ '/results',
+    #         data = jsonify(swapprofit_json) )
+
+    #     return jsonify({'message':
+    #         'Results excel has been processed successfully'}), 200
+
 
 
 
