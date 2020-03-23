@@ -25,7 +25,9 @@ def process_tournament_excel(df):
         casino_id = r['Casino ID']
         casino = Casinos.query.get( casino_id )
         if casino is None:
-            error_list.append(f'Casino with id {casino_id} not found')
+            msg = f'Casino with id {casino_id} not found'
+            if msg not in error_list:
+                error_list.append(msg)
             continue
 
 

@@ -17,6 +17,7 @@
         </style>
     </head>
     <body>
+        <button class="btn btn-light text-dark m-3" onclick="logout()">LOG OUT</button>
         <div id="page" class="mt-5 p-5 d-flex justify-content-center">
             <div class="text-right">
                 <div id="drop-area" class="d-flex align-items-center justify-content-center un-highlight" 
@@ -95,17 +96,20 @@ function upload() {
         log.className = 'border p-2';
         logContent += `Processing... ${file.name}<br />`;
         log.innerHTML = logContent;
-
+        
         fetch('{{ host }}/upload/files', {
             method: 'POST',
             body: data
         })
-        .then(resp => resp.json())
+        .then(resp => resp.json())       
         .then(resp => {
             if (resp.message)
                 logContent += successMessage( resp.message );
-            else if (resp.error)
-                logContent += errorMessage( resp.error.join('<br />') );            
+            else if (resp.error) {
+                let err = resp.error;
+                let msg = Array.isArray(err) ? err.join('<br />') : err;
+                logContent += errorMessage( msg );
+            }
             log.innerHTML = logContent;
             
             // Open new tab to download file
@@ -115,7 +119,7 @@ function upload() {
                     Date.now(), // 1584681630463 (must be unique for multiple windows to open)
                     'resizable, height=200px, width=300px' )
             }
-           
+
             // Continue uploading
             upload();
         })
@@ -163,6 +167,11 @@ function clearData() {
     displayFileData();
     log.className = 'border d-flex align-items-center justify-content-center';
     log.innerHTML = `<h2 style="color:rgb(181, 181, 181)">LOG</h2>`;
+}
+
+function logout() {
+    document.cookie = `pokersociety-jwt=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+    window.location = '{{ host }}';
 }
         </script>
     </body>

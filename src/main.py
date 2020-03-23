@@ -142,7 +142,7 @@ def file_upload():
 
     swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
     if swapprofit is None:
-        return jsonify({'error': ['Swap Profit not a subscriber']})
+        return jsonify({'error': 'Swap Profit not a subscriber'})
 
 
     f = request.files['excel']
@@ -204,7 +204,7 @@ def file_upload():
 
 
 
-    return jsonify({'message':'Unrecognized file'}), 200
+    return jsonify({'error': 'Unrecognized file'}), 200
 
 
 
