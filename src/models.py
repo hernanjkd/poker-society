@@ -116,8 +116,9 @@ class Tournaments(db.Model):
         from_casino = ['address','city','state','zip_code','time_zone','latitude','longitude']
         return {
             'updated_at': self.updated_at,
-            'tournament': { **{attr: getattr(self, attr) for attr in from_trmnt},
-                            **{attr: getattr(self.casino, attr) for attr in from_casino} },
+            'tournament': { 'casino': self.casino.name,
+                **{attr: getattr(self, attr) for attr in from_trmnt},
+                **{attr: getattr(self.casino, attr) for attr in from_casino} },
             'flights': [
                 {'id':f.id,'day':f.day,'start_at':f.start_at,'tournament_id':f.tournament_id} 
                 for f in self.flights ]
