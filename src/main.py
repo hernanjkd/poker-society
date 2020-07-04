@@ -192,15 +192,15 @@ def file_upload():
 
 
     # RESULTS
-    # if utils.are_headers_for('results', headers):
+    if utils.are_headers_for('results', headers):
             
-    #     swapprofit_json = actions.process_results_csv( df )
+        swapprofit_json = actions.process_results_excel( df )
 
-    #     requests.post( os.environ.get('SWAPPROFIT_HOST')+ '/results',
-    #         data = jsonify(swapprofit_json) )
+        # requests.post( os.environ.get('SWAPPROFIT_HOST')+ '/results',
+        #     data = jsonify(swapprofit_json) )
 
-    #     return jsonify({'message':
-    #         'Results excel has been processed successfully'}), 200
+        return jsonify({'message':
+            'Results excel has been processed successfully'}), 200
 
 
 

@@ -145,4 +145,10 @@ def process_casinos_excel(df):
 
 
 def process_results_excel(df):
-    pass
+    
+    print(df)
+
+    for index, r in df.iterrows():
+
+        print(index, r)
+        break
