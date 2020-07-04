@@ -143,3 +143,6 @@ def process_casinos_excel(df):
         
     return
 
+
+def process_results_excel(df):
+    pass

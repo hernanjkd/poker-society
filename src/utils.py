@@ -63,13 +63,14 @@ def resolve_name_day(string):
 
 def are_headers_for(table, file_headers):
     switch = {
-        'results':  ['place','nationality','first_name','middle_name',
-                    'last_name','winnings','tps points'],
-        'casinos':  ['CASINO','STATE (ABB.)','STATE (FULL)','REGION','TIME ZONE','ADDRESS',
-                    'CITY','ZIP CODE','LAT','LONG','WEBSITE'],
-        'tournaments':['Date','Day','Time','Where','Tournament','Buy-in',
-                    'Starting Stack', 'Blinds','Structure Link','Casino ID',
-                    'Tournament ID','Multi ID','H1','NOTES - LOU','Results Link','Entrants'] }
+        'results': ['Place','Full Name','Winnings','TPS Points','Nationality',
+            'Residence'],
+        'casinos': ['CASINO','STATE (ABB.)','STATE (FULL)','REGION',
+            'TIME ZONE','ADDRESS','CITY','ZIP CODE','LAT','LONG','WEBSITE'],
+        'tournaments': ['Date','Day','Time','Where','Tournament','Buy-in',
+            'Starting Stack','Blinds','Structure Link','Casino ID','Multi ID',
+            'Tournament ID','H1','NOTES - LOU','Results Link','Entrants']
+    }
     for header in switch[table]:
         if header not in file_headers:
             return False

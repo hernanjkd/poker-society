@@ -124,6 +124,7 @@ def login():
 @app.route('/upload/files', methods=['GET','POST'])
 def file_upload():
 
+    # If user not logged in, send him to login page
     try:
         jwt = request.cookies.get('pokersociety-jwt')
         decode_jwt( jwt )
