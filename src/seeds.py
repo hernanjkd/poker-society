@@ -22,8 +22,8 @@ def run():
     db.session.add( Users(
         email = '123',
         password = sha256('123'),
-        first_name = 'Lou',
-        nickname = '',
+        first_name = 'Louiz',
+        nickname = 'Lou',
         last_name = 'Stadler',
         nationality = 'USA'
     ))
