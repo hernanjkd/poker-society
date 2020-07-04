@@ -18,8 +18,8 @@ class Users(db.Model):
     password = db.Column(db.String(256), nullable=False)
     status = db.Column(db.Enum(UserStatus), default=UserStatus.unclaimed)
     first_name = db.Column(db.String(100), nullable=False)
-    middle_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100), nullable=False)
+    nickname = db.Column(db.String(100))
     nationality = db.Column(db.String(30))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -35,8 +35,8 @@ class Users(db.Model):
             'email': self.email,
             'status': self.status._value_,
             'first_name': self.first_name,
-            'middle_name': self.middle_name,
             'last_name': self.last_name,
+            'nickname': self.nickname,
             'nationality': self.nationality,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
@@ -175,8 +175,8 @@ class Results(db.Model):
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournaments.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     first_name = db.Column(db.String(20))
-    middle_name = db.Column(db.String(20))
     last_name = db.Column(db.String(20))
+    nickname = db.Column(db.String(20))
     nationality = db.Column(db.String(30))
     position = db.Column(db.Integer)
     winnings = db.Column(db.String(30), default=None)
@@ -195,8 +195,8 @@ class Results(db.Model):
             'tournament_id': self.tournament_id,
             'user_id': self.user_id,
             'first_name': self.first_name,
-            'middle_name': self.middle_name,
             'last_name': self.last_name,
+            'nickname': self.nickname,
             'nationality': self.nationality,
             'email': user and self.user.email,
             'position': self.position,

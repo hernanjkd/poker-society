@@ -23,7 +23,7 @@ def run():
         email = '123',
         password = sha256('123'),
         first_name = 'Lou',
-        middle_name = '',
+        nickname = '',
         last_name = 'Stadler',
         nationality = 'USA'
     ))
