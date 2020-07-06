@@ -176,7 +176,7 @@ class Results(db.Model):
     # user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     full_name = db.Column(db.String(40))
     nationality = db.Column(db.String(30))
-    position = db.Column(db.Integer)
+    place = db.Column(db.String(6))
     winnings = db.Column(db.String(30), default=None)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -195,7 +195,7 @@ class Results(db.Model):
             'full_name': self.full_name,
             'nationality': self.nationality,
             'email': user and self.user.email,
-            'position': self.position,
+            'place': self.place,
             'winnings': self.winnings,
             'created_at': self.created_at,
             'updated_at': self.updated_at
