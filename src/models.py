@@ -24,7 +24,7 @@ class Users(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    results = db.relationship('Results', back_populates='user')
+    # results = db.relationship('Results', back_populates='user')
 
     def __repr__(self):
         return f'<Users {self.email}>'
@@ -106,7 +106,7 @@ class Tournaments(db.Model):
 
     casino = db.relationship('Casinos', back_populates='tournaments')
     flights = db.relationship('Flights', back_populates='tournament')
-    results = db.relationship('Results', back_populates='tournament')
+    # results = db.relationship('Results', back_populates='tournament')
 
     def __repr__(self):
         return f'<Tournament {self.name}>'
