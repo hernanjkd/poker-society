@@ -151,12 +151,28 @@ def process_results_excel(df):
     for index, r in df.iterrows():
 
         if index == 0:
+            # Get the trmnt data that's in the first row
             trmnt_data = {
                 'id': None,
                 'name': r['Event'],
                 'entrants': r['Entrants'],
                 'prize_total': r['Total Prize Pool']
             }
+        #
+        # Trmnt id MUST be in the excel file
+        #
+        #
+        # how do we match the result name with the user in db ???
+        #
+        # Richard Blume Jr
+        '''
+        name = r['Full Name'].split(' ')
+        first_name = name[0] # Richard
+        last_name = ' '.join(name[1:]) # Blume Jr
+        '''
 
+        # db.session.add( Results(
+        #     full
+        # ))
         print(trmnt_data)
         break

@@ -172,19 +172,17 @@ class Flights(db.Model):
 class Results(db.Model):
     __tablename__ = 'results'
     id = db.Column(db.Integer, primary_key=True)
-    tournament_id = db.Column(db.Integer)#, db.ForeignKey('tournaments.id'))
-    user_id = db.Column(db.Integer)#, db.ForeignKey('users.id'))
-    first_name = db.Column(db.String(20))
-    last_name = db.Column(db.String(20))
-    nickname = db.Column(db.String(20))
+    tournament_id = db.Column(db.Integer) #, db.ForeignKey('tournaments.id'))
+    # user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    full_name = db.Column(db.String(40))
     nationality = db.Column(db.String(30))
     position = db.Column(db.Integer)
     winnings = db.Column(db.String(30), default=None)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    tournament = db.relationship('Tournaments', back_populates='results')
-    user = db.relationship('Users', back_populates='results')
+    # tournament = db.relationship('Tournaments', back_populates='results')
+    # user = db.relationship('Users', back_populates='results')
 
     def __repr__(self):
         return f'<Results user:{self.user.last_name} tournament:{self.tournament.name}>'
@@ -193,10 +191,8 @@ class Results(db.Model):
         return {
             'id': self.id,
             'tournament_id': self.tournament_id,
-            'user_id': self.user_id,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'nickname': self.nickname,
+            # 'user_id': self.user_id,
+            'full_name': self.full_name,
             'nationality': self.nationality,
             'email': user and self.user.email,
             'position': self.position,
