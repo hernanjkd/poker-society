@@ -194,7 +194,7 @@ class Results(db.Model):
             # 'user_id': self.user_id,
             'full_name': self.full_name,
             'nationality': self.nationality,
-            'email': user and self.user.email,
+            # 'email': user and self.user.email,
             'place': self.place,
             'winnings': self.winnings,
             'created_at': self.created_at,
