@@ -146,31 +146,17 @@ def process_casinos_excel(df):
 
 def process_results_excel(df):
     
-    print(df)
+    trmnt_data = {}
 
     for index, r in df.iterrows():
 
-        print(index, r)
+        if index == 0:
+            trmnt_data = {
+                'id': None,
+                'name': r['Event'],
+                'entrants': r['Entrants'],
+                'prize_total': r['Total Prize Pool']
+            }
+
+        print(trmnt_data)
         break
-
-        if '' in [ r['CASINO'].strip(), r['LONG'], r['LAT'] ]:
-            continue
-
-        casino = Casinos.query.get( r['ID'] )    
-
-        casinojson = {
-            'id': r['ID'].strip(),
-            'name': r['CASINO'].strip(),
-            'address': r['ADDRESS'].strip(),
-            'city': r['CITY'].strip(),
-            'state': r['STATE (FULL)'].strip(),
-            'zip_code': str( r['ZIP CODE'] ).strip(),
-            'website': r['WEBSITE'].strip(),
-            'latitude': float(r['LAT']),
-            'longitude': float(r['LONG']),
-            'time_zone': r['TIME ZONE'].strip(),
-            'phone': str( r['PHONE NUMBER'] ).strip(),
-            'facebook': r['FACEBOOK'].strip(),
-            'twitter': r['TWITTER'].strip(),
-            'instagram': r['INSTAGRAM'].strip()
-        }
