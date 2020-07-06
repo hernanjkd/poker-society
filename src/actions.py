@@ -147,22 +147,27 @@ def process_casinos_excel(df):
 def process_results_excel(df):
     
     trmnt_data = {}
+    swapprofit_json = {}
 
     for index, r in df.iterrows():
 
+        # Get the trmnt data that's in the first row
         if index == 0:
-            # Get the trmnt data that's in the first row
             trmnt_data = {
-                'id': None,
+                'tournament_id': r['Tournament ID'],
                 'name': r['Event'],
                 'entrants': r['Entrants'],
                 'prize_total': r['Total Prize Pool']
+            }
+            swapprofit_json = {
+                'tournament_id': r['Tournament ID'],
+                'tournament_name': r['Event']
             }
         #
         # Trmnt id MUST be in the excel file
         #
         #
-        # how do we match the result name with the user in db ???
+        # how do we match the result Full Name with the user in db ???
         #
         # Richard Blume Jr
         '''
@@ -171,8 +176,13 @@ def process_results_excel(df):
         last_name = ' '.join(name[1:]) # Blume Jr
         '''
 
-        # db.session.add( Results(
-        #     full
-        # ))
-        print(trmnt_data)
-        break
+        # Add to database
+        db.session.add( Results(
+            full_name = r['Full Name'],
+            place = r['Place'],
+            nationality = r['Nationality'],
+            winnings = r['Winnings']
+        ))
+
+        db.session.commit()
+
