@@ -172,7 +172,7 @@ class Flights(db.Model):
 class Results(db.Model):
     __tablename__ = 'results'
     id = db.Column(db.Integer, primary_key=True)
-    tournament_id = db.Column(db.Integer) #, db.ForeignKey('tournaments.id'))
+    tournament_id = db.Column(db.Integer)#, db.ForeignKey('tournaments.id'))
     # user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     full_name = db.Column(db.String(40))
     nationality = db.Column(db.String(30))

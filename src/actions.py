@@ -147,24 +147,31 @@ def process_casinos_excel(df):
 def process_results_excel(df):
     
 
-    swapprofit_json = {}
+    trmnt_data = {}
 
     for index, r in df.iterrows():
 
         # Get the trmnt data that's in the first row
         if index == 0:
-            swapprofit_json = {
+            trmnt_data = {
                 'tournament_id': r['Tournament ID'],
                 'tournament_name': r['Event'],
                 'results_link': None,
                 'users': []
             }
-        #
-        # Trmnt id MUST be in the excel file
-        #
-        #
-        # how do we match the result Full Name with the user in db ???
-        #
+
+            # Check to see if file was uploaded already
+            entry = Results.query.filter_by(
+                tournament_id = r['Tournament ID']
+            ).first()
+            
+            if entry is not None:
+                return None, {
+                    'error':'This tournament ID has already been uploaded'
+                }
+
+
+        
         # Richard Blume Jr
         '''
         name = r['Full Name'].split(' ')
@@ -172,6 +179,7 @@ def process_results_excel(df):
         last_name = ' '.join(name[1:]) # Blume Jr
         '''
 
+        # User data that will be used for database and to send to swapprofit
         user_data = {
             'full_name': r['Full Name'],
             'place': r['Place'],
@@ -180,10 +188,15 @@ def process_results_excel(df):
         }
 
         # Add to database
-        db.session.add( Results( **user_data ))
+        db.session.add( Results( 
+            tournament_id = trmnt_data['tournament_id'],
+            **user_data,
+        ))
         db.session.commit()
 
         # Add to swapprofit json
-        swapprofit_json['users'].append( user_data )
+        trmnt_data['users'].append( user_data )
 
-    return swapprofit_json
+    return trmnt_data, {
+        'message': 'Results excel has been processed successfully'
+    }
