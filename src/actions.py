@@ -180,10 +180,10 @@ def process_results_excel(df):
         }
 
         # Add to database
-        db.session.add( Results( **user_data ))
-        db.session.commit()
+        # db.session.add( Results( **user_data ))
+        # db.session.commit()
 
         # Add to swapprofit json
         swapprofit_json['users'].append( user_data )
 
-    return 
+    return swapprofit_json
