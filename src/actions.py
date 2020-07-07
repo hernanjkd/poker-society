@@ -146,22 +146,18 @@ def process_casinos_excel(df):
 
 def process_results_excel(df):
     
-    trmnt_data = {}
+
     swapprofit_json = {}
 
     for index, r in df.iterrows():
 
         # Get the trmnt data that's in the first row
         if index == 0:
-            trmnt_data = {
-                'tournament_id': r['Tournament ID'],
-                'name': r['Event'],
-                'entrants': r['Entrants'],
-                'prize_total': r['Total Prize Pool']
-            }
             swapprofit_json = {
                 'tournament_id': r['Tournament ID'],
-                'tournament_name': r['Event']
+                'tournament_name': r['Event'],
+                'results_link': None,
+                'users': []
             }
         #
         # Trmnt id MUST be in the excel file
@@ -176,13 +172,18 @@ def process_results_excel(df):
         last_name = ' '.join(name[1:]) # Blume Jr
         '''
 
-        # Add to database
-        db.session.add( Results(
-            full_name = r['Full Name'],
-            place = r['Place'],
-            nationality = r['Nationality'],
-            winnings = r['Winnings']
-        ))
+        user_data = {
+            full_name: r['Full Name'],
+            place: r['Place'],
+            nationality: r['Nationality'],
+            winnings: r['Winnings']
+        }
 
+        # Add to database
+        db.session.add( Results( **user_data ))
         db.session.commit()
 
+        # Add to swapprofit json
+        swapprofit_json['users'].append( user_data )
+
+    return 
