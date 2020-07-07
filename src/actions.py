@@ -173,10 +173,10 @@ def process_results_excel(df):
         '''
 
         user_data = {
-            full_name: r['Full Name'],
-            place: r['Place'],
-            nationality: r['Nationality'],
-            winnings: r['Winnings']
+            'full_name': r['Full Name'],
+            'place': r['Place'],
+            'nationality': r['Nationality'],
+            'winnings': r['Winnings']
         }
 
         # Add to database
