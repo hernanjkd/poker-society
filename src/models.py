@@ -39,6 +39,7 @@ class Users(db.Model):
             'last_name': self.last_name,
             'nickname': self.nickname,
             'nationality': self.nationality,
+            'hendon_url': self.hendon_url,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
         }
