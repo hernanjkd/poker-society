@@ -21,6 +21,7 @@ class Users(db.Model):
     last_name = db.Column(db.String(100), nullable=False)
     nickname = db.Column(db.String(100))
     nationality = db.Column(db.String(30))
+    hendon_url = db.Column(db.String(200))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
