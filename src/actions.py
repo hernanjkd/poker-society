@@ -146,7 +146,6 @@ def process_casinos_excel(df):
 
 def process_results_excel(df):
     
-
     trmnt_data = {}
 
     for index, r in df.iterrows():
@@ -170,14 +169,6 @@ def process_results_excel(df):
                     'error':'This tournament ID has already been uploaded'
                 }
 
-
-        
-        # Richard Blume Jr
-        '''
-        name = r['Full Name'].split(' ')
-        first_name = name[0] # Richard
-        last_name = ' '.join(name[1:]) # Blume Jr
-        '''
 
         # User data that will be used for database and to send to swapprofit
         user_data = {
