@@ -141,11 +141,6 @@ def file_upload():
     if 'excel' not in request.files:
         raise APIException('"excel" property missing in the files array', 404)
 
-    swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
-    if swapprofit is None:
-        return jsonify({'error': 'Swap Profit not a subscriber'})
-
-
     f = request.files['excel']
     df = pd.read_excel( f, keep_default_na=False )
     
@@ -162,13 +157,14 @@ def file_upload():
         # updated_df = df # DELETE, ONLY FOR TESTING
         # error_list = [] # DELETE, ONLY FOR TESTING
 
-        # Save file with added Tournament IDs
+        # Save file with added Tournament IDs, which will be downloaded in the frontend
         if trmnt_added:
             writer = pd.ExcelWriter(
                 f"{os.environ['APP_PATH']}/src/excel_downloads/{f.filename}" )
             df.to_excel( writer, index=False )
             writer.save()
 
+        # Display any errors that happened
         if len(error_list) > 0:
             return jsonify({
                 'download': trmnt_added,
@@ -196,7 +192,11 @@ def file_upload():
             
         swapprofit_json, message = actions.process_results_excel( df )
 
-        # requests.post( os.environ.get('SWAPPROFIT_HOST')+ '/results',
+        swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
+        if swapprofit is None:
+            return jsonify({'error': 'Swap Profit not a subscriber'})
+
+        # requests.post( swapprofit.api_host + '/results',
         #     data = jsonify(swapprofit_json) )
 
         return jsonify(message), 200

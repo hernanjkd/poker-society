@@ -172,6 +172,7 @@ def process_results_excel(df):
 
         # User data that will be used for database and to send to swapprofit
         user_data = {
+            # 'id': r['User ID'],
             'full_name': r['Full Name'],
             'place': r['Place'],
             'nationality': r['Nationality'],
