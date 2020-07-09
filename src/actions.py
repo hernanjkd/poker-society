@@ -170,8 +170,8 @@ def process_results_excel(df):
                 }
 
 
-        user_id = r['User ID'] if r['User ID'] != '' else None
-        
+        user_id = r['User ID'] or None
+        print(r['Entrants'] == '')
         # Add user to the json sent to swapprofit
         if user_id:
             trmnt_data['users'].append({
@@ -181,15 +181,15 @@ def process_results_excel(df):
             })
 
         # Add to database
-        db.session.add( Results(
-            tournament_id = trmnt_data['tournament_id'],
-            user_id = user_id,
-            full_name = r['Full Name'],
-            place = r['Place'],
-            nationality = r['Nationality'],
-            winnings = r['Winnings']
-        ))
-        db.session.commit()
+        # db.session.add( Results(
+        #     tournament_id = trmnt_data['tournament_id'],
+        #     user_id = user_id,
+        #     full_name = r['Full Name'],
+        #     place = r['Place'],
+        #     nationality = r['Nationality'],
+        #     winnings = r['Winnings']
+        # ))
+        # db.session.commit()
 
     return trmnt_data, {
         'message': 'Results excel has been processed successfully'
