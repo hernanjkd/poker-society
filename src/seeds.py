@@ -28,6 +28,11 @@ def run():
         nationality = 'USA'
     ))
 
+    db.session.add( Results(
+        user_id = None,
+        full_name = 'Pedro Andres'
+    ))
+
     db.session.add( Subscribers(
         company_name = 'Swap Profit',
         api_host = 'http://localhost:3000',

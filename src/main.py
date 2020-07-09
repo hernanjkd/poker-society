@@ -164,7 +164,7 @@ def file_upload():
             df.to_excel( writer, index=False )
             writer.save()
 
-        # Display any errors that happened
+        # Display any errors that happened while processing the file
         if len(error_list) > 0:
             return jsonify({
                 'download': trmnt_added,
@@ -201,7 +201,7 @@ def file_upload():
 
         return jsonify(message), 200
 
-
+        
 
 
     return jsonify({'error': 'Unrecognized file'}), 200
