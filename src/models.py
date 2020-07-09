@@ -25,7 +25,7 @@ class Users(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # results = db.relationship('Results', back_populates='user')
+    results = db.relationship('Results', back_populates='user')
 
     def __repr__(self):
         return f'<Users {self.email}>'
@@ -108,7 +108,7 @@ class Tournaments(db.Model):
 
     casino = db.relationship('Casinos', back_populates='tournaments')
     flights = db.relationship('Flights', back_populates='tournament')
-    # results = db.relationship('Results', back_populates='tournament')
+    results = db.relationship('Results', back_populates='tournament')
 
     def __repr__(self):
         return f'<Tournament {self.name}>'
@@ -174,8 +174,8 @@ class Flights(db.Model):
 class Results(db.Model):
     __tablename__ = 'results'
     id = db.Column(db.Integer, primary_key=True)
-    tournament_id = db.Column(db.Integer)#, db.ForeignKey('tournaments.id'))
-    # user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    tournament_id = db.Column(db.Integer, db.ForeignKey('tournaments.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     full_name = db.Column(db.String(40))
     nationality = db.Column(db.String(30))
     place = db.Column(db.String(6))
@@ -183,8 +183,8 @@ class Results(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # tournament = db.relationship('Tournaments', back_populates='results')
-    # user = db.relationship('Users', back_populates='results')
+    tournament = db.relationship('Tournaments', back_populates='results')
+    user = db.relationship('Users', back_populates='results')
 
     def __repr__(self):
         return f'<Results user:{self.user.last_name} tournament:{self.tournament.name}>'
@@ -193,10 +193,10 @@ class Results(db.Model):
         return {
             'id': self.id,
             'tournament_id': self.tournament_id,
-            # 'user_id': self.user_id,
+            'user_id': self.user_id,
             'full_name': self.full_name,
             'nationality': self.nationality,
-            # 'email': user and self.user.email,
+            'email': user and self.user.email,
             'place': self.place,
             'winnings': self.winnings,
             'created_at': self.created_at,

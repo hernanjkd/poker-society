@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: a34722390de1
+Revision ID: ab6672c0ce5d
 Revises: 
-Create Date: 2020-03-21 15:56:44.758870
+Create Date: 2020-07-09 00:42:30.567486
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'a34722390de1'
+revision = 'ab6672c0ce5d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -52,9 +52,10 @@ def upgrade():
     sa.Column('password', sa.String(length=256), nullable=False),
     sa.Column('status', sa.Enum('valid', 'pending', 'unclaimed', 'pending_claim', name='userstatus'), nullable=True),
     sa.Column('first_name', sa.String(length=100), nullable=False),
-    sa.Column('middle_name', sa.String(length=100), nullable=True),
     sa.Column('last_name', sa.String(length=100), nullable=False),
+    sa.Column('nickname', sa.String(length=100), nullable=True),
     sa.Column('nationality', sa.String(length=30), nullable=True),
+    sa.Column('hendon_url', sa.String(length=200), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
@@ -92,11 +93,9 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('tournament_id', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('first_name', sa.String(length=20), nullable=True),
-    sa.Column('middle_name', sa.String(length=20), nullable=True),
-    sa.Column('last_name', sa.String(length=20), nullable=True),
+    sa.Column('full_name', sa.String(length=40), nullable=True),
     sa.Column('nationality', sa.String(length=30), nullable=True),
-    sa.Column('position', sa.Integer(), nullable=True),
+    sa.Column('place', sa.String(length=6), nullable=True),
     sa.Column('winnings', sa.String(length=30), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
