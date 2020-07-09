@@ -25,6 +25,7 @@ def run():
         first_name = 'Luiz',
         nickname = 'Lou',
         last_name = 'Stadler',
+        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=207424',
         nationality = 'USA'
     ))
     db.session.add( Users(
@@ -33,6 +34,7 @@ def run():
         first_name = 'Kate',
         nickname = '',
         last_name = 'Hoang',
+        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=421758',
         nationality = 'USA'
     ))
     db.session.add( Users(
@@ -41,6 +43,7 @@ def run():
         first_name = 'Cary',
         nickname = '',
         last_name = 'Katz',
+        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=26721',
         nationality = 'USA'
     ))
     db.session.add( Users(
@@ -49,6 +52,7 @@ def run():
         first_name = 'Nikita',
         nickname = 'Mikita',
         last_name = 'Bodyakovskiy',
+        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=159100',
         nationality = 'USA'
     ))
     db.session.add( Users(
@@ -57,6 +61,7 @@ def run():
         first_name = 'Perry',
         nickname = '',
         last_name = 'Shiao',
+        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=371190',
         nationality = 'USA'
     ))
     db.session.add( Users(
@@ -65,6 +70,7 @@ def run():
         first_name = 'Bobby',
         nickname = '',
         last_name = 'Leff',
+        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=187837',
         nationality = 'USA'
     ))
     db.session.add( Users(
@@ -73,6 +79,7 @@ def run():
         first_name = 'Neal',
         nickname = '',
         last_name = 'Corcoran',
+        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=506855',
         nationality = 'USA'
     ))
     db.session.add( Users(
@@ -81,8 +88,12 @@ def run():
         first_name = 'Brian',
         nickname = '',
         last_name = 'Gelrod',
+        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=239802',
         nationality = 'USA'
     ))
+
+
+
 
     db.session.add( Results(
         user_id = None,
