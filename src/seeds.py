@@ -27,6 +27,62 @@ def run():
         last_name = 'Stadler',
         nationality = 'USA'
     ))
+    db.session.add( Users(
+        email='hoang28974@gmail.com',
+        password=sha256('kateHoang'),
+        first_name = 'Kate',
+        nickname = '',
+        last_name = 'Hoang',
+        nationality = 'USA'
+    ))
+    db.session.add( Users(
+        email='katz234@gmail.com',
+        password=sha256('carykatz'),
+        first_name = 'Cary',
+        nickname = '',
+        last_name = 'Katz',
+        nationality = 'USA'
+    ))
+    db.session.add( Users(
+        email='mikitapoker@gmail.com',
+        password=sha256('nikitapoker'),
+        first_name = 'Nikita',
+        nickname = 'Mikita',
+        last_name = 'Bodyakovskiy',
+        nationality = 'USA'
+    ))
+    db.session.add( Users(
+        email='perry1830@msn.com',
+        password=sha256('Kobe$$'),
+        first_name = 'Perry',
+        nickname = '',
+        last_name = 'Shiao',
+        nationality = 'USA'
+    ))
+    db.session.add( Users(
+        email='leff1117@aol.com',
+        password=sha256('eatme'),
+        first_name = 'Bobby',
+        nickname = '',
+        last_name = 'Leff',
+        nationality = 'USA'
+    ))
+    db.session.add( Users(
+        email='neal_corcoran@yahoo.com',
+        password=sha256('Brooklyn1'),
+        first_name = 'Neal',
+        nickname = '',
+        last_name = 'Corcoran',
+        nationality = 'USA'
+    ))
+    db.session.add( Users(
+        email='brooklynbman@yahoo.com',
+        password=sha256('Brooklyn1'),
+        first_name = 'Brian',
+        nickname = '',
+        last_name = 'Gelrod',
+        nationality = 'USA'
+    ))
 
     db.session.add( Results(
         user_id = None,
