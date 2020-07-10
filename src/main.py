@@ -189,15 +189,15 @@ def file_upload():
 
     # RESULTS
     if utils.are_headers_for('results', headers):
-            
+        
         swapprofit_json, message = actions.process_results_excel( df )
 
         swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
         if swapprofit is None:
             return jsonify({'error': 'Swap Profit not a subscriber'})
 
-        requests.post( swapprofit.api_host + '/results',
-            data = jsonify(swapprofit_json) )
+        # requests.post( swapprofit.api_host + '/results',
+        #     data = jsonify(swapprofit_json) )
 
         return jsonify(message), 200
 

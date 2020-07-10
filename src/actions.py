@@ -166,12 +166,11 @@ def process_results_excel(df):
         if index == 0:
             
             # Check trmnt existance
-            trmnt = Tournaments.query.get( r['Tournament ID'] )
-            if trmnt is None:
-                db.session.rollback()
-                return None, {
-                    'error':'This tournament ID was not found: '+ str(r['Tournament ID'])
-                }
+            # trmnt = Tournaments.query.get( r['Tournament ID'] )
+            # if trmnt is None:
+            #     return None, {
+            #         'error':'This tournament ID was not found: '+ str(r['Tournament ID'])
+            #     }
 
             # Check to see if file was uploaded already
             entry = Results.query.filter_by(
@@ -179,34 +178,39 @@ def process_results_excel(df):
             ).first()
             
             if entry is not None:
-                db.session.rollback()
                 return None, {
                     'error':'This tournament ID has already been uploaded: '+ str(trmnt.id)
                 }
-
+            
+            # Swap Profit JSON
             trmnt_data = {
                 'tournament_id': trmnt.id,
                 'tournament_buyin': trmnt.buy_in,
-                'tournament_name': r['Event'],
                 'users': {}
             }
 
 
         user_id = r['User ID'] or None
         
-        # Add user to the json sent to swapprofit
+        # Add user to the Swap Profit JSON
         if user_id:
             user = Users.query.get( user_id )
             if user is None:
+                db.session.rollback()
                 return None, {
                     'error':'Couldn\'t find user with ID: '+ str(user_id)
                 }
 
+            # Find user total winning swaps
+            winning_swaps = Results.query.filter_by( user_id=user.id ).count()
+            
+            # Swap Profit JSON
             trmnt_data['users'][user.email] = {
                 'pokersociety_id': user_id,
                 'place': r['Place'],
-                'winnings': r['Winnings']
-            })
+                'winnings': r['Winnings'],
+                'total_winning_swaps': winning_swaps
+            }
 
         # Add to database
         db.session.add( Results(
