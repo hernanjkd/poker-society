@@ -196,12 +196,12 @@ def file_upload():
         if swapprofit is None:
             return jsonify({'error': 'Swap Profit not a subscriber'})
 
-        # requests.post( swapprofit.api_host + '/results',
-        #     data = jsonify(swapprofit_json) )
+        requests.post( swapprofit.api_host + '/results',
+            data = jsonify(swapprofit_json) )
 
         return jsonify(message), 200
 
-        
+
 
 
     return jsonify({'error': 'Unrecognized file'}), 200
@@ -285,9 +285,9 @@ def get_results(id):
                         .order_by( Tournaments.position.asc() )
     
     if result is None:
-        raise APIException('This tournament has no results yet', 404)
+        return jsonify({'message':'This tournament has no results yet'}), 404
     
-    return jsonify([x.serialize() for x in result])
+    return jsonify([x.serialize() for x in result]), 200
 
 
 
