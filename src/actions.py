@@ -145,19 +145,33 @@ def process_casinos_excel(df):
 
 
 def process_results_excel(df):
-    
+    '''
+    results = {
+        "tournament_id": 45,
+        "tournament_buy_in": 150,
+        "users": {
+            "sdfoij@yahoo.com": {
+                "place": 11,
+                "winnings": 200,
+                "total_winning_swaps": 34
+            }
+        }
+    }
+    '''
     trmnt_data = {}
 
     for index, r in df.iterrows():
 
         # Get the trmnt data that's in the first row
         if index == 0:
-            trmnt_data = {
-                'tournament_id': r['Tournament ID'],
-                'tournament_name': r['Event'],
-                'results_link': None,
-                'users': []
-            }
+            
+            # Check trmnt existance
+            trmnt = Tournaments.query.get( r['Tournament ID'] )
+            if trmnt is None:
+                db.session.rollback()
+                return None, {
+                    'error':'This tournament ID was not found: '+ str(r['Tournament ID'])
+                }
 
             # Check to see if file was uploaded already
             entry = Results.query.filter_by(
@@ -165,16 +179,30 @@ def process_results_excel(df):
             ).first()
             
             if entry is not None:
+                db.session.rollback()
                 return None, {
-                    'error':'This tournament ID has already been uploaded'
+                    'error':'This tournament ID has already been uploaded: '+ str(trmnt.id)
                 }
+
+            trmnt_data = {
+                'tournament_id': trmnt.id,
+                'tournament_buyin': trmnt.buy_in,
+                'tournament_name': r['Event'],
+                'users': {}
+            }
 
 
         user_id = r['User ID'] or None
         
         # Add user to the json sent to swapprofit
         if user_id:
-            trmnt_data['users'].append({
+            user = Users.query.get( user_id )
+            if user is None:
+                return None, {
+                    'error':'Couldn\'t find user with ID: '+ str(user_id)
+                }
+
+            trmnt_data['users'][user.email] = {
                 'pokersociety_id': user_id,
                 'place': r['Place'],
                 'winnings': r['Winnings']
@@ -182,14 +210,16 @@ def process_results_excel(df):
 
         # Add to database
         db.session.add( Results(
-            tournament_id = trmnt_data['tournament_id'],
+            # tournament_id = trmnt_data['tournament_id'],
             user_id = user_id,
             full_name = r['Full Name'],
             place = r['Place'],
             nationality = r['Nationality'],
             winnings = r['Winnings']
         ))
-        db.session.commit()
+
+    # If no errors, commit all data
+    db.session.commit()
     
     return trmnt_data, {
         'message': 'Results excel has been processed successfully'
