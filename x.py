@@ -1,4 +1,5 @@
 import requests
+import re
 
 j = {"tournament_id": 884, "tournament_buyin": "$200", "users": {
     "neal_corcoran@yahoo.com": 
@@ -19,5 +20,33 @@ j = {"tournament_id": 884, "tournament_buyin": "$200", "users": {
         {"pokersociety_id": 4, "place": "8th", "winnings": 500, "total_winning_swaps": 0}
 }}
 
-requests.post( "http://localhost:3000/results",
-    json=j )
+# requests.post( "http://localhost:3000/results",
+#     json=j )
+
+# regex = r'\$\s*(\d+)'
+
+# print('piki')
+
+# x = '$ 300'
+# x = re.search( regex, x )
+# print(x.group(1) if x is not None else 0)
+# x = '$200'
+# x = re.search( regex, x )
+# print(x.group(1) if x is not None else 0)
+# x = '$0++'
+# x = re.search( regex, x )
+# print(x.group(1) if x is not None else 0)
+# x = 'Day 2'
+# x = re.search( regex, x )
+# print(x.group(1) if x is not None else 0)
+
+
+to_int = lambda x: int(x) if str(x).isnumeric() else 0
+
+k = '345'
+j = 'osdifj'
+piki = 556
+
+print(to_int(k))
+print(to_int(j))
+print(to_int(piki))

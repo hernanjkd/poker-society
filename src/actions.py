@@ -148,7 +148,7 @@ def process_results_excel(df):
     '''
     results = {
         "tournament_id": 45,
-        "tournament_buy_in": 150,
+        "tournament_buyin": 150,
         "users": {
             "sdfoij@yahoo.com": {
                 "place": 11,
