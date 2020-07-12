@@ -282,8 +282,8 @@ def get_tournaments(id):
 @app.route('/results/tournament/<int:id>')
 def get_results(id):
 
-    result = Results.query.filter_by( tournament_id = id) \
-                        .order_by( Tournaments.position.asc() )
+    result = Results.query.filter_by( tournament_id=id ) \
+                        .order_by( Results.place.asc() )
     
     if result is None:
         return jsonify({'message':'This tournament has no results yet'}), 404
