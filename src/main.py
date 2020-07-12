@@ -196,8 +196,9 @@ def file_upload():
         if swapprofit is None:
             return jsonify({'error': 'Swap Profit not a subscriber'})
 
-        # requests.post( swapprofit.api_host + '/results',
-        #     data = jsonify(swapprofit_json) )
+        if swapprofit_json is not None:
+            requests.post( swapprofit.api_host + '/results',
+                json=swapprofit_json ) 
 
         return jsonify(message), 200
 

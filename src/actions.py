@@ -166,11 +166,11 @@ def process_results_excel(df):
         if index == 0:
             
             # Check trmnt existance
-            # trmnt = Tournaments.query.get( r['Tournament ID'] )
-            # if trmnt is None:
-            #     return None, {
-            #         'error':'This tournament ID was not found: '+ str(r['Tournament ID'])
-            #     }
+            trmnt = Tournaments.query.get( r['Tournament ID'] )
+            if trmnt is None:
+                return None, {
+                    'error':'This tournament ID was not found: '+ str(r['Tournament ID'])
+                }
 
             # Check to see if file was uploaded already
             entry = Results.query.filter_by(
@@ -214,7 +214,7 @@ def process_results_excel(df):
 
         # Add to database
         db.session.add( Results(
-            # tournament_id = trmnt_data['tournament_id'],
+            tournament_id = trmnt_data['tournament_id'],
             user_id = user_id,
             full_name = r['Full Name'],
             place = r['Place'],

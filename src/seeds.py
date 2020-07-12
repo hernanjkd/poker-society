@@ -93,6 +93,18 @@ def run():
     ))
 
 
+    oldvegas = Tournaments(
+        id=884,
+        name='RRPO #21 - NLH $100,000 Guaranteed',
+        buy_in='$200',
+        start_at=datetime(1990,5,2,10)
+    )
+    flight1_oldvegas = Flights(
+        start_at=datetime(1990,5,2,10),
+        tournament=oldvegas,
+        day='1A'
+    )
+    db.session.add_all([oldvegas, flight1_oldvegas])
 
 
     db.session.add( Results(
