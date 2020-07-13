@@ -146,7 +146,7 @@ def process_casinos_excel(df):
 
 def process_results_excel(df):
     '''
-    results = {
+    {
         "tournament_id": 45,
         "tournament_buyin": 150,
         "users": {
