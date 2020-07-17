@@ -209,7 +209,7 @@ def process_results_excel(df):
                 'pokersociety_id': user_id,
                 'place': r['Place'],
                 'winnings': r['Winnings'],
-                'total_winning_swaps': winning_swaps
+                'total_winning_swaps': winning_swaps + 1 # plus the current one
             }
 
         # Add to database
