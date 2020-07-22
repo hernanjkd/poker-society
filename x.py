@@ -1,6 +1,6 @@
 # import requests
 import re
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 
 j = {"tournament_id": 884, "tournament_buyin": "$200", "users": {
     "neal_corcoran@yahoo.com": 
@@ -56,10 +56,9 @@ piki = 556
 # x = {'3':'','4':'3'}
 # print( len(x) )
 
-lst = [1,2,3,4]
-x = 'car'
 
-for x in lst:
-    1
+now = dt.utcnow()
+tmrw = now + timedelta(days=1)
+yesterday = now - timedelta(days=1)
 
-print(x)
+print( (tmrw - now) < timedelta(days=2) )
