@@ -292,20 +292,6 @@ def get_results(id):
 
 
 
-@app.route('/roi/winning_swaps/<email>')
-def get_roi_data(email): 
-    
-    user = Users.query.filter_by( email=email )
-    if user is None:
-        raise APIException('User not found', 404)
-
-    won_trmnts = Results.query.filter( user_id=user.id ) \
-                    .filter( Results.earnings != None )
-    
-    return jsonify(won_trmnts.count()), 200
-
-
-
 @app.route('/swapprofit/update')
 def swapprofit_update():
 
