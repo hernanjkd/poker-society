@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+	<title>Results</title>
 	<style>
 		body {
 		  background-color: black;
@@ -41,8 +43,12 @@
 	</style>
 </head>
 <body >
+{% if results %}
 	<div style="margin: 5% 0px 5% 0px">
-		<h2 style="text-align:center">Tournament Results</h2>
+		<h1 style="text-align:center">Tournament Results</h1>
+
+		<h2 style="text-align:center">{{ casino }}</h2>
+		<h2 style="text-align:center">{{ trmnt_name }}</h2>
 		​
 		<table style="width:90%;border-collapse:collapse;
 		    margin-left:5%; 
@@ -55,119 +61,31 @@
 			        <td style="width:30%;">Hometown</td>
 			    </tr>
 		    </thead>
-		    <tbody></tbody>
-			<script>
-
-				var results = [
-				    {
-				        created_at: "Fri, 10 Jul 2020 17:18:45 GMT",
-				        full_name: "Neal Corcoran",
-				        id: 2,
-				        nationality: "United States",
-				        place: "1st",
-				        tournament_id: 884,
-				        updated_at: "Fri, 10 Jul 2020 17:18:45 GMT",
-				        user_id: 7,
-				        winnings: "20000"
-				    },
-				    {
-				        created_at: "Fri, 10 Jul 2020 17:18:45 GMT",
-				        full_name: "Kate Hoang",
-				        id: 3,
-				        nationality: "United States",
-				        place: "2nd",
-				        tournament_id: 884,
-				        updated_at: "Fri, 10 Jul 2020 17:18:45 GMT",
-				        user_id: 2,
-				        winnings: "12000"
-				    },
-				    {
-				        created_at: "Fri, 10 Jul 2020 17:18:45 GMT",
-				        full_name: "Perry Shiao",
-				        id: 4,
-				        nationality: "United States",
-				        place: "3rd",
-				        tournament_id: 884,
-				        updated_at: "Fri, 10 Jul 2020 17:18:45 GMT",
-				        user_id: 5,
-				        winnings: "10000"
-				    },
-				    {
-				        created_at: "Fri, 10 Jul 2020 17:18:45 GMT",
-				        full_name: "Bobby Leff",
-				        id: 5,
-				        nationality: "Canada",
-				        place: "4th",
-				        tournament_id: 884,
-				        updated_at: "Fri, 10 Jul 2020 17:18:45 GMT",
-				        user_id: 6,
-				        winnings: "5000"
-				    },
-				    {
-				        created_at: "Fri, 10 Jul 2020 17:18:46 GMT",
-				        full_name: "Cary Katz",
-				        id: 6,
-				        nationality: "United States",
-				        place: "5th",
-				        tournament_id: 884,
-				        updated_at: "Fri, 10 Jul 2020 17:18:46 GMT",
-				        user_id: 3,
-				        winnings: "4000"
-				    },
-				    {
-				        created_at: "Fri, 10 Jul 2020 17:18:46 GMT",
-				        full_name: "Brian Gelrod",
-				        id: 7,
-				        nationality: "United States",
-				        place: "6th",
-				        tournament_id: 884,
-				        updated_at: "Fri, 10 Jul 2020 17:18:46 GMT",
-				        user_id: 8,
-				        winnings: "3000"
-				    },
-				    {
-				        created_at: "Fri, 10 Jul 2020 17:18:46 GMT",
-				        full_name: "Lou",
-				        id: 8,
-				        nationality: "United States",
-				        place: "7th",
-				        tournament_id: 884,
-				        updated_at: "Fri, 10 Jul 2020 17:18:46 GMT",
-				        user_id: 1,
-				        winnings: "120000"
-				    },
-				    {
-				        created_at: "Fri, 10 Jul 2020 17:18:46 GMT",
-				        full_name: "Mikita",
-				        id: 9,
-				        nationality: "Russia",
-				        place: "8th",
-				        tournament_id: 884,
-				        updated_at: "Fri, 10 Jul 2020 17:18:46 GMT",
-				        user_id: 4,
-				        winnings: "500"
-				    }
-				];
-
-				document.querySelector('tbody').innerHTML =  results.map((x, i) => {
-					var cColor;
-					if(i%2==0){cColor='#282828'}else{cColor = '#000000'}
-					return(
-						`<tr style='height:50px; background-color: ${cColor}'>
-				            <td style="text-align:center">${x.place}</td>
-				            <td style="text-align:center">${x.full_name}</td>
-				            <td style="text-align:center">$${x.winnings}</td>
-				            <td style="text-align:center">${x.nationality}</td>
-				        </tr>`)
-				})
-				.join('')
-
-
-			</script>   
+			<tbody></tbody>
 		</table>
 	</div>
-​
+	<script>
+
+		var results = JSON.parse('{{ results | safe }}')
+
+		document.querySelector('tbody').innerHTML =  results.map((x, i) => (
+				`<tr style='height:50px; background-color: ${i%2==0?'#282828':'#000000'}'>
+					<td style="text-align:center">${x.place}</td>
+					<td style="text-align:center">${x.full_name}</td>
+					<td style="text-align:center">$${x.winnings}</td>
+					<td style="text-align:center">${x.nationality}</td>
+				</tr>`)
+		)
+		.join('')
+
+	</script>
+{% else %}
+	<div style="margin: 5% 0px 5% 0px">
+		<h2 style="text-align:center">{{ casino }}</h2>
+		<h2 style="text-align:center">{{ trmnt_name }}</h2>
+		
+		<h1 style="text-align:center;margin-top:100px">This tournament has no results yet</h1>
+	</div>
+{% endif %}
 </body>
-  <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-  <script type="text/javascript" src="js/script.js"> </script>
 </html>

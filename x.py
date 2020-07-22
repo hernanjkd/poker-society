@@ -1,6 +1,15 @@
 # import requests
 import re
-from datetime import datetime as dt, timedelta
+# from datetime import datetime as dt, timedelta
+
+
+j = {
+    'hello':'one'
+}
+
+print( type(str(j)) )
+
+
 
 j = {"tournament_id": 884, "tournament_buyin": "$200", "users": {
     "neal_corcoran@yahoo.com": 
@@ -57,8 +66,9 @@ piki = 556
 # print( len(x) )
 
 
-now = dt.utcnow()
-tmrw = now + timedelta(days=1)
-yesterday = now - timedelta(days=1)
+# now = dt.utcnow()
+# tmrw = now + timedelta(days=1)
+# yesterday = now - timedelta(days=1)
 
-print( (tmrw - now) < timedelta(days=2) )
+# print( (tmrw - now) < timedelta(days=2) )
+

@@ -1,4 +1,4 @@
-import os; import re; import io; import csv
+import os; import re; import io; import csv; import json
 import actions; import requests
 import utils; import seeds
 import pandas as pd
@@ -281,14 +281,33 @@ def get_tournaments(id):
 
 @app.route('/results/tournament/<int:id>')
 def get_results(id):
+    
+    trmnt = Tournaments.query.get( id )
 
-    result = Results.query.filter_by( tournament_id=id ) \
-                        .order_by( Results.place.asc() )
+    results = Results.query.filter_by( tournament_id=id ) \
+                            .order_by( Results.place.asc() )
+    results = None
+    if results is None:
+        return render_template('results_table.html', 
+            # casino = trmnt.casino.name,
+            trmnt_name = trmnt.name,
+            results = False
+        )
     
-    if result is None:
-        return jsonify({'message':'This tournament has no results yet'}), 404
-    
-    return jsonify([x.serialize() for x in result]), 200
+    obj = []
+    for x in results:
+        obj.append({
+            'place': x.place,
+            'full_name': x.full_name,
+            'winnings': x.winnings,
+            'nationality': x.nationality
+        })
+
+    return render_template('results_table.html',
+        # casino = trmnt.casino.name,
+        trmnt_name = trmnt.name,
+        results = json.dumps(obj)
+    )
 
 
 
