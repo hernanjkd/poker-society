@@ -69,12 +69,12 @@
 		var results = JSON.parse('{{ results | safe }}')
 
 		document.querySelector('tbody').innerHTML =  results.map((x, i) => (
-				`<tr style='height:50px; background-color: ${i%2==0?'#282828':'#000000'}'>
-					<td style="text-align:center">${x.place}</td>
-					<td style="text-align:center">${x.full_name}</td>
-					<td style="text-align:center">$${x.winnings}</td>
-					<td style="text-align:center">${x.nationality}</td>
-				</tr>`)
+			`<tr style='height:50px; background-color:${i%2==0?'#282828':'#000000'}'>
+				<td style="text-align:center">${x.place}</td>
+				<td style="text-align:center">${x.full_name}</td>
+				<td style="text-align:center">$${x.winnings}</td>
+				<td style="text-align:center">${x.nationality}</td>
+			</tr>`)
 		)
 		.join('')
 

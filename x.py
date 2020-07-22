@@ -3,11 +3,7 @@ import re
 # from datetime import datetime as dt, timedelta
 
 
-j = {
-    'hello':'one'
-}
 
-print( type(str(j)) )
 
 
 

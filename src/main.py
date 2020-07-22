@@ -217,13 +217,17 @@ def download_file(filename):
 
 
 
-@app.route('/users/<int:id>', methods=['GET','PUT'])
+@app.route('/users/<id>', methods=['GET','PUT'])
 def get_update_user(id):
 
-    user = Users.query.get(id)
-    if user is None:
-        raise APIException('User not found', 404)
+    if id.isnumeric():
+        user = Users.query.get( int(id) )
+    else: # email
+        user = Users.query.filter_by( email=id ).first()
     
+    if user is None:
+        raise APIException('User not found with id: '+ id, 404)
+
     if request.method == 'GET':
         return jsonify(user.serialize())
 
@@ -294,20 +298,20 @@ def get_results(id):
             template_data['casino'] = trmnt.casino.name
 
     if results.count() == 0:
-        return render_template('results_table.html', 
-            **template_data,
-            results = False
-        )
+        results = False
     
-    obj = []
-    for x in results:
-        obj.append({
-            'place': x.place,
-            'full_name': x.full_name,
-            'winnings': x.winnings,
-            'nationality': x.nationality
-        })
+    else:
+        obj = []
+        for x in results:
+            obj.append({
+                'place': x.place,
+                'full_name': x.full_name,
+                'winnings': x.winnings,
+                'nationality': x.nationality
+            })
+        results = json.dumps(obj)
 
+    
     return render_template('results_table.html',
         **template_data,
         results = json.dumps(obj)
