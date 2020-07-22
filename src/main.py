@@ -286,11 +286,16 @@ def get_results(id):
 
     results = Results.query.filter_by( tournament_id=id ) \
                             .order_by( Results.place.asc() )
-    results = None
-    if results is None:
+    
+    template_data = {}
+    if trmnt:
+        template_data['trmnt_name'] = trmnt.name
+        if trmnt.casino:
+            template_data['casino'] = trmnt.casino.name
+
+    if results.count() == 0:
         return render_template('results_table.html', 
-            # casino = trmnt.casino.name,
-            trmnt_name = trmnt.name,
+            **template_data,
             results = False
         )
     
@@ -304,8 +309,7 @@ def get_results(id):
         })
 
     return render_template('results_table.html',
-        # casino = trmnt.casino.name,
-        trmnt_name = trmnt.name,
+        **template_data,
         results = json.dumps(obj)
     )
 
