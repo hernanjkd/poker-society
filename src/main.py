@@ -319,6 +319,37 @@ def get_results(id):
 
 
 
+@app.route('/swapprofit/user', methods=['POST'])
+def swapprofit_register_user():
+
+    json = request.get_json()
+    utils.check_params(json, 'api_token', 'email', 'password', 'first_name',
+        'last_name')
+
+    if json['api_token'] != os.environ['API_TOKEN']:
+        raise APIException('Invalid api token', 400)
+
+    # Find user in db
+    user = Users.query.filter_by( email=json['email'] ).first()
+    
+    # If no user found, create one
+    if user is None:
+        user = Users(
+            email = json['email'],
+            password = json['password'],
+            first_name = json['first_name'],
+            last_name = json['last_name'],
+            nickname = json.get('nickname'),
+            hendon_url = json.get('hendon_url'),
+            status = 'valid'
+        )
+        db.session.add( user )
+        db.session.commit()
+
+    return jsonify({'pokersociety_id': user.id})
+
+
+
 @app.route('/swapprofit/update')
 def swapprofit_update():
 

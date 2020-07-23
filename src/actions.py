@@ -152,8 +152,7 @@ def process_results_excel(df):
         "users": {
             "sdfoij@yahoo.com": {
                 "place": 11,
-                "winnings": 200,
-                "total_winning_swaps": 34
+                "winnings": 200
             }
         }
     }
@@ -200,16 +199,11 @@ def process_results_excel(df):
                 return None, {
                     'error':'Couldn\'t find user with ID: '+ str(user_id)
                 }
-
-            # Find user total winning swaps
-            winning_swaps = Results.query.filter_by( user_id=user.id ).count()
             
             # Swap Profit JSON
             trmnt_data['users'][user.email] = {
-                'pokersociety_id': user_id,
                 'place': r['Place'],
-                'winnings': r['Winnings'],
-                'total_winning_swaps': winning_swaps + 1 # plus the current one
+                'winnings': r['Winnings']
             }
 
         # Add to database
