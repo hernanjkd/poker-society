@@ -176,10 +176,10 @@ def process_results_excel(df):
                 tournament_id = r['Tournament ID']
             ).first()
             
-            # if entry is not None:
-            #     return None, {
-            #         'error':'This tournament ID has already been uploaded: '+ str(trmnt.id)
-            #     }
+            if entry is not None:
+                return None, {
+                    'error':'This tournament ID has already been uploaded: '+ str(trmnt.id)
+                }
             
             # Swap Profit JSON
             trmnt_data = {
