@@ -368,6 +368,7 @@ def swapprofit_email_update(id):
     return jsonify({'message':'ok'}), 200
 
 
+
 @app.route('/swapprofit/update')
 def swapprofit_update():
 

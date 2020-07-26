@@ -67,4 +67,5 @@ piki = 556
 # yesterday = now - timedelta(days=1)
 
 # print( (tmrw - now) < timedelta(days=2) )
-
+# x = True
+# print( x is True )
