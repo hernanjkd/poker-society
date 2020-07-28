@@ -171,6 +171,9 @@ def process_results_excel(df):
                     'error':'This tournament ID was not found: '+ str(r['Tournament ID'])
                 }
 
+            trmnt.results_link = (os.environ['API_HOST'] + '/results/tournament/' +
+                str(r['Tournament ID']) )
+
             # Check to see if file was uploaded already
             entry = Results.query.filter_by(
                 tournament_id = r['Tournament ID']
