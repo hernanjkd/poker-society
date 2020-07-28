@@ -405,7 +405,7 @@ def get_all_users_in_trmnt(id):
         return 'Swap Profit not a subscriber'
 
     resp = requests.post( 
-        'http://127.0.0.1:3000' + '/users/tournament/' + str(id),
+        swapprofit.api_host + '/users/tournament/' + str(id),
         json={'api_token': utils.sha256( os.environ['API_TOKEN'] )} )
 
     if not resp.ok:
