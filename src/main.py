@@ -198,9 +198,14 @@ def file_upload():
 
         if swapprofit_json is not None:
             resp = requests.post( swapprofit.api_host + '/results/update',
-                json=swapprofit_json )
+                json={
+                    'api_token': utils.sha256( os.environ['API_TOKEN'] ),
+                    **swapprofit_json
+                })
             if not resp.ok:
                 message = {'error': 'There was a problem in Swap Profit'}
+            else:
+                message = resp.json()
 
 
         return jsonify(message), 200
