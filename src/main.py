@@ -397,6 +397,21 @@ def swapprofit_update():
 
 
 
+@app.route('/users/tournament/<int:id>')
+def get_all_users_in_trmnt(id):
+
+    swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
+    if swapprofit is None:
+        return 'Swap Profit not a subscriber'
+
+    resp = requests.post( 
+        'http://127.0.0.1:3000' + '/users/tournament/' + str(id),
+        json={'api_token': utils.sha256( os.environ['API_TOKEN'] )} )
+
+    if not resp.ok:
+        return 'There was an error in Swap Profit'
+
+    return jsonify(resp.json())
 
 
 if __name__ == '__main__':
