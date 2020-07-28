@@ -397,6 +397,7 @@ def swapprofit_update():
 
 
 
+# Endpoint to get the player ids that have swaps in the trmnt
 @app.route('/users/tournament/<int:id>')
 def get_all_users_in_trmnt(id):
 
