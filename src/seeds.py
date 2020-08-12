@@ -13,8 +13,8 @@ def run():
     Subscribers.query.delete()
 
     db.session.execute("ALTER SEQUENCE users_id_seq RESTART")
-    db.session.execute("ALTER SEQUENCE tournaments_id_seq RESTART")
-    db.session.execute("ALTER SEQUENCE flights_id_seq RESTART")
+    db.session.execute("ALTER SEQUENCE tournaments_id_seq RESTART WITH 100")
+    db.session.execute("ALTER SEQUENCE flights_id_seq RESTART WITH 100")
     db.session.execute("ALTER SEQUENCE results_id_seq RESTART")
     db.session.execute("ALTER SEQUENCE subscribers_id_seq RESTART")
 
