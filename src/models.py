@@ -157,7 +157,7 @@ class Flights(db.Model):
     tournament = db.relationship('Tournaments', back_populates='flights')
 
     def __repr__(self):
-        return f'<Flights tournament:{self.tournament.name} {self.start_at} - {self.end_at}>'
+        return f'<Flights tournament:{self.tournament.name} {self.start_at}>'
 
     def serialize(self):
         return {

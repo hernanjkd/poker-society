@@ -13,8 +13,8 @@ def run():
     Subscribers.query.delete()
 
     db.session.execute("ALTER SEQUENCE users_id_seq RESTART")
-    db.session.execute("ALTER SEQUENCE tournaments_id_seq RESTART WITH 100")
-    db.session.execute("ALTER SEQUENCE flights_id_seq RESTART WITH 100")
+    db.session.execute("ALTER SEQUENCE tournaments_id_seq RESTART")
+    db.session.execute("ALTER SEQUENCE flights_id_seq RESTART")
     db.session.execute("ALTER SEQUENCE results_id_seq RESTART")
     db.session.execute("ALTER SEQUENCE subscribers_id_seq RESTART")
 
@@ -94,7 +94,7 @@ def run():
 
 
     oldvegas = Tournaments(
-        id=884,
+        id=6,
         name='RRPO #21 - NLH $100,000 Guaranteed',
         buy_in='$200',
         start_at=datetime(1990,5,2,10)
@@ -105,14 +105,6 @@ def run():
         day='1A'
     )
     db.session.add_all([oldvegas, flight1_oldvegas])
-
-    coconut = Tournaments(
-        id=882,	
-        name='Live Tournament at Vegas Casino',
-        buy_in='$500',
-        start_at=datetime.utcnow() - timedelta(days=2),
-    )
-    db.session.add(coconut)
 
     db.session.add( Results(
         user_id = None,
@@ -126,3 +118,11 @@ def run():
     ))
     
     db.session.commit()
+
+
+    # Give room for Swap Profit to add mock tournaments
+    db.session.execute("ALTER SEQUENCE tournaments_id_seq RESTART WITH 100")
+    db.session.execute("ALTER SEQUENCE flights_id_seq RESTART WITH 100")
+
+
+    return
