@@ -187,7 +187,7 @@ class Results(db.Model):
     user = db.relationship('Users', back_populates='results')
 
     def __repr__(self):
-        return f'<Results user:{self.user.last_name} tournament:{self.tournament.name}>'
+        return f'<Results id:{self.id}>'
 
     def serialize(self):
         return {

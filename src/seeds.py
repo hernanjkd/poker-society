@@ -117,12 +117,12 @@ def run():
         api_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTU4MTM1NTIsImlhdCI6MTU3OTgxMzU1MiwibmJmIjoxNTc5ODEzNTUyLCJzdWIiOjEsInJvbGUiOiJhZG1pbiJ9.1_rMYxvQtp2KiCGreT5frEMUApDh_hPx3322OZiiVa0"
     ))
     
-    db.session.commit()
-
 
     # Give room for Swap Profit to add mock tournaments
     db.session.execute("ALTER SEQUENCE tournaments_id_seq RESTART WITH 100")
     db.session.execute("ALTER SEQUENCE flights_id_seq RESTART WITH 100")
 
+
+    db.session.commit()
 
     return
