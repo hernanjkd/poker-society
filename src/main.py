@@ -173,7 +173,7 @@ def file_upload():
 
         msg = 'Tournament excel processed successfully'
         return jsonify({
-            'message': msg+'. Downloading file...' if trmnt_added else msg,
+            'message': msg+'. File downloaded' if trmnt_added else msg,
             'download': trmnt_added
         }), 200
             
