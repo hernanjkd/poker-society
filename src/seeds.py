@@ -12,11 +12,14 @@ def run():
     Users.query.delete()
     Subscribers.query.delete()
 
+
     db.session.execute("ALTER SEQUENCE users_id_seq RESTART")
     db.session.execute("ALTER SEQUENCE tournaments_id_seq RESTART")
     db.session.execute("ALTER SEQUENCE flights_id_seq RESTART")
     db.session.execute("ALTER SEQUENCE results_id_seq RESTART")
     db.session.execute("ALTER SEQUENCE subscribers_id_seq RESTART")
+
+    db.session.commit()
 
 
     db.session.add( Users(
@@ -92,8 +95,12 @@ def run():
         nationality = 'USA'
     ))
 
-
+    old_casino = Casinos(
+        id='testing123',
+        name='Old Vegas For Testing'
+    )
     oldvegas = Tournaments(
+        casino=old_casino,
         id=6,
         name='RRPO #21 - NLH $100,000 Guaranteed',
         buy_in='$200',
@@ -104,7 +111,7 @@ def run():
         tournament=oldvegas,
         day='1A'
     )
-    db.session.add_all([oldvegas, flight1_oldvegas])
+    db.session.add_all([old_casino, oldvegas, flight1_oldvegas])
 
     db.session.add( Results(
         user_id = None,

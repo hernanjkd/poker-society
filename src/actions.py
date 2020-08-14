@@ -223,5 +223,5 @@ def process_results_excel(df):
     db.session.commit()
     
     return trmnt_data, {
-        'message': 'Results excel has been processed successfully'
+        'message': 'Results excel processed successfully'
     }

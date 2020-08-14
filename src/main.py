@@ -171,8 +171,9 @@ def file_upload():
                 'error': error_list
             })
 
+        msg = 'Tournament excel processed successfully'
         return jsonify({
-            'message': 'Done. Downloading file' if trmnt_added else 'Done',
+            'message': msg+'. Downloading file...' if trmnt_added else msg,
             'download': trmnt_added
         }), 200
             
@@ -184,7 +185,7 @@ def file_upload():
         actions.process_casinos_excel( df )
         
         return jsonify({'message':
-            'Casino excel has been proccessed successfully'}), 200
+            'Casino excel proccessed successfully'}), 200
 
 
     # RESULTS
@@ -388,7 +389,7 @@ def swapprofit_update():
         raise APIException('Invalid span: '+ span, 400)
     
     if span == 'all':
-        trmnt = Tournaments.query.all()
+        trmnts = Tournaments.query.all()
     else:
         time_ago = datetime.utcnow() - timedelta( minutes=5, **{span:amount} )
         trmnts = Tournaments.query.filter( Tournaments.updated_at > time_ago )

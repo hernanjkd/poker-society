@@ -116,9 +116,11 @@ class Tournaments(db.Model):
     def swapprofit_serialize(self):
         from_trmnt = ['id','name','results_link','start_at']
         from_casino = ['address','city','state','zip_code','time_zone','latitude','longitude']
+        print()
+        print('self',self.casino_id, self.id, self.name, end='\n\n')
         return {
             'updated_at': self.updated_at,
-            'tournament': { 'casino': self.casino.name,
+            'tournament': { #'casino': self.casino.name,
                 **{attr: getattr(self, attr) for attr in from_trmnt},
                 **{attr: getattr(self.casino, attr) for attr in from_casino} },
             'flights': [
