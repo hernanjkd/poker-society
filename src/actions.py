@@ -31,7 +31,7 @@ def process_tournament_excel(df):
             continue
 
 
-        # Used to loop and check properties quicker
+        # Used for new tournaments and for updating existing ones
         trmntjson = {
             'name': trmnt_name,
             'start_at': start_at,
@@ -77,7 +77,7 @@ def process_tournament_excel(df):
         else:
             trmnt = Tournaments.query.get( r['Tournament ID'] )
             if trmnt is None:
-                error_list.append(f'Can\'t find Tournament id: "{r["Tournament ID"]}"')
+                error_list.append(f'Can\'t find tournament with id: "{r["Tournament ID"]}"')
                 continue
             
             flight = Flights.query.filter_by( tournament_id=trmnt.id ) \
