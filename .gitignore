@@ -7,5 +7,6 @@ public/
 dist/
 excel_downloads/
 package.json
+excel_download/
 
 __pycache__/

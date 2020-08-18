@@ -83,9 +83,17 @@ def process_tournament_excel(df):
             flight = Flights.query.filter_by( tournament_id=trmnt.id ) \
                 .filter( or_( Flights.day == flight_day, Flights.start_at == start_at )) \
                 .first()
+
+            print('flight day', flight_day)
+            print('start at', start_at, end='\n')
+            x = Flights.query.filter_by( tournament_id=trmnt.id )
+            for z in x:
+                print(z.serialize())
+                print()
+
             if flight is None:
                 error_list.append(
-                    f'Can\'t find Flight tournament_id: {trmnt.id}, '
+                    f'Can\'t find Flight with tournament_id: {trmnt.id}, '
                     f'day: {flight_day}, start_at: {start_at}' )
                 continue
 
