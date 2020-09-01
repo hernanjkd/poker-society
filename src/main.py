@@ -384,7 +384,7 @@ def swapprofit_update():
 
     # Defaults to hours=1
     span = request.args.get('span', 'hours')
-    amount = request.args.get('amount', 1)
+    amount = int( request.args.get('amount', '1') )
 
     if span not in ['hours','days','all']:
         raise APIException('Invalid span: '+ span, 400)
