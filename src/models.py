@@ -115,7 +115,7 @@ class Tournaments(db.Model):
 
     def swapprofit_serialize(self):
         from_trmnt = ['id','name','results_link','start_at']
-        from_casino = ['address','city','state','zip_code','time_zone','latitude','longitude']
+        from_casino = ['address','city', 'name','state','zip_code','time_zone','latitude','longitude']
         print()
         print('self',self.casino_id, self.id, self.name, end='\n\n')
         return {
