@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+	<title>Results</title>
+	<style>
+		body {
+		  background-color: black;
+		  color: white;
+		  min-width:700px;
+		}
+		​
+		h2 {
+		  color: white;
+		  text-align: center;
+		}
+		​
+		table {
+		    border: 1px solid black;
+		    border-collapse:collapse;
+		}
+		thead td {
+			font-weight:600;
+		      text-align: center;
+		      background-color: black;
+		}
+		​
+		tr:nth-child(even) {
+		  background-color: #282828		;
+		}
+		​
+		tr:nth-child(odd) {
+		  background-color: #000000		;
+		}
+		​
+		td {
+		  color: white;
+		  font-family: verdana;
+		  font-size: 24px;
+		  text-align: center;
+		  
+		}
+	</style>
+</head>
+<body >
+{% if results %}
+	<div style="margin: 5% 0px 5% 0px">
+		<h1 style="text-align:center">Tournament Results</h1>
+
+		<h2 style="text-align:center">{{ casino }}</h2>
+		<h2 style="text-align:center">{{ trmnt_name }}</h2>
+		​
+		<table style="width:90%;border-collapse:collapse;
+		    margin-left:5%; 
+		    margin-right:5%;">
+			<thead>
+			    <tr style="height:60px">
+			    	<td style="width:15%;">Place</td>
+			        <td style="width:35%;">Name</td>
+			        <td style="width:20%;">Winnings</td>
+			        <td style="width:30%;">Hometown</td>
+			    </tr>
+		    </thead>
+			<tbody></tbody>
+		</table>
+	</div>
+	<script>
+
+		var results = JSON.parse('{{ results | safe }}')
+
+		document.querySelector('tbody').innerHTML =  results.map((x, i) => (
+			`<tr style='height:50px; background-color:${i%2==0?'#282828':'#000000'}'>
+				<td style="text-align:center">${x.place}</td>
+				<td style="text-align:center">${x.full_name}</td>
+				<td style="text-align:center">$${x.winnings}</td>
+				<td style="text-align:center">${x.nationality}</td>
+			</tr>`)
+		)
+		.join('')
+
+	</script>
+{% else %}
+	<div style="margin: 5% 0px 5% 0px">
+		<h2 style="text-align:center">{{ casino }}</h2>
+		<h2 style="text-align:center">{{ trmnt_name }}</h2>
+		
+		<h1 style="text-align:center;margin-top:100px">This tournament has no results yet</h1>
+	</div>
+{% endif %}
+</body>
+</html>

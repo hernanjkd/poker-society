@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+        <title>Poker Society Log In</title>
+        <style>
+            
+        </style>
+    </head>
+    <body>
+        <div class="d-flex justify-content-center">
+            <div id="page" class="mt-5 p-5">
+                <div id="message" class="text-danger my-3"></div>
+                <div style="width:300px">
+                    <input class="form-control"
+                        onkeypress="listenEnter(event)"
+                        type="text" id="email" placeholder="Email" />
+                </div>
+                <div class="my-3" style="width:300px">
+                    <input class="form-control"
+                        onkeypress="listenEnter(event)"
+                        type="password" id="password" placeholder="Password" />
+                </div>
+                <div class="text-center">
+                    <button class="py-2 px-3 btn btn-info" 
+                        onclick="login()">
+                        LOG IN
+                    </button>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            function listenEnter(event) {
+                if (event.key === 'Enter')
+                    login()
+            }
+            function login() {
+                let email = document.querySelector('#email').value;
+                let password = document.querySelector('#password').value;
+                
+                fetch('{{ host }}/users/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                })
+                .then(resp => resp.json())
+                .then(resp => {
+                    if (resp.login) {
+                        document.cookie = `pokersociety-jwt=${resp.jwt};path=/`;
+                        window.location = '{{ host }}/upload/files';
+                    }
+                    else
+                        document.querySelector('#message').innerHTML = resp.message;
+                })
+                .catch(err => console.error(err))
+            }
+        </script>
+    </body>
+</html>
