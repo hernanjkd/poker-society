@@ -97,7 +97,14 @@ def run():
 
     old_casino = Casinos(
         id='testing123',
-        name='Old Vegas For Testing'
+        name='Old Vegas For Testing',
+        city='Miami',
+        state='FL',
+        zip_code="33183",
+        time_zone='EST',
+        address='121222',
+        latitude='111',
+        longitude='2222'
     )
     oldvegas = Tournaments(
         casino=old_casino,
