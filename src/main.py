@@ -395,6 +395,9 @@ def swapprofit_update():
         time_ago = datetime.utcnow() - timedelta( minutes=5, **{span:amount} )
         trmnts = Tournaments.query.filter( Tournaments.updated_at > time_ago )
     
+    for x in trmnts:
+        d = [x.swapprofit_serialize() ]
+        print("THIIS IS WAHAT IS CIOMFU", d )
     return jsonify([ x.swapprofit_serialize() for x in trmnts ])
 
 
