@@ -4,7 +4,7 @@ import pandas as pd
 from sqlalchemy import or_
 from utils import APIException
 from models import db, Users, Casinos, Tournaments, Flights, Results
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def process_tournament_excel(df):
@@ -89,7 +89,6 @@ def process_tournament_excel(df):
             x = Flights.query.filter_by( tournament_id=trmnt.id )
             for z in x:
                 print(z.serialize())
-                print()
 
             if flight is None:
                 error_list.append(
@@ -179,8 +178,7 @@ def process_results_excel(df):
                     'error':'This tournament ID was not found: '+ str(r['Tournament ID'])
                 }
 
-            trmnt.results_link = (os.environ['API_HOST'] + '/results/tournament/' +
-                str(r['Tournament ID']) )
+            trmnt.results_link = (os.environ['API_HOST'] + '/results/tournament/' + str(r['Tournament ID']) )
 
             # Check to see if file was uploaded already
             entry = Results.query.filter_by(
@@ -210,14 +208,15 @@ def process_results_excel(df):
                 return None, {
                     'error':'Couldn\'t find user with ID: '+ str(user_id)
                 }
-            
+            print('user', user)
             # Swap Profit JSON
             trmnt_data['users'][user.email] = {
                 'place': r['Place'],
                 'winnings': r['Winnings']
             }
 
-        # Add to database
+
+        # Add to PokerSociety database
         db.session.add( Results(
             tournament_id = trmnt_data['tournament_id'],
             user_id = user_id,

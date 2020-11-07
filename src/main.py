@@ -339,6 +339,7 @@ def swapprofit_user():
     if json['api_token'] != utils.sha256( os.environ['API_TOKEN'] ):
         raise APIException('Invalid api token', 400)
 
+
     # Find user in db
     user = Users.query.filter_by( email=json['email'] ).first()
 

@@ -24,25 +24,16 @@ def run():
 
     db.session.add( Users(
         email = 'lou@gmail.com',
-        password = sha256('123'),
-        first_name = 'Luiz',
-        nickname = 'Lou',
-        last_name = 'Stadler',
+        password = sha256('loustadler'),
+        first_name = 'John',
+        nickname = '',
+        last_name = 'Doe',
         hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=207424',
         nationality = 'USA'
     ))
     db.session.add( Users(
-        email='hoang28974@gmail.com',
-        password=sha256('kateHoang'),
-        first_name = 'Kate',
-        nickname = '',
-        last_name = 'Hoang',
-        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=421758',
-        nationality = 'USA'
-    ))
-    db.session.add( Users(
-        email='katz234@gmail.com',
-        password=sha256('carykatz'),
+        email='gherndon5@hotmail.com',
+        password=sha256('casper5'),
         first_name = 'Cary',
         nickname = '',
         last_name = 'Katz',
@@ -50,12 +41,21 @@ def run():
         nationality = 'USA'
     ))
     db.session.add( Users(
-        email='mikitapoker@gmail.com',
-        password=sha256('nikitapoker'),
-        first_name = 'Nikita',
-        nickname = 'Mikita',
-        last_name = 'Bodyakovskiy',
-        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=159100',
+        email='gherndon5@gmail.com',
+        password=sha256('casper5'),
+        first_name = 'Gabriel',
+        nickname = '',
+        last_name = 'Herndon',
+        hendon_url= None,
+        nationality = 'USA'
+    ))
+    db.session.add( Users(
+        email='lou@pokersociety.com',
+        password=sha256('swaptest'),
+        first_name = 'Luiz',
+        nickname = 'Lou',
+        last_name = 'Stadler',
+        hendon_url= 'https://pokerdb.thehendonmob.com/player.php?a=r&n=207424',
         nationality = 'USA'
     ))
     db.session.add( Users(
@@ -65,15 +65,6 @@ def run():
         nickname = '',
         last_name = 'Shiao',
         hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=371190',
-        nationality = 'USA'
-    ))
-    db.session.add( Users(
-        email='leff1117@aol.com',
-        password=sha256('eatme'),
-        first_name = 'Bobby',
-        nickname = '',
-        last_name = 'Leff',
-        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=187837',
         nationality = 'USA'
     ))
     db.session.add( Users(
@@ -94,36 +85,45 @@ def run():
         hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=239802',
         nationality = 'USA'
     ))
-
-    old_casino = Casinos(
-        id='testing123',
-        name='Old Vegas For Testing',
-        city='Miami',
-        state='FL',
-        zip_code="33183",
-        time_zone='EST',
-        address='121222',
-        latitude='111',
-        longitude='2222'
-    )
-    oldvegas = Tournaments(
-        casino=old_casino,
-        id=6,
-        name='RRPO #21 - NLH $100,000 Guaranteed',
-        buy_in='$200',
-        start_at=datetime(1990,5,2,10)
-    )
-    flight1_oldvegas = Flights(
-        start_at=datetime(1990,5,2,10),
-        tournament=oldvegas,
-        day='1A'
-    )
-    db.session.add_all([old_casino, oldvegas, flight1_oldvegas])
-
-    db.session.add( Results(
-        user_id = None,
-        full_name = 'Pedro Andres'
+    db.session.add( Users(
+        email='leff1117@aol.com',
+        password=sha256('eatme'),
+        first_name = 'Bobby',
+        nickname = '',
+        last_name = 'Leff',
+        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=187837',
+        nationality = 'USA'
     ))
+    
+
+    # old_casino = Casinos(
+    #     id='testing123',
+    #     name='Old Vegas For Testing',
+    #     city='Miami',
+    #     state='FL',
+    #     zip_code="33183",
+    #     time_zone='EST',
+    #     latitude='111',
+    #     longitude='2222'
+    # )
+    # oldvegas = Tournaments(
+    #     casino=old_casino,
+    #     id=6,
+    #     name='RRPO #21 - NLH $100,000 Guaranteed',
+    #     buy_in='$200',
+    #     start_at=datetime(1990,5,2,10)
+    # )
+    # flight1_oldvegas = Flights(
+    #     start_at=datetime(1990,5,2,10),
+    #     tournament=oldvegas,
+    #     day='1A'
+    # )
+    # db.session.add_all([old_casino, oldvegas, flight1_oldvegas])
+
+    # db.session.add( Results(
+    #     user_id = None,
+    #     full_name = 'Pedro Andres'
+    # ))
 
     db.session.add( Subscribers(
         company_name = 'Swap Profit',
