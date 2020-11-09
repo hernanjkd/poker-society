@@ -166,9 +166,10 @@ def process_results_excel(df):
     }
     '''
     trmnt_data = {}
-
+    
     for index, r in df.iterrows():
-
+        # print('index', index)
+        # print('r', r)
         # Get the trmnt data that's in the first row
         if index == 0:
             
@@ -178,7 +179,7 @@ def process_results_excel(df):
                 return None, {
                     'error':'This tournament ID was not found: '+ str(r['Tournament ID'])
                 }
-
+            print('tournament', trmnt)
             trmnt.results_link = (os.environ['API_HOST'] + '/results/tournament/' + str(r['Tournament ID']) )
 
             # Check to see if file was uploaded already
@@ -199,7 +200,7 @@ def process_results_excel(df):
                 'users': {}
             }
 
-
+            print('trmnt_data', trmnt_data)
         user_id = r['User ID'] or None
         
         # Add user to the Swap Profit JSON
@@ -210,11 +211,12 @@ def process_results_excel(df):
                 return None, {
                     'error':'Couldn\'t find user with ID: '+ str(user_id)
                 }
-            print('user', user)
+            print('user', user, user.id)
             # Swap Profit JSON
             trmnt_data['users'][user.email] = {
                 'place': r['Place'],
-                'winnings': r['Winnings']
+                'winnings': r['Winnings'],
+                'user_id': user.id
             }
 
 
