@@ -154,6 +154,7 @@ def process_casinos_excel(df):
 def process_results_excel(df):
     '''
     {
+        "api_token": 1
         "tournament_id": 45,
         "tournament_buyin": 150,
         "users": {
@@ -192,6 +193,7 @@ def process_results_excel(df):
             
             # Swap Profit JSON
             trmnt_data = {
+                'api_token': 1,
                 'tournament_id': trmnt.id,
                 'tournament_buyin': trmnt.buy_in,
                 'users': {}
