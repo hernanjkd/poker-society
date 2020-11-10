@@ -196,9 +196,10 @@ def file_upload():
         swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
         if swapprofit is None:
             return jsonify({'error': 'Swap Profit not a subscriber'})
-
+        print('swapprofitjson', swapprofit_json)
         if swapprofit_json is not None:
-            resp = requests.post( swapprofit.api_host + '/results/update',
+            # SWAPPROFUT ENDS HERE  swapprofit.api_host
+            resp = requests.post( 'http://0.0.0.0:3000' + '/results/update',
                 json={
                     'api_token': utils.sha256( os.environ['API_TOKEN'] ),
                     **swapprofit_json
@@ -208,7 +209,7 @@ def file_upload():
             else:
                 log = resp.json()
 
-
+            print('resp', resp)
         return jsonify(log), 200
 
 
@@ -398,7 +399,7 @@ def swapprofit_update():
     
     for x in trmnts:
         d = [x.swapprofit_serialize() ]
-        print("THIIS IS WAHAT IS CIOMFU", d )
+        # print("THIIS IS WAHAT IS CIOMFU", d )
     return jsonify([ x.swapprofit_serialize() for x in trmnts ])
 
 

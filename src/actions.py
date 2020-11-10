@@ -3,9 +3,11 @@ import utils
 import pandas as pd
 from sqlalchemy import or_
 from utils import APIException
-from models import db, Users, Casinos, Tournaments, Flights, Results
+from models import db, Users, Casinos, Tournaments, Flights, Results, Subscribers
 from datetime import datetime, timedelta
-
+from flask import ( Flask, request, jsonify, render_template, send_file, 
+    make_response, redirect )
+import requests
 
 def process_tournament_excel(df):
 
@@ -168,13 +170,14 @@ def process_results_excel(df):
     trmnt_data = {}
     
     for index, r in df.iterrows():
-        # print('index', index)
         # print('r', r)
         # Get the trmnt data that's in the first row
         if index == 0:
             
             # Check trmnt existance
             trmnt = Tournaments.query.get( r['Tournament ID'] )
+            print('trmnt.buy_in', trmnt.buy_in)
+
             if trmnt is None:
                 return None, {
                     'error':'This tournament ID was not found: '+ str(r['Tournament ID'])
@@ -194,13 +197,12 @@ def process_results_excel(df):
             
             # Swap Profit JSON
             trmnt_data = {
-                'api_token': 1,
+                'api_token': utils.sha256( os.environ['API_TOKEN'] ),
                 'tournament_id': trmnt.id,
                 'tournament_buyin': trmnt.buy_in,
                 'users': {}
             }
 
-            print('trmnt_data', trmnt_data)
         user_id = r['User ID'] or None
         
         # Add user to the Swap Profit JSON
@@ -211,14 +213,12 @@ def process_results_excel(df):
                 return None, {
                     'error':'Couldn\'t find user with ID: '+ str(user_id)
                 }
-            print('user', user, user.id)
             # Swap Profit JSON
             trmnt_data['users'][user.email] = {
                 'place': r['Place'],
-                'winnings': r['Winnings'],
-                'user_id': user.id
+                'winnings': r['Winnings']
+                # 'user_id': user.id
             }
-
 
         # Add to PokerSociety database
         db.session.add( Results(
@@ -232,7 +232,14 @@ def process_results_excel(df):
 
     # If no errors, commit all data
     db.session.commit()
-    
+    # swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
+    # if swapprofit is None:
+    #     return 'Swap Profit not a subscriber'
+    # resp = requests.post( 
+    #         'http://0.0.0.0:3000' + '/results/update',
+    #         json=trmnt_data )
+    # print('resp', resp)
+
     return trmnt_data, {
         'message': 'Results excel processed successfully'
     }
