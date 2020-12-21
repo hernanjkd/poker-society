@@ -107,6 +107,11 @@ def process_tournament_excel(df):
                 for db_column, value in trmntjson.items():
                     if getattr(trmnt, db_column) != value:
                         setattr( trmnt, db_column, value )
+            
+            if flight_day is None:
+                for db_column, value in trmntjson.items():
+                    if getattr(trmnt, db_column) != value:
+                        setattr( trmnt, db_column, value )
 
 
     db.session.commit()

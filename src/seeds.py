@@ -1,6 +1,7 @@
 from models import db, Users, Casinos, Tournaments, Flights, Results, Subscribers
 from datetime import datetime, timedelta
 from utils import sha256
+import os
 
 
 def run():
@@ -13,15 +14,56 @@ def run():
     Subscribers.query.delete()
 
 
-    db.session.execute("ALTER SEQUENCE users_id_seq RESTART")
-    db.session.execute("ALTER SEQUENCE tournaments_id_seq RESTART")
-    db.session.execute("ALTER SEQUENCE flights_id_seq RESTART")
     db.session.execute("ALTER SEQUENCE results_id_seq RESTART")
+    db.session.execute("ALTER SEQUENCE flights_id_seq RESTART")
+    db.session.execute("ALTER SEQUENCE tournaments_id_seq RESTART")
+    db.session.execute("ALTER SEQUENCE users_id_seq RESTART")
     db.session.execute("ALTER SEQUENCE subscribers_id_seq RESTART")
 
     db.session.commit()
+    d1 = datetime.utcnow() + timedelta(minutes=5)
+    d2 = datetime.utcnow() - timedelta(hours=16, minutes=59, seconds=50)
 
 
+    oneCasino= Casinos(
+        id=1,
+        name='Seminole Hard Rock Hotel & Casino',
+        address='1 Seminole Way',
+        city='Davie',
+        state='FL',
+        zip_code='33314',
+        latitude=26.0510,
+        longitude=-80.2097,
+        time_zone='Etc/GMT-4'
+    )
+
+    aboutToStart = Tournaments(
+        casino=oneCasino,
+        name='About To Start Event',
+        start_at= d1,
+    )
+    db.session.add(aboutToStart)
+    aboutToEnd = Tournaments(
+        casino=oneCasino,
+        name='About To End Event',
+        start_at= d2,
+    )
+    db.session.add(aboutToEnd)
+
+    flight1_start = Flights(
+        start_at=aboutToStart.start_at,
+        tournament=aboutToStart,
+        day=1
+    )
+    db.session.add(flight1_start)
+
+    flight1_end = Flights(
+        start_at=aboutToEnd.start_at,
+        tournament=aboutToEnd,
+        day=1
+    )
+    db.session.add(flight1_end)
+    
     db.session.add( Users(
         email = 'lou@gmail.com',
         password = sha256('loustadler'),
@@ -41,7 +83,7 @@ def run():
         nationality = 'USA'
     ))
     db.session.add( Users(
-        email='gherndon5@gmail.com',
+        email='techpriest.gabriel@gmail.com',
         password=sha256('casper5'),
         first_name = 'Gabriel',
         nickname = '',
@@ -96,46 +138,15 @@ def run():
     ))
     
 
-    # old_casino = Casinos(
-    #     id='testing123',
-    #     name='Old Vegas For Testing',
-    #     city='Miami',
-    #     state='FL',
-    #     zip_code="33183",
-    #     time_zone='EST',
-    #     latitude='111',
-    #     longitude='2222'
-    # )
-    # oldvegas = Tournaments(
-    #     casino=old_casino,
-    #     id=6,
-    #     name='RRPO #21 - NLH $100,000 Guaranteed',
-    #     buy_in='$200',
-    #     start_at=datetime(1990,5,2,10)
-    # )
-    # flight1_oldvegas = Flights(
-    #     start_at=datetime(1990,5,2,10),
-    #     tournament=oldvegas,
-    #     day='1A'
-    # )
-    # db.session.add_all([old_casino, oldvegas, flight1_oldvegas])
-
-    # db.session.add( Results(
-    #     user_id = None,
-    #     full_name = 'Pedro Andres'
-    # ))
-
     db.session.add( Subscribers(
         company_name = 'Swap Profit',
-        api_host = 'https://swapprofit-beta.herokuapp.com', #'http://localhost:3000'
+        api_host = os.environ['SWAPPROFIT_API_HOST'],
         api_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTU4MTM1NTIsImlhdCI6MTU3OTgxMzU1MiwibmJmIjoxNTc5ODEzNTUyLCJzdWIiOjEsInJvbGUiOiJhZG1pbiJ9.1_rMYxvQtp2KiCGreT5frEMUApDh_hPx3322OZiiVa0"
     ))
     
-
     # Give room for Swap Profit to add mock tournaments
     db.session.execute("ALTER SEQUENCE tournaments_id_seq RESTART WITH 100")
     db.session.execute("ALTER SEQUENCE flights_id_seq RESTART WITH 100")
-
 
     db.session.commit()
 

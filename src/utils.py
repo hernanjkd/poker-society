@@ -59,6 +59,8 @@ def resolve_name_day(string):
     a = re.search(r'(.*) - Day ([\d\w]+)', string)
     tournament_name = string if a is None else a.group(1)
     flight_day = a and a.group(2)
+    print('Tournament Name: ', tournament_name)
+    print('Flight Day: ', flight_day)
     return [tournament_name, flight_day]
 
 def are_headers_for(table, file_headers):

@@ -27,7 +27,6 @@ jwt = JWTManager(app)
 SetupAdmin(app)
 
 
-
 ######################################################################
 # Takes in a dictionary with id, role and expiration date in minutes
 #        create_jwt({ 'id': 100, 'role': 'admin', 'exp': 15 })
@@ -45,12 +44,9 @@ def add_claims_to_access_token(data):
     }
 
 
-
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
-
-
 
 
 @app.route('/reset_database')
@@ -59,13 +55,11 @@ def reset_database():
     return 'seeds ran'
 
 
-
 @app.route('/testing/<filename>')
 def testing(filename):
     resp = make_response( redirect('/upload/files') )
     resp.set_cookie( 'pokersociety_jwt', 'hi jwt' )
     return resp
-
 
 
 @app.route('/users', methods=['POST'])
@@ -89,7 +83,6 @@ def register():
                 'exp': 600
             })
         }), 200
-
 
 
 @app.route('/', methods=['GET','POST'])
@@ -119,7 +112,6 @@ def login():
         'jwt': create_jwt({'id':user.id, 'role':'admin'})
     })
     
-
 
 @app.route('/upload/files', methods=['GET','POST'])
 def file_upload():
@@ -199,7 +191,7 @@ def file_upload():
         print('swapprofitjson', swapprofit_json)
         if swapprofit_json is not None:
             # SWAPPROFUT ENDS HERE  swapprofit.api_host
-            resp = requests.post( 'http://0.0.0.0:3000' + '/results/update',
+            resp = requests.post( os.environ['SWAPPROFIT_API_HOST'] + '/results/update',
                 json={
                     'api_token': utils.sha256( os.environ['API_TOKEN'] ),
                     **swapprofit_json
@@ -218,13 +210,11 @@ def file_upload():
     return jsonify({'error': 'Unrecognized file'}), 200
 
 
-
 @app.route('/download/file/<filename>')
 def download_file(filename):
     path = f"{os.environ['APP_PATH']}/src/excel_downloads/{filename}"   
     return send_file( path, cache_timeout=0, as_attachment=True,
         attachment_filename=filename )
-
 
 
 @app.route('/users/<id>', methods=['GET','PUT'])
@@ -250,7 +240,6 @@ def get_update_user(id):
     return jsonify(user.serialize())
 
 
-
 @app.route('/casinos/<id>', methods=['GET'])
 def get_casinos(id):
 
@@ -259,7 +248,6 @@ def get_casinos(id):
         raise APIException('Casino not found', 404)
 
     return jsonify( casino.serialize() )
-
 
 
 @app.route('/tournaments/<id>', methods=['GET'])
@@ -290,7 +278,6 @@ def get_tournaments(id):
         raise APIException('Tournament not found', 404)
 
     return jsonify(trmnt.serialize())
-
 
 
 @app.route('/results/tournament/<int:id>')
@@ -328,7 +315,6 @@ def get_results(id):
     )
 
 
-
 # Endpoint to create and return the user id to swap profit
 @app.route('/swapprofit/user', methods=['POST'])
 def swapprofit_user():
@@ -362,7 +348,6 @@ def swapprofit_user():
     return jsonify({'pokersociety_id': user.id})
 
 
-
 # Update email when user updates his email in swap profit
 @app.route('/swapprofit/email/user/<int:id>', methods=['PUT'])
 def swapprofit_email_update(id):
@@ -378,7 +363,6 @@ def swapprofit_email_update(id):
     db.session.commit()
 
     return jsonify({'message':'ok'}), 200
-
 
 
 @app.route('/swapprofit/update')
@@ -401,7 +385,6 @@ def swapprofit_update():
         d = [x.swapprofit_serialize() ]
         # print("THIIS IS WAHAT IS CIOMFU", d )
     return jsonify([ x.swapprofit_serialize() for x in trmnts ])
-
 
 
 # Endpoint to get the player ids that have swaps in the trmnt
