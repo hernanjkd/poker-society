@@ -22,7 +22,7 @@ def run():
 
     db.session.commit()
     d1 = datetime.utcnow() + timedelta(minutes=5)
-    d2 = datetime.utcnow() - timedelta(hours=16, minutes=59, seconds=50)
+    d2 = datetime.utcnow() - timedelta(hours=16, minutes=59)
 
 
     oneCasino= Casinos(
