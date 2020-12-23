@@ -65,8 +65,8 @@ def run():
     db.session.add(flight1_end)
     
     db.session.add( Users(
-        email = 'lou@gmail.com',
-        password = sha256('loustadler'),
+        email = 'lou@gsmail.com',
+        password = sha256('loustadsler'),
         first_name = 'John',
         nickname = '',
         last_name = 'Doe',
