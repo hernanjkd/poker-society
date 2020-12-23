@@ -91,51 +91,6 @@ def run():
         hendon_url= None,
         nationality = 'USA'
     ))
-    db.session.add( Users(
-        email='lou@pokersociety.com',
-        password=sha256('swaptest'),
-        first_name = 'Luiz',
-        nickname = 'Lou',
-        last_name = 'Stadler',
-        hendon_url= 'https://pokerdb.thehendonmob.com/player.php?a=r&n=207424',
-        nationality = 'USA'
-    ))
-    db.session.add( Users(
-        email='perry1830@msn.com',
-        password=sha256('Kobe$$'),
-        first_name = 'Perry',
-        nickname = '',
-        last_name = 'Shiao',
-        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=371190',
-        nationality = 'USA'
-    ))
-    db.session.add( Users(
-        email='neal_corcoran@yahoo.com',
-        password=sha256('Brooklyn1'),
-        first_name = 'Neal',
-        nickname = '',
-        last_name = 'Corcoran',
-        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=506855',
-        nationality = 'USA'
-    ))
-    db.session.add( Users(
-        email='brooklynbman@yahoo.com',
-        password=sha256('Brooklyn1'),
-        first_name = 'Brian',
-        nickname = '',
-        last_name = 'Gelrod',
-        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=239802',
-        nationality = 'USA'
-    ))
-    db.session.add( Users(
-        email='leff1117@aol.com',
-        password=sha256('eatme'),
-        first_name = 'Bobby',
-        nickname = '',
-        last_name = 'Leff',
-        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=187837',
-        nationality = 'USA'
-    ))
     
 
     db.session.add( Subscribers(
