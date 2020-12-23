@@ -5,7 +5,7 @@ import os
 
 
 def run():
-
+    
     Results.query.delete()
     Flights.query.delete()
     Tournaments.query.delete()
