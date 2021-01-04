@@ -173,6 +173,7 @@ def process_results_excel(df):
     }
     '''
     trmnt_data = {}
+    print('hello')
     
     for index, r in df.iterrows():
         # print('r', r)
@@ -237,13 +238,13 @@ def process_results_excel(df):
 
     # If no errors, commit all data
     db.session.commit()
-    swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
-    if swapprofit is None:
-        return 'Swap Profit not a subscriber'
-    resp = requests.post( 
-            os.environ['SWAPPROFIT_API_HOST'] + '/results/update',
-            json=trmnt_data )
-    print('resp', resp)
+    # swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
+    # if swapprofit is None:
+    #     return 'Swap Profit not a subscriber'
+    # resp = requests.post( 
+    #         os.environ['SWAPPROFIT_API_HOST'] + '/results/update',
+    #         json=trmnt_data )
+    # print('resp', resp)
 
     return trmnt_data, {
         'message': 'Results excel processed successfully'

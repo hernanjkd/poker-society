@@ -191,7 +191,7 @@ def file_upload():
         print('swapprofitjson', swapprofit_json)
         if swapprofit_json is not None:
             # SWAPPROFUT ENDS HERE  swapprofit.api_host
-            resp = requests.post( os.environ['SWAPPROFIT_API_HOST'] + '/results/update',
+            resp = requests.post( swapprofit.api_host + '/results/update',
                 json={
                     'api_token': utils.sha256( os.environ['API_TOKEN'] ),
                     **swapprofit_json
