@@ -237,13 +237,13 @@ def process_results_excel(df):
 
     # If no errors, commit all data
     db.session.commit()
-    # swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
-    # if swapprofit is None:
-    #     return 'Swap Profit not a subscriber'
-    # resp = requests.post( 
-    #         'http://0.0.0.0:3000' + '/results/update',
-    #         json=trmnt_data )
-    # print('resp', resp)
+    swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
+    if swapprofit is None:
+        return 'Swap Profit not a subscriber'
+    resp = requests.post( 
+            os.environ['API_HOST'] + '/results/update',
+            json=trmnt_data )
+    print('resp', resp)
 
     return trmnt_data, {
         'message': 'Results excel processed successfully'
