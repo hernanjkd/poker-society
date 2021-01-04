@@ -241,7 +241,7 @@ def process_results_excel(df):
     if swapprofit is None:
         return 'Swap Profit not a subscriber'
     resp = requests.post( 
-            os.environ['API_HOST'] + '/results/update',
+            os.environ['SWAPPROFIT_API_HOST'] + '/results/update',
             json=trmnt_data )
     print('resp', resp)
 
