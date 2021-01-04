@@ -39,14 +39,16 @@ def run():
 
     aboutToStart = Tournaments(
         casino=oneCasino,
-        name='About To Start Event',
+        name='Example Live Event',
         start_at= d1,
+        buy_in='$100'
     )
     db.session.add(aboutToStart)
     aboutToEnd = Tournaments(
         casino=oneCasino,
-        name='About To End Event',
+        name='Example End Event',
         start_at= d2,
+        buy_in='$150'
     )
     db.session.add(aboutToEnd)
 

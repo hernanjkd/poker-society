@@ -202,6 +202,7 @@ def file_upload():
                 log = resp.json()
 
             print('resp', resp)
+            print('resp', resp.json())
         return jsonify(log), 200
 
 
