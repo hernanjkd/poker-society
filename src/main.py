@@ -16,7 +16,7 @@ from sqlalchemy import asc, desc
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.secret_key = os.environ.get('FLASK_KEY')
-app.config['JWT_SECRET_KEY'] = 'super secret key'
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db)
