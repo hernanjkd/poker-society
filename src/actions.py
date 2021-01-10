@@ -214,7 +214,7 @@ def process_results_excel(df):
         x = f'Bearer {utils.sha256( os.environ["API_TOKEN"]) }'
 
         headers = CaseInsensitiveDict()
-        headers["Authorization"] = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjkxNjA5NzkwODIwLCJpYXQiOjE2MDk3OTA4MjAsIm5iZiI6MTYwOTc5MDgyMCwic3ViIjoyLCJyb2xlIjoiYWRtaW4ifQ.dryh3JpD4PFekq7TsRZLFy-kXIY3P5JupDs9UneiBxg"
+        headers["Authorization"] = "Bearer " + os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id)
 
         print('x', x)
         print('url', os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id))
