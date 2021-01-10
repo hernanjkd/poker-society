@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from flask import ( Flask, request, jsonify, render_template, send_file, 
     make_response, redirect )
 import requests
+from requests.structures import CaseInsensitiveDict
 
 def process_tournament_excel(df):
 
@@ -173,22 +174,20 @@ def process_results_excel(df):
     }
     '''
     trmnt_data = {}
-    print('hello')
     
     for index, r in df.iterrows():
-        # print('r', r)
+
         # Get the trmnt data that's in the first row
         if index == 0:
             
             # Check trmnt existance
             trmnt = Tournaments.query.get( r['Tournament ID'] )
-            print('trmnt.buy_in', trmnt.buy_in)
 
             if trmnt is None:
                 return None, {
                     'error':'This tournament ID was not found: '+ str(r['Tournament ID'])
                 }
-            print('tournament', trmnt)
+            # print('tournament', trmnt)
             trmnt.results_link = (os.environ['API_HOST'] + '/results/tournament/' + str(r['Tournament ID']) )
 
             # Check to see if file was uploaded already
@@ -205,46 +204,60 @@ def process_results_excel(df):
             trmnt_data = {
                 'api_token': utils.sha256( os.environ['API_TOKEN'] ),
                 'tournament_id': trmnt.id,
-                'tournament_buyin': trmnt.buy_in,
+                'tournament_buyin': trmnt.buy_in_amount,
                 'users': {}
             }
 
-        user_id = r['User ID'] or None
-        
-        # Add user to the Swap Profit JSON
-        if user_id:
-            user = Users.query.get( user_id )
-            if user is None:
-                db.session.rollback()
-                return None, {
-                    'error':'Couldn\'t find user with ID: '+ str(user_id)
-                }
-            # Swap Profit JSON
-            trmnt_data['users'][user.email] = {
-                'place': r['Place'],
-                'winnings': r['Winnings']
-                # 'user_id': user.id
-            }
+        user_id = r['User ID'] 
+
+        url = os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id)
+        x = f'Bearer {utils.sha256( os.environ["API_TOKEN"]) }'
+
+        headers = CaseInsensitiveDict()
+        headers["Authorization"] = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjkxNjA5NzkwODIwLCJpYXQiOjE2MDk3OTA4MjAsIm5iZiI6MTYwOTc5MDgyMCwic3ViIjoyLCJyb2xlIjoiYWRtaW4ifQ.dryh3JpD4PFekq7TsRZLFy-kXIY3P5JupDs9UneiBxg"
+
+        print('x', x)
+        print('url', os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id))
+        resp = requests.get(url, headers=headers  )   
+    
+        print("Email is:", resp.json())
+        user= resp.json()
+    # Add user to the Swap Profit JSON
+    # if user_id:
+    #     user = Users.query.get( user_id )
+    #     if user is None:
+    #         db.session.rollback()
+    #         return None, {
+    #             'error':'Couldn\'t find user with ID: '+ str(user_id)
+    #         }
+    # Swap Profit JSON
+        trmnt_data['users'][user['email']] = {
+            'place': r['Place'],
+            'winnings': r['Winnings'],
+            'user_id': r['User ID']
+        }
 
         # Add to PokerSociety database
         db.session.add( Results(
             tournament_id = trmnt_data['tournament_id'],
-            user_id = user_id,
+            user_id = r['User ID'],
             full_name = r['Full Name'],
             place = r['Place'],
             nationality = r['Nationality'],
             winnings = r['Winnings']
         ))
 
+    print('Final Tournament Data:', trmnt_data)
     # If no errors, commit all data
     db.session.commit()
-    # swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
-    # if swapprofit is None:
-    #     return 'Swap Profit not a subscriber'
+    print('just comiited')
+    swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
+    if swapprofit is None:
+        return 'Swap Profit not a subscriber'
     # resp = requests.post( 
     #         os.environ['SWAPPROFIT_API_HOST'] + '/results/update',
     #         json=trmnt_data )
-    # print('resp', resp)
+    # print('resp', resp.ok)
 
     return trmnt_data, {
         'message': 'Results excel processed successfully'

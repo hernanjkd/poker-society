@@ -375,17 +375,51 @@ def swapprofit_update():
 
     if span not in ['hours','days','all']:
         raise APIException('Invalid span: '+ span, 400)
-    
+    print('a')
     if span == 'all':
+        csnos = Casinos.query.all()
         trmnts = Tournaments.query.all()
     else:
         time_ago = datetime.utcnow() - timedelta( minutes=5, **{span:amount} )
         trmnts = Tournaments.query.filter( Tournaments.updated_at > time_ago )
+        csnos = Casinos.query.all()
+    print('b')
+    d = []
     
-    for x in trmnts:
-        d = [x.swapprofit_serialize() ]
+    e=[]
+    for x in csnos:
+        e.append(x.swapprofit_serialize())
+    d.append(e)
+    f = []
+    for y in trmnts:
+        f.append(y.swapprofit_serialize())
+    d.append(f)
+
+    print('d', d)
+
         # print("THIIS IS WAHAT IS CIOMFU", d )
-    return jsonify([ x.swapprofit_serialize() for x in trmnts ])
+    return jsonify(d)
+
+# @app.route('/swapprofit/casinos/update')
+# def swapprofit_casino_update():
+
+#     # Defaults to hours=1
+#     span = request.args.get('span', 'hours')
+#     amount = int( request.args.get('amount', '1') )
+
+#     if span not in ['hours','days','all']:
+#         raise APIException('Invalid span: '+ span, 400)
+    
+#     if span == 'all':
+#         csnos = Casinos.query.all()
+#     else:
+#         time_ago = datetime.utcnow() - timedelta( minutes=5, **{span:amount} )
+#         csnos = Casinos.query.filter( Casinos.updated_at > time_ago )
+    
+#     for x in csnos:
+#         d = [x.serialize() ]
+#         # print("THIIS IS WAHAT IS CIOMFU", d )
+#     return jsonify([ x.serialize() for x in csnos ])
 
 
 # Endpoint to get the player ids that have swaps in the trmnt

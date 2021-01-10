@@ -25,7 +25,7 @@ class Users(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    results = db.relationship('Results', back_populates='user')
+    # results = db.relationship('Results', back_populates='user')
 
     def __repr__(self):
         return f'<Users {self.email}>'
@@ -89,6 +89,28 @@ class Casinos(db.Model):
             'updated_at': self.updated_at
         }
 
+    def swapprofit_serialize(self):
+        # from_trmnt = ['id','name','results_link','start_at']
+        from_casino = ['name','address','city', 'state','zip_code','time_zone','latitude','longitude']
+        # print('print self.casino.name', self.casino.name)
+        # print('self',self.casino_id, self.id, self.name, end='\n\n')
+        return {
+            'casino':{
+                'updated_at': self.updated_at,
+                'id': self.id,
+                'name': self.name,
+                'address': self.address,
+                'city': self.city,
+                'state': self.state,
+                'zip_code': self.zip_code,
+                'longitude': self.longitude,
+                'latitude': self.latitude,
+                'time_zone': self.time_zone,
+            }
+            # **{attr: getattr(self.casino, attr) for attr in from_casino} ,
+            
+        }
+
 
 class Tournaments(db.Model):
     __tablename__ = 'tournaments'
@@ -97,7 +119,7 @@ class Tournaments(db.Model):
     multiday_id = db.Column(db.String(25), default=None)
     name = db.Column(db.String(500), nullable=False)
     h1 = db.Column(db.String(200))
-    buy_in = db.Column(db.String(20))
+    buy_in_amount = db.Column(db.String(20))
     blinds = db.Column(db.String(20))
     starting_stack = db.Column(db.String(20))
     results_link = db.Column(db.String(500))
@@ -114,16 +136,18 @@ class Tournaments(db.Model):
         return f'<Tournament {self.name}>'
 
     def swapprofit_serialize(self):
-        from_trmnt = ['id','name','results_link','start_at']
+        from_trmnt = ['id','casino_id','name','results_link','structure_link','buy_in_amount','starting_stack','blinds','start_at']
         from_casino = ['address','city', 'state','zip_code','time_zone','latitude','longitude']
-        # print('print self.casino.name', self.casino.name)
-        # print('self',self.casino_id, self.id, self.name, end='\n\n')
+        # print({**{attr: getattr(self.casino, attr) for attr in from_casino}})
         return {
             'updated_at': self.updated_at,
-            'tournament': { 
-                'casino': self.casino.name,
+            'created_at': self.created_at,
+
+            'tournament':{
                 **{attr: getattr(self, attr) for attr in from_trmnt},
-                **{attr: getattr(self.casino, attr) for attr in from_casino} },
+                'casino_id': self.casino.id,
+            },
+            
             'flights': [
                 {'id':f.id,'day':f.day,'start_at':f.start_at,'tournament_id':f.tournament_id} 
                 for f in self.flights ]
@@ -135,7 +159,7 @@ class Tournaments(db.Model):
             'casino_id': self.casino_id,
             'name': self.name,
             'h1': self.h1,
-            'buy_in': self.buy_in,
+            'buy_in_amount': self.buy_in_amount,
             'blinds': self.blinds,
             'starting_stack': self.starting_stack,
             'results_link': self.results_link,
@@ -178,7 +202,7 @@ class Results(db.Model):
     __tablename__ = 'results'
     id = db.Column(db.Integer, primary_key=True)
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournaments.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.String(6))
     full_name = db.Column(db.String(40))
     nationality = db.Column(db.String(30))
     place = db.Column(db.String(6))
@@ -187,7 +211,7 @@ class Results(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     tournament = db.relationship('Tournaments', back_populates='results')
-    user = db.relationship('Users', back_populates='results')
+    # user = db.relationship('Users', back_populates='results')
 
     def __repr__(self):
         return f'<Results id:{self.id}>'

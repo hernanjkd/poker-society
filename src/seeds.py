@@ -6,11 +6,12 @@ import os
 
 def run():
     
-    Results.query.delete()
     Flights.query.delete()
     Tournaments.query.delete()
     Casinos.query.delete()
     Users.query.delete()
+    Results.query.delete()
+
     Subscribers.query.delete()
 
 
@@ -26,7 +27,7 @@ def run():
 
 
     oneCasino= Casinos(
-        id=1,
+        id='USFL001',
         name='Seminole Hard Rock Hotel & Casino',
         address='1 Seminole Way',
         city='Davie',
@@ -41,14 +42,14 @@ def run():
         casino=oneCasino,
         name='Example Live Event',
         start_at= d1,
-        buy_in=100
+        buy_in_amount=100
     )
     db.session.add(aboutToStart)
     aboutToEnd = Tournaments(
         casino=oneCasino,
         name='Example End Event',
         start_at= d2,
-        buy_in=150
+        buy_in_amount=150
     )
     db.session.add(aboutToEnd)
 
@@ -66,24 +67,24 @@ def run():
     )
     db.session.add(flight1_end)
     
-    db.session.add( Users(
-        email = 'lou@gsmail.com',
-        password = sha256('loustadsler'),
-        first_name = 'John',
-        nickname = '',
-        last_name = 'Doe',
-        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=207424',
-        nationality = 'USA'
-    ))
-    db.session.add( Users(
-        email='gherndon5@hotmail.com',
-        password=sha256('casper5'),
-        first_name = 'Cary',
-        nickname = '',
-        last_name = 'Katz',
-        hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=26721',
-        nationality = 'USA'
-    ))
+    # db.session.add( Users(
+    #     email = 'lou@gsmail.com',
+    #     password = sha256('loustadsler'),
+    #     first_name = 'John',
+    #     nickname = '',
+    #     last_name = 'Doe',
+    #     hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=207424',
+    #     nationality = 'USA'
+    # ))
+    # db.session.add( Users(
+    #     email='gherndon5@hotmail.com',
+    #     password=sha256('casper5'),
+    #     first_name = 'Cary',
+    #     nickname = '',
+    #     last_name = 'Katz',
+    #     hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=26721',
+    #     nationality = 'USA'
+    # ))
     db.session.add( Users(
         email='techpriest.gabriel@gmail.com',
         password=sha256('casper5'),

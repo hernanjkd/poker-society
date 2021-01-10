@@ -73,7 +73,7 @@ def are_headers_for(table, file_headers):
             'Starting Stack','Blinds','Structure Link','Casino ID','Multi ID',
             'Tournament ID','H1','NOTES - LOU','Results Link','Entrants']
     }
-    print('hrllo')
+
     for header in switch[table]:
         if header not in file_headers:
             return False
