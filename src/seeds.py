@@ -7,10 +7,11 @@ import os
 def run():
     
     Flights.query.delete()
+    Results.query.delete()
+
     Tournaments.query.delete()
     Casinos.query.delete()
     Users.query.delete()
-    Results.query.delete()
 
     Subscribers.query.delete()
 

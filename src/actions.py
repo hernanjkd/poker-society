@@ -214,7 +214,7 @@ def process_results_excel(df):
         x = f'Bearer {utils.sha256( os.environ["API_TOKEN"]) }'
 
         headers = CaseInsensitiveDict()
-        headers["Authorization"] = "Bearer " + os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id)
+        headers["Authorization"] = "Bearer " + os.environ['SWAPPROFIT_API_TOKEN']
 
         print('x', x)
         print('url', os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id))
@@ -222,6 +222,8 @@ def process_results_excel(df):
     
         print("Email is:", resp.json())
         user= resp.json()
+        print(r['User ID'])
+        print(user['email'])
     # Add user to the Swap Profit JSON
     # if user_id:
     #     user = Users.query.get( user_id )
