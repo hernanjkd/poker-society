@@ -213,7 +213,7 @@ def process_results_excel(df):
         url = os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id)
 
         headers = CaseInsensitiveDict()
-        headers["Authorization"] = "Bearer " + os.environ['API_TOKEN']
+        headers["Authorization"] = "Bearer " + os.environ['SWAPPROFIT_API_TOKEN']
 
         print('url', os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id))
         resp = requests.get(url, headers=headers  )   
