@@ -202,7 +202,7 @@ def process_results_excel(df):
             
             # Swap Profit JSON
             trmnt_data = {
-                'api_token': os.environ['SWAPPORFIT_API_TOKEN'],
+                'api_token': os.environ['SWAPPROFIT_API_TOKEN'],
                 'tournament_id': trmnt.id,
                 'tournament_buyin': trmnt.buy_in_amount,
                 'users': {}
@@ -211,12 +211,10 @@ def process_results_excel(df):
         user_id = r['User ID'] 
 
         url = os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id)
-        x = f'Bearer {utils.sha256( os.environ["API_TOKEN"]) }'
 
         headers = CaseInsensitiveDict()
         headers["Authorization"] = "Bearer " + os.environ['SWAPPROFIT_API_TOKEN']
 
-        print('x', x)
         print('url', os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id))
         resp = requests.get(url, headers=headers  )   
     
