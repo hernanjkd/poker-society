@@ -100,7 +100,7 @@ def run():
     db.session.add( Subscribers(
         company_name = 'Swap Profit',
         api_host = os.environ['SWAPPROFIT_API_HOST'],
-        api_token = os.environ['SWAPPROFIT_API_TOKEN']
+        api_token = os.environ['API_TOKEN']
     ))
     
     # Give room for Swap Profit to add mock tournaments
