@@ -41,7 +41,7 @@ def process_tournament_excel(df):
             'casino_id': casino_id,
             'multiday_id': r['Multi ID'].strip(),
             'h1': r['H1'].strip(),
-            'buy_in': str( r['Buy-in'] ).strip(),
+            'buy_in_amount': str( r['Buy-in'] ).strip(),
             'blinds': str( r['Blinds'] ).strip(),
             'results_link': str( r['Results Link'] ).strip(),
             'starting_stack': str( r['Starting Stack'] ).strip(),
