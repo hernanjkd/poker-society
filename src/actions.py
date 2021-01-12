@@ -202,7 +202,7 @@ def process_results_excel(df):
             
             # Swap Profit JSON
             trmnt_data = {
-                'api_token': utils.sha256( os.environ['API_TOKEN'] ),
+                'api_token': utils.sha256( os.environ['SWAPPORFIT_API_TOKEN'] ),
                 'tournament_id': trmnt.id,
                 'tournament_buyin': trmnt.buy_in_amount,
                 'users': {}
