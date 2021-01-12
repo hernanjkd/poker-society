@@ -193,7 +193,7 @@ def file_upload():
             # SWAPPROFUT ENDS HERE  swapprofit.api_host
             resp = requests.post( swapprofit.api_host + '/results/update',
                 json={
-                    'api_token': utils.sha256( os.environ['API_TOKEN'] ),
+                    'api_token': os.environ['SWAPPROFIT_API_TOKEN'] ,
                     **swapprofit_json
                 })
             if not resp.ok:
