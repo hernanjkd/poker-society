@@ -36,7 +36,7 @@ def run():
         zip_code='33314',
         latitude=26.0510,
         longitude=-80.2097,
-        time_zone='Etc/GMT-4'
+        time_zone='EST'
     )
 
     aboutToStart = Tournaments(
