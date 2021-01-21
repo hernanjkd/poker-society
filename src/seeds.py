@@ -36,7 +36,8 @@ def run():
         zip_code='33314',
         latitude=26.0510,
         longitude=-80.2097,
-        time_zone='America/New_York'
+        time_zone='America/New_York',
+        
     )
 
     aboutToStart = Tournaments(
@@ -57,7 +58,7 @@ def run():
     flight1_start = Flights(
         start_at=aboutToStart.start_at,
         tournament=aboutToStart,
-        day=1
+        
     )
     db.session.add(flight1_start)
 
@@ -68,24 +69,7 @@ def run():
     )
     db.session.add(flight1_end)
     
-    # db.session.add( Users(
-    #     email = 'lou@gsmail.com',
-    #     password = sha256('loustadsler'),
-    #     first_name = 'John',
-    #     nickname = '',
-    #     last_name = 'Doe',
-    #     hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=207424',
-    #     nationality = 'USA'
-    # ))
-    # db.session.add( Users(
-    #     email='gherndon5@hotmail.com',
-    #     password=sha256('casper5'),
-    #     first_name = 'Cary',
-    #     nickname = '',
-    #     last_name = 'Katz',
-    #     hendon_url='https://pokerdb.thehendonmob.com/player.php?a=r&n=26721',
-    #     nationality = 'USA'
-    # ))
+
     db.session.add( Users(
         email='techpriest.gabriel@gmail.com',
         password=sha256('casper5'),
