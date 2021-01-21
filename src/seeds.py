@@ -65,7 +65,6 @@ def run():
     flight1_end = Flights(
         start_at=aboutToEnd.start_at,
         tournament=aboutToEnd,
-        day=1
     )
     db.session.add(flight1_end)
     
