@@ -25,6 +25,8 @@ def run():
     db.session.commit()
     d1 = datetime.utcnow() + timedelta(minutes=5)
     d2 = datetime.utcnow() - timedelta(hours=16, minutes=59)
+    d3 = datetime.utcnow() + timedelta(days=365)
+    d4 = datetime.utcnow() + timedelta(days=366)
 
 
     oneCasino= Casinos(
@@ -37,7 +39,6 @@ def run():
         latitude=26.0510,
         longitude=-80.2097,
         time_zone='America/New_York',
-        
     )
 
     aboutToStart = Tournaments(
@@ -54,6 +55,20 @@ def run():
         buy_in_amount=150
     )
     db.session.add(aboutToEnd)
+    open1 = Tournaments(
+        casino=oneCasino,
+        name='Example Always Open Event #1',
+        start_at= d3,
+        buy_in_amount=150
+    )
+    db.session.add(open1)
+    open2 = Tournaments(
+        casino=oneCasino,
+        name='Example Always Open Event #2',
+        start_at= d4,
+        buy_in_amount=250
+    )
+    db.session.add(open2)
 
     flight1_start = Flights(
         start_at=aboutToStart.start_at,
@@ -67,7 +82,17 @@ def run():
         tournament=aboutToEnd,
     )
     db.session.add(flight1_end)
-    
+
+    flight1_open1 = Flights(
+        start_at=d3,
+        tournament=open1
+    )
+    db.session.add(flight1_open1)
+    flight1_open2 = Flights(
+        start_at=d4,
+        tournament=open2
+    )
+    db.session.add(flight1_open2)
 
     db.session.add( Users(
         email='techpriest.gabriel@gmail.com',
