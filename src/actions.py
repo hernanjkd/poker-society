@@ -218,10 +218,10 @@ def process_results_excel(df):
         print('url', os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id))
         resp = requests.get(url, headers=headers  )   
     
-        print("Email is:", resp.json())
+        # print("Email is:", resp.json())
         user= resp.json()
-        print(r['User ID'])
-        print(user['email'])
+        # print(r['User ID'])
+        # print(user['email'])
     # Add user to the Swap Profit JSON
     # if user_id:
     #     user = Users.query.get( user_id )
@@ -247,7 +247,7 @@ def process_results_excel(df):
             winnings = r['Winnings']
         ))
 
-    print('Final Tournament Data:', trmnt_data)
+    # print('Final Tournament Data:', trmnt_data)
     # If no errors, commit all data
     db.session.commit()
     print('just comiited')

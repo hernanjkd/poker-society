@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: d29b2582c399
+Revision ID: 2c547474ac5e
 Revises: 
-Create Date: 2021-01-08 11:11:03.597373
+Create Date: 2021-03-15 12:43:02.403975
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd29b2582c399'
+revision = '2c547474ac5e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -67,7 +67,7 @@ def upgrade():
     sa.Column('multiday_id', sa.String(length=25), nullable=True),
     sa.Column('name', sa.String(length=500), nullable=False),
     sa.Column('h1', sa.String(length=200), nullable=True),
-    sa.Column('buy_in', sa.String(length=20), nullable=True),
+    sa.Column('buy_in_amount', sa.String(length=20), nullable=True),
     sa.Column('blinds', sa.String(length=20), nullable=True),
     sa.Column('starting_stack', sa.String(length=20), nullable=True),
     sa.Column('results_link', sa.String(length=500), nullable=True),
@@ -92,7 +92,7 @@ def upgrade():
     op.create_table('results',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('tournament_id', sa.Integer(), nullable=True),
-    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('user_id', sa.String(length=6), nullable=True),
     sa.Column('full_name', sa.String(length=40), nullable=True),
     sa.Column('nationality', sa.String(length=30), nullable=True),
     sa.Column('place', sa.String(length=6), nullable=True),
@@ -100,7 +100,6 @@ def upgrade():
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['tournament_id'], ['tournaments.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
