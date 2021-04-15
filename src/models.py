@@ -127,6 +127,7 @@ class Tournaments(db.Model):
     start_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    custom = db.Column(db.Boolean, default=False)
 
     casino = db.relationship('Casinos', back_populates='tournaments')
     flights = db.relationship('Flights', back_populates='tournament')
@@ -159,6 +160,7 @@ class Tournaments(db.Model):
             'casino_id': self.casino_id,
             'name': self.name,
             'h1': self.h1,
+            'custom': self.custom,
             'buy_in_amount': self.buy_in_amount,
             'blinds': self.blinds,
             'starting_stack': self.starting_stack,
