@@ -305,7 +305,7 @@ def get_results(id):
                 'place': x.place,
                 'full_name': x.full_name,
                 'winnings': x.winnings,
-                'nationality': x.nationality
+                # 'nationality': x.nationality
             })
         results = json.dumps(obj)
 
