@@ -30,17 +30,7 @@ def run():
     d4 = datetime.utcnow() + timedelta(days=301)
 
 
-    oneCasino= Casinos(
-        id='USFL001',
-        name='Seminole Hard Rock Hotel & Casino',
-        address='1 Seminole Way',
-        city='Davie',
-        state='FL',
-        zip_code='33314',
-        latitude=26.0510,
-        longitude=-80.2097,
-        time_zone='America/New_York',
-    )
+    
 
     # past = Tournaments(
     #     casino=oneCasino,
@@ -195,6 +185,18 @@ def run():
     #     winnings = 400
     # ))
 
+    oneCasino= Casinos(
+        id='USFL001',
+        name='Seminole Hard Rock Hotel & Casino',
+        address='1 Seminole Way',
+        city='Davie',
+        state='FL',
+        zip_code='33314',
+        latitude=26.0510,
+        longitude=-80.2097,
+        time_zone='America/New_York',
+    )
+
     db.session.add( Users(
         email='techpriest.gabriel@gmail.com',
         password=sha256('casper5'),
@@ -213,6 +215,7 @@ def run():
     ))
     
     # Give room for Swap Profit to add mock tournaments
+    db.session.execute("ALTER SEQUENCE casinos_id_seq RESTART WITH 100")
     db.session.execute("ALTER SEQUENCE tournaments_id_seq RESTART WITH 100")
     db.session.execute("ALTER SEQUENCE flights_id_seq RESTART WITH 100")
 
