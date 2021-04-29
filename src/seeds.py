@@ -195,7 +195,7 @@ def run():
         latitude=26.0510,
         longitude=-80.2097,
         time_zone='America/New_York',
-    )
+    ))
 
     db.session.add( Users(
         email='techpriest.gabriel@gmail.com',
