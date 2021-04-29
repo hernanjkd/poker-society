@@ -185,7 +185,7 @@ def run():
     #     winnings = 400
     # ))
 
-    oneCasino= Casinos(
+    db.session.add( Casinos(
         id='USFL001',
         name='Seminole Hard Rock Hotel & Casino',
         address='1 Seminole Way',
