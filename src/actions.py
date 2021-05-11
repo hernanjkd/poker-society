@@ -160,19 +160,19 @@ def process_casinos_excel(df):
 
 
 def process_results_excel(df):
-    '''
-    {
-        "api_token": 1
-        "tournament_id": 45,
-        "tournament_buyin": 150,
-        "users": {
-            "sdfoij@yahoo.com": {
-                "place": 11,
-                "winnings": 200
-            }
-        }
-    }
-    '''
+    # '''
+    # {
+    #     "api_token": 1
+    #     "tournament_id": 45,
+    #     "tournament_buyin": 150,
+    #     "users": {
+    #         "sdfoij@yahoo.com": {
+    #             "place": 11,
+    #             "winnings": 200
+    #         }
+    #     }
+    # }
+    # '''
     trmnt_data = {}
     
     for index, r in df.iterrows():
@@ -220,8 +220,8 @@ def process_results_excel(df):
     
         # print("Email is:", resp.json())
         user= resp.json()
-        # print(r['User ID'])
-        # print(user['email'])
+        print(r['User ID'])
+        print(user['email'])
     # Add user to the Swap Profit JSON
     # if user_id:
     #     user = Users.query.get( user_id )
@@ -234,7 +234,7 @@ def process_results_excel(df):
         trmnt_data['users'][user['email']] = {
             'place': r['Place'],
             'winnings': r['Winnings'],
-            'user_id': r['User ID']
+            # 'user_id': r['User ID']
         }
 
         # Add to PokerSociety database
@@ -243,7 +243,6 @@ def process_results_excel(df):
             user_id = r['User ID'],
             full_name = r['Full Name'],
             place = r['Place'],
-            nationality = r['Nationality'],
             winnings = r['Winnings']
         ))
 
