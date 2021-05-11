@@ -221,7 +221,7 @@ def process_results_excel(df):
         # print("Email is:", resp.json())
         user= resp.json()
         print(r['User ID'])
-        print(user['email'])
+        print(user)
     # Add user to the Swap Profit JSON
     # if user_id:
     #     user = Users.query.get( user_id )
@@ -234,7 +234,7 @@ def process_results_excel(df):
         trmnt_data['users'][user['email']] = {
             'place': r['Place'],
             'winnings': r['Winnings'],
-            # 'user_id': r['User ID']
+            'user_id': r['User ID']
         }
 
         # Add to PokerSociety database
