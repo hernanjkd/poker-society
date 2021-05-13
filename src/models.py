@@ -147,6 +147,7 @@ class Tournaments(db.Model):
             'tournament':{
                 **{attr: getattr(self, attr) for attr in from_trmnt},
                 'casino_id': self.casino.id,
+                'time_zone': self.casino.time_zone,
             },
             
             'flights': [
