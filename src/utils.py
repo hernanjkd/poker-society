@@ -65,7 +65,7 @@ def resolve_name_day(string):
 
 def are_headers_for(table, file_headers):
     switch = {
-        'results': ['Place','Full Name','Winnings','TPS Points','Nationality',
+        'results': ['Subscriber','Place','Full Name','Winnings','TPS Points','Nationality',
             'Residence','User ID','Tournament ID'],
         'casinos': ['CASINO','STATE (ABB.)','STATE (FULL)','REGION',
             'TIME ZONE','ADDRESS','CITY','ZIP CODE','LAT','LONG','WEBSITE'],

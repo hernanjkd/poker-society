@@ -176,6 +176,11 @@ def process_results_excel(df):
     trmnt_data = {}
     
     for index, r in df.iterrows():
+        subscriber = str(r['Subscriber'])
+
+        subscriber = subscriber.replace(" ","")
+        api_token = subscriber.upper() + '_API_TOKEN'
+        api_host = subscriber.upper() + '_API_HOST'
 
         # Get the trmnt data that's in the first row
         if index == 0:
@@ -199,10 +204,9 @@ def process_results_excel(df):
                 return None, {
                     'error':'This tournament ID has already been uploaded: '+ str(trmnt.id)
                 }
-            
-            # Swap Profit JSON
+          
             trmnt_data = {
-                'api_token': os.environ['SWAPPROFIT_API_TOKEN'],
+                'api_token': api_token,
                 'tournament_id': trmnt.id,
                 'tournament_buyin': trmnt.buy_in_amount,
                 'users': {}
@@ -210,26 +214,14 @@ def process_results_excel(df):
 
         user_id = r['User ID'] 
 
-        url = os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id)
-
         headers = CaseInsensitiveDict()
-        headers["Authorization"] = "Bearer " + os.environ['SWAPPROFIT_API_TOKEN']
+        url =  os.environ[api_host] + '/profiles/' + str(user_id)
+        headers["Authorization"] = "Bearer " + os.environ[api_token]
 
-        print('url', os.environ['SWAPPROFIT_API_HOST'] + '/profiles/' + str(user_id))
         resp = requests.get(url, headers=headers  )   
     
-        # print("Email is:", resp.json())
         user= resp.json()
-        print(r['User ID'])
-        print(user)
-    # Add user to the Swap Profit JSON
-    # if user_id:
-    #     user = Users.query.get( user_id )
-    #     if user is None:
-    #         db.session.rollback()
-    #         return None, {
-    #             'error':'Couldn\'t find user with ID: '+ str(user_id)
-    #         }
+
     # Swap Profit JSON
         trmnt_data['users'][user['email']] = {
             'place': r['Place'],
@@ -250,14 +242,14 @@ def process_results_excel(df):
     # If no errors, commit all data
     db.session.commit()
     print('just comiited')
-    swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
-    if swapprofit is None:
-        return 'Swap Profit not a subscriber'
+    theSubscriber = Subscribers.query.filter_by(company_name=str(r['Subscriber'])).first()
+    if theSubscriber is None:
+        return 'No one is a subscriber'
     # resp = requests.post( 
     #         os.environ['SWAPPROFIT_API_HOST'] + '/results/update',
     #         json=trmnt_data )
     # print('resp', resp.ok)
 
-    return trmnt_data, {
+    return theSubscriber, trmnt_data, {
         'message': 'Results excel processed successfully'
     }

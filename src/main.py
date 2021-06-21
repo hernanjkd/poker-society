@@ -183,21 +183,23 @@ def file_upload():
     # RESULTS
     if utils.are_headers_for('results', headers):
         
-        swapprofit_json, log = actions.process_results_excel( df )
+        subscriber, subscriber_json, log = actions.process_results_excel( df )
 
-        swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
-        if swapprofit is None:
+        # swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
+        if subscriber is None:
             return jsonify({'error': 'Swap Profit not a subscriber'})
-        print('swapprofitjson', swapprofit_json)
-        if swapprofit_json is not None:
+        aSub = subscriber.company_name.replace(" ","")
+        api_token = aSub.upper() +'_API_TOKEN'
+
+        if subscriber_json is not None:
             # SWAPPROFUT ENDS HERE  swapprofit.api_host
-            resp = requests.post( swapprofit.api_host + '/results/update',
+            resp = requests.post( subscriber.api_host + '/results/update',
                 json={
-                    'api_token': os.environ['SWAPPROFIT_API_TOKEN'] ,
-                    **swapprofit_json
+                    'api_token': os.environ[api_token] ,
+                    **subscriber_json
                 })
             if not resp.ok:
-                log = {'error': 'There was a problem in Swap Profit'}
+                log = {'error': 'There was a problem with the subscriber'}
             else:
                 log = resp.json()
 
@@ -426,16 +428,19 @@ def swapprofit_update():
 @app.route('/users/tournament/<int:id>')
 def get_all_users_in_trmnt(id):
 
-    swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
-    if swapprofit is None:
-        return 'Swap Profit not a subscriber'
+    req = request.get_json()
+    utils.check_params(json, 'subscriber')
+
+    subscriber = Subscribers.query.filter_by(company_name=req['subscriber']).first()
+    if subscriber is None:
+        return 'This is not a subscriber'
 
     resp = requests.post( 
-        swapprofit.api_host + '/users/tournament/' + str(id),
+        subscriber.api_host + '/users/tournament/' + str(id),
         json={'api_token': utils.sha256( os.environ['API_TOKEN'] )} )
 
     if not resp.ok:
-        return 'There was an error in Swap Profit'
+        return 'There was an error with ' + req['subscriber']
 
     return jsonify(resp.json())
 
