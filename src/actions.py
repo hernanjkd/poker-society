@@ -49,6 +49,7 @@ def process_tournament_excel(df):
             'structure_link': r['Structure Link'].strip()
         }
         flightjson = {
+            'subscriber': str( r['Subscriber'] ).strip(),
             'day': flight_day,
             'start_at': start_at, 
             'notes': r['NOTES - LOU'].strip()
