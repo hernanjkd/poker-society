@@ -55,6 +55,7 @@ class Casinos(db.Model):
     zip_code = db.Column(db.String(14))
     longitude = db.Column(db.Float)
     latitude = db.Column(db.Float)
+    subscriber = db.Column(db.String(20))
     time_zone = db.Column(db.String(50))
     website = db.Column(db.String(100))
     phone = db.Column(db.String(15))
@@ -80,6 +81,7 @@ class Casinos(db.Model):
             'longitude': self.longitude,
             'latitude': self.latitude,
             'time_zone': self.time_zone,
+            'subscriber': self.subscriber,
             'website': self.website,
             'phone': self.phone,
             'facebook': self.facebook,
@@ -121,6 +123,7 @@ class Tournaments(db.Model):
     h1 = db.Column(db.String(200))
     buy_in_amount = db.Column(db.String(20))
     blinds = db.Column(db.String(20))
+    subscriber = db.Column(db.String(25))
     starting_stack = db.Column(db.String(20))
     results_link = db.Column(db.String(500))
     structure_link = db.Column(db.String(500))
@@ -137,8 +140,8 @@ class Tournaments(db.Model):
         return f'<Tournament {self.name}>'
 
     def swapprofit_serialize(self):
-        from_trmnt = ['id','casino_id','name','results_link','structure_link','buy_in_amount','starting_stack','blinds','start_at']
-        from_casino = ['address','city', 'state','zip_code','time_zone','latitude','longitude']
+        from_trmnt = ['id','casino_id','name','results_link','structure_link','buy_in_amount','starting_stack','blinds','start_at', 'subscriber']
+        from_casino = ['address','city', 'state','zip_code','time_zone','latitude','longitude', 'subscriber']
         # print({**{attr: getattr(self.casino, attr) for attr in from_casino}})
         return {
             'updated_at': self.updated_at,
@@ -167,6 +170,7 @@ class Tournaments(db.Model):
             'starting_stack': self.starting_stack,
             'results_link': self.results_link,
             'structure_link': self.structure_link,
+            'subscriber': self.subscriber,
             'start_at': self.start_at,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
@@ -180,6 +184,7 @@ class Flights(db.Model):
     tournament_id = db.Column(db.Integer, db.ForeignKey('tournaments.id'))
     start_at = db.Column(db.DateTime)
     day = db.Column(db.String(5), default=None)
+    subscriber = db.Column(db.String(20))
     notes = db.Column(db.String(3000))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -196,6 +201,7 @@ class Flights(db.Model):
             'start_at': self.start_at,
             'day': self.day,
             'notes': self.notes,
+            'subscriber': self.subsrciber,
             'created_at': self.created_at,
             'updated_at': self.updated_at
         }
@@ -209,6 +215,7 @@ class Results(db.Model):
     full_name = db.Column(db.String(40))
     nationality = db.Column(db.String(30))
     place = db.Column(db.String(6))
+    subscriber = db.Column(db.String(20))
     winnings = db.Column(db.String(30), default=None)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -229,7 +236,9 @@ class Results(db.Model):
             'place': self.place,
             'winnings': self.winnings,
             'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'updated_at': self.updated_at,
+            'subscriber': self.subscriber,
+
         }
 
 
