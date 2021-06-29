@@ -36,6 +36,7 @@ def process_tournament_excel(df):
 
         # Used for new tournaments and for updating existing ones
         trmntjson = {
+            'subscriber': str( r['Subscriber'] ).strip(),
             'name': trmnt_name,
             'start_at': start_at,
             'casino_id': casino_id,
@@ -131,6 +132,7 @@ def process_casinos_excel(df):
 
         casinojson = {
             'id': r['ID'].strip(),
+            'subscriber': r['SUBSCRIBER'].strip(),
             'name': r['CASINO'].strip(),
             'address': r['ADDRESS'].strip(),
             'city': r['CITY'].strip(),
