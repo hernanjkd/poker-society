@@ -187,6 +187,8 @@ def process_results_excel(df):
         api_token = subscriber.upper() + '_API_TOKEN'
         api_host = subscriber.upper() + '_API_HOST'
 
+        print('api_host', api_host)
+
         # Get the trmnt data that's in the first row
         if index == 0:
             
