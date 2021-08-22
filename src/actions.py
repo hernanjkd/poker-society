@@ -126,6 +126,7 @@ def process_casinos_excel(df):
     
     for index, r in df.iterrows():
         
+        
         if '' in [ r['CASINO'].strip(), r['LONG'], r['LAT'] ]:
             continue
 
@@ -180,6 +181,7 @@ def process_results_excel(df):
     
     for index, r in df.iterrows():
         subscriber = str(r['Subscriber'])
+        print('SUBSCRIBER', subscriber)
 
         subscriber = subscriber.replace(" ","")
         api_token = subscriber.upper() + '_API_TOKEN'
@@ -241,17 +243,11 @@ def process_results_excel(df):
             winnings = r['Winnings']
         ))
 
-    # print('Final Tournament Data:', trmnt_data)
-    # If no errors, commit all data
     db.session.commit()
-    print('just comiited')
+
     theSubscriber = Subscribers.query.filter_by(company_name=str(r['Subscriber'])).first()
     if theSubscriber is None:
         return 'No one is a subscriber'
-    # resp = requests.post( 
-    #         os.environ['SWAPPROFIT_API_HOST'] + '/results/update',
-    #         json=trmnt_data )
-    # print('resp', resp.ok)
 
     return theSubscriber, trmnt_data, {
         'message': 'Results excel processed successfully'
