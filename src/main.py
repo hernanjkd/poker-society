@@ -198,6 +198,8 @@ def file_upload():
                     'api_token': os.environ[api_token] ,
                     **subscriber_json
                 })
+
+            print ('CHECK',resp, resp.ok)
             if not resp.ok:
                 log = {'error': 'There was a problem with the subscriber'}
             else:
