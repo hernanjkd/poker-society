@@ -393,7 +393,7 @@ def swapprofit_update():
 
     if span not in ['hours','days','all']:
         raise APIException('Invalid span: '+ span, 400)
-    print('a')
+    # print('a')
     if span == 'all':
         csnos = Casinos.query.all()
         trmnts = Tournaments.query.all()
@@ -401,7 +401,7 @@ def swapprofit_update():
         time_ago = datetime.utcnow() - timedelta( minutes=5, **{span:amount} )
         trmnts = Tournaments.query.filter( Tournaments.updated_at > time_ago )
         csnos = Casinos.query.all()
-    print('b')
+    # print('b')
     d = []
     
     e=[]
@@ -413,7 +413,7 @@ def swapprofit_update():
         f.append(y.swapprofit_serialize())
     d.append(f)
 
-    print('d', d)
+    # print('d', d)
 
         # print("THIIS IS WAHAT IS CIOMFU", d )
     return jsonify(d)

@@ -213,7 +213,7 @@ def process_results_excel(df):
                 }
           
             trmnt_data = {
-                'api_token': api_token,
+                'api_token': os.environ[api_token],
                 'tournament_id': trmnt.id,
                 'tournament_buyin': trmnt.buy_in_amount,
                 'users': {}
