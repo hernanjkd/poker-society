@@ -282,12 +282,18 @@ def get_tournaments(id):
 
     return jsonify(trmnt.serialize())
 
-@app.route('/tournament/<int:id>', methods=['PUT'])
+@app.route('/tournament/<int:id>', methods=['PUT', 'DELETE'])
 def reset_link(id):
     trmnt = Tournaments.query.get( id )
     trmnt.results_link = None
+    results = Results.query.filter_by( tournament_id=id ) \
+                            .order_by( Results.place.asc() )
+    for result in results:
+        db.session.delete(result)
+
+    
     db.session.commit()
-    return 'Link was reset' 
+    return 'Resutls were reset' 
 
 @app.route('/results/tournament/<int:id>')
 def get_results(id):
