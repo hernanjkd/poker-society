@@ -282,6 +282,12 @@ def get_tournaments(id):
 
     return jsonify(trmnt.serialize())
 
+@app.route('/tournament/<int:id>', methods=['PUT'])
+def reset_link(id):
+    trmnt = Tournaments.query.get( id )
+    trmnt.results_link = None
+    db.session.commit()
+    return 'Link was reset' 
 
 @app.route('/results/tournament/<int:id>')
 def get_results(id):
