@@ -248,11 +248,10 @@ def process_results_excel(df):
     db.session.commit()
 
     theSubscriber = Subscribers.query.filter_by(company_name=str(r['Subscriber'])).first()
+    print("HEKKIIII")
     if theSubscriber is None:
         return 'No one is a subscriber'
-    print(theSubscriber, trmnt_data,{
-        'message': 'Results excel processed successfully'
-    })
-    return theSubscriber, trmnt_data, {
-        'message': 'Results excel processed successfully'
-    }
+    x = {'message': 'Results excel processed successfully'}
+
+    print(theSubscriber, trmnt_data, x)
+    return theSubscriber, trmnt_data, x
