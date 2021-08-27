@@ -53,6 +53,15 @@ def run():
         nationality = 'USA'
     ))
     
+    db.session.add( Users(
+        email='lou@thepokersociety.com',
+        password=sha256('$wap1234!'),
+        first_name = 'Lou',
+        nickname = '',
+        last_name = 'Stadler',
+        hendon_url= None,
+        nationality = 'USA'
+    ))
 
     db.session.add( Subscribers(
         company_name = 'Swap Profit',
