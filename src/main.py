@@ -305,7 +305,10 @@ def finish_tournament(id):
     flights = Flights.query.filter_by( tournament_id=id ) \
                             .order_by( Flights.start_at.asc() )
     trmnt.start_at=trmnt.start_at - timedelta(days=4)
-    return 'Resutls were reset' 
+    for flight in flights:
+        flight.start_at = flight.start_at - timedelta(days=4)
+
+    return 'Tournmanet has ended' 
 
 @app.route('/results/tournament/<int:id>')
 def get_results(id):
