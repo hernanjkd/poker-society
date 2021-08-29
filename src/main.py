@@ -299,6 +299,14 @@ def reset_link(id):
     db.session.commit()
     return 'Resutls were reset' 
 
+@app.route('finish/tournament/<int:id>')
+def finish_tournament(id):
+    trmnt = Tournaments.query.get( id )
+    flights = Flights.query.filter_by( tournament_id=id ) \
+                            .order_by( Flights.start_at.asc() )
+    trmnt.start_at=trmnt.start_at - timedelta(days=4)
+    return 'Resutls were reset' 
+
 @app.route('/results/tournament/<int:id>')
 def get_results(id):
     
