@@ -306,12 +306,12 @@ def finish_tournament(id):
                             .order_by( Flights.start_at.asc() )
     trmntx = datetime.utcnow() - timedelta(days=4)
     datetime.strptime( 
-            trmntx,
+            str(trmntx),
             '%Y-%m-%d%H:%M:%S' )
     for flight in flights:
         x= datetime.utcnow() - timedelta(days=4)
         flight.start_at  =datetime.strptime( 
-            x,
+            str( x),
             '%Y-%m-%d%H:%M:%S' )
 
     return 'Tournmanet has ended' 
