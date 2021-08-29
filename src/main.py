@@ -304,9 +304,15 @@ def finish_tournament(id):
     trmnt = Tournaments.query.get( id )
     flights = Flights.query.filter_by( tournament_id=id ) \
                             .order_by( Flights.start_at.asc() )
-    trmnt.start_at=trmnt.start_at - timedelta(days=4)
+    trmntx = datetime.utcnow() - timedelta(days=4)
+    datetime.strptime( 
+            trmntx,
+            '%Y-%m-%d%H:%M:%S' )
     for flight in flights:
-        flight.start_at = flight.start_at - timedelta(days=4)
+        x= datetime.utcnow() - timedelta(days=4)
+        flight.start_at  =datetime.strptime( 
+            x,
+            '%Y-%m-%d%H:%M:%S' )
 
     return 'Tournmanet has ended' 
 
