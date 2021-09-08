@@ -67,7 +67,7 @@ def are_headers_for(table, file_headers):
     switch = {
         'results': ['Subscriber','Place','Full Name','Winnings','TPS Points','Nationality', 'Event',
             'Residence','User ID','Tournament ID'],
-        'casinos': ['SUBSCRIBER','CASINO','STATE (ABB.)','STATE (FULL)','REGION',
+        'casinos': ['SUBSCRIBER','CASINO','STATE (ABB.)','STATE (FULL)','REGION', 'ONLINE',
             'TIME ZONE','ADDRESS','CITY','ZIP CODE','LAT','LONG','WEBSITE'],
         'tournaments': ['Subscriber','Date','Day','Time','Where','Tournament','Buy-in',
             'Starting Stack','Blinds','Structure Link','Casino ID','Multi ID',

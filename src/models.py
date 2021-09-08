@@ -55,6 +55,8 @@ class Casinos(db.Model):
     zip_code = db.Column(db.String(14))
     longitude = db.Column(db.Float)
     latitude = db.Column(db.Float)
+
+    online = db.Column(db.Boolean, default=False)
     subscriber = db.Column(db.String(20))
     time_zone = db.Column(db.String(50))
     website = db.Column(db.String(100))
@@ -77,6 +79,7 @@ class Casinos(db.Model):
             'address': self.address,
             'city': self.city,
             'state': self.state,
+            'online': self.online,
             'zip_code': self.zip_code,
             'longitude': self.longitude,
             'latitude': self.latitude,
@@ -93,13 +96,14 @@ class Casinos(db.Model):
 
     def swapprofit_serialize(self):
         # from_trmnt = ['id','name','results_link','start_at']
-        from_casino = ['name','address','city', 'state','zip_code','time_zone','latitude','longitude']
+        from_casino = ['name','online','address','city', 'state','zip_code','time_zone','latitude','longitude']
         # print('print self.casino.name', self.casino.name)
         # print('self',self.casino_id, self.id, self.name, end='\n\n')
         return {
             'casino':{
                 'updated_at': self.updated_at,
                 'id': self.id,
+                'online': self.online,
                 'name': self.name,
                 'address': self.address,
                 'city': self.city,

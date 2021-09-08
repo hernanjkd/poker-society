@@ -127,28 +127,50 @@ def process_casinos_excel(df):
     for index, r in df.iterrows():
         
         
-        if '' in [ r['CASINO'].strip(), r['LONG'], r['LAT'] ]:
+        if '' in [ r['CASINO'].strip()]:
             continue
 
         casino = Casinos.query.get( r['ID'] )    
 
-        casinojson = {
-            'id': r['ID'].strip(),
-            'subscriber': r['SUBSCRIBER'].strip(),
-            'name': r['CASINO'].strip(),
-            'address': r['ADDRESS'].strip(),
-            'city': r['CITY'].strip(),
-            'state': r['STATE (FULL)'].strip(),
-            'zip_code': str( r['ZIP CODE'] ).strip(),
-            'website': r['WEBSITE'].strip(),
-            'latitude': float(r['LAT']),
-            'longitude': float(r['LONG']),
-            'time_zone': r['TIME ZONE'].strip(),
-            'phone': str( r['PHONE NUMBER'] ).strip(),
-            'facebook': r['FACEBOOK'].strip(),
-            'twitter': r['TWITTER'].strip(),
-            'instagram': r['INSTAGRAM'].strip()
-        }
+        isOnline = None
+        if r['ONLINE'].strip() == 'X' or r['ONLINE'].strip() == 'x':
+            isOnline = True
+        else:
+            isOnline = False
+
+        if isOnline == False:
+            casinojson = {
+                'id': r['ID'].strip(),
+                'subscriber': r['SUBSCRIBER'].strip(),
+                'name': r['CASINO'].strip(),
+                'address': r['ADDRESS'].strip(),
+                'city': r['CITY'].strip(),
+                'online': isOnline,
+                'state': r['STATE (FULL)'].strip(),
+                'zip_code': str( r['ZIP CODE'] ).strip(),
+                'website': r['WEBSITE'].strip(),
+                'latitude': float(r['LAT']),
+                'longitude': float(r['LONG']),
+                'time_zone': r['TIME ZONE'].strip(),
+                'phone': str( r['PHONE NUMBER'] ).strip(),
+                'facebook': r['FACEBOOK'].strip(),
+                'twitter': r['TWITTER'].strip(),
+                'instagram': r['INSTAGRAM'].strip()
+            }
+
+        else:
+            casinojson = {
+                'id': r['ID'].strip(),
+                'subscriber': r['SUBSCRIBER'].strip(),
+                'name': r['CASINO'].strip(),
+                'online': isOnline,
+                'website': r['WEBSITE'].strip(),
+                'phone': str( r['PHONE NUMBER'] ).strip(),
+                'facebook': r['FACEBOOK'].strip(),
+                'twitter': r['TWITTER'].strip(),
+                'instagram': r['INSTAGRAM'].strip()
+            }
+        
     
         if casino is None:
             db.session.add( Casinos( **casinojson ))
@@ -159,7 +181,8 @@ def process_casinos_excel(df):
                     setattr(casino, attr, val)
             
         db.session.commit()
-        
+        xxc = Casinos.query.get(r['ID'].strip())
+        print('xx', xxc)
     return
 
 
