@@ -1,4 +1,5 @@
 from models import db, Users, Casinos, Tournaments, Flights, Results, Subscribers
+import pytz
 from datetime import datetime, timedelta
 from utils import sha256
 import os
@@ -64,10 +65,13 @@ def run():
         nationality = 'USA'
     ))
 
+    timezone = pytz.timezone("America/New_York")
+
+
     design_present = Tournaments(
         casino=oneCasino,
         name='Test - Present Tournament',
-        start_at= d3,
+        start_at= timezone.localize(d3),
         buy_in_amount=100, 
         id=5555
     )
@@ -75,19 +79,22 @@ def run():
     flight1_design_present = Flights(
         start_at=design_present.start_at,
         tournament=design_present,
-        id=5555
+        id=5555,
+        day="1A"
     )
     db.session.add(flight1_design_present)
     flight2_design_present = Flights(
         start_at=design_present.start_at + timedelta(hours=6),
         tournament=design_present,
-        id=5556
+        id=5556,
+        day="1B"
     )
     db.session.add(flight2_design_present)
     flight3_design_present = Flights(
         start_at=design_present.start_at + timedelta(hours=12),
         tournament=design_present,
-        id=5557
+        id=5557, 
+        day="1C"
     )
     db.session.add(flight3_design_present)
 
