@@ -70,7 +70,7 @@ def run():
     #                   CURRENT TOURNAMENT - UNENTERED
     # ==========================================================
     
-    timezone = pytz.timezone("America/New_York")
+    timezone = pytz.timezone("US/Eastern")
 
     design_unentered = Tournaments(
         casino=oneCasino,
