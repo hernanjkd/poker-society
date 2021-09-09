@@ -75,8 +75,7 @@ def run():
     design_unentered = Tournaments(
         casino=oneCasino,
         name='Test - Unentered Tournament',
-        start_at= d3.astimezone(timezone('America/New_York'))
-
+        start_at= d3.astimezone(timezone('America/New_York')),
         buy_in_amount=100, 
         id=2222
     )
@@ -93,7 +92,7 @@ def run():
     design_present = Tournaments(
         casino=oneCasino,
         name='Test - Present Tournament',
-        start_at= timezone.localize(d3),
+        start_at= d3.astimezone(timezone('America/New_York')),
         buy_in_amount=100, 
         id=5555
     )
