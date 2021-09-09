@@ -65,7 +65,28 @@ def run():
         nationality = 'USA'
     ))
 
+
+        # ==========================================================
+    #                   CURRENT TOURNAMENT - UNENTERED
+    # ==========================================================
+    
     timezone = pytz.timezone("America/New_York")
+
+    design_unentered = Tournaments(
+        casino=oneCasino,
+        name='Test - Unentered Tournament',
+        start_at= timezone.localize(d3),
+        buy_in_amount=100, 
+        id=2222
+    )
+    db.session.add(design_unentered)
+    flight1_design_unentered= Flights(
+        start_at=design_unentered.start_at,
+        tournament=design_unentered,
+        id=2222
+    )
+    db.session.add(flight1_design_unentered)
+
 
 
     design_present = Tournaments(
