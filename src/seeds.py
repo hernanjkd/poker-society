@@ -27,7 +27,7 @@ def run():
     d0 = datetime.utcnow() - timedelta(hours=17, minutes=1)
     d1 = datetime.utcnow() + timedelta(minutes=5)
     d2 = datetime.utcnow() - timedelta(hours=16, minutes=59)
-    d3 = datetime.utcnow() 
+    d3 = datetime.datetime.now(datetime.timezone.utc)
     d4 = datetime.utcnow()  
 
 
