@@ -27,7 +27,7 @@ def run():
     d0 = datetime.utcnow() - timedelta(hours=17, minutes=1)
     d1 = datetime.utcnow() + timedelta(minutes=5)
     d2 = datetime.utcnow() - timedelta(hours=16, minutes=59)
-    d3 = datetime.now(datetime.timezone.utc)
+    d3 = datetime.utcnow() 
     d4 = datetime.utcnow()  
 
 
@@ -75,7 +75,7 @@ def run():
     design_unentered = Tournaments(
         casino=oneCasino,
         name='Test - Unentered Tournament',
-        start_at= d3.astimezone(timezone('America/New_York')),
+        start_at= d3,
         buy_in_amount=100, 
         id=2222
     )
@@ -92,7 +92,7 @@ def run():
     design_present = Tournaments(
         casino=oneCasino,
         name='Test - Present Tournament',
-        start_at= d3.astimezone(timezone('America/New_York')),
+        start_at= d3,
         buy_in_amount=100, 
         id=5555
     )
