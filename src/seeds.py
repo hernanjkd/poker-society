@@ -1,5 +1,5 @@
 from models import db, Users, Casinos, Tournaments, Flights, Results, Subscribers
-import pytz
+from pytz import timezone
 from datetime import datetime, timedelta
 from utils import sha256
 import os
