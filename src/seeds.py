@@ -70,12 +70,13 @@ def run():
     #                   CURRENT TOURNAMENT - UNENTERED
     # ==========================================================
     
-    timezone = pytz.timezone("US/Eastern")
+    # timezone = pytz.timezone("US/Eastern")
 
     design_unentered = Tournaments(
         casino=oneCasino,
         name='Test - Unentered Tournament',
-        start_at= timezone.localize(d3),
+        start_at= d3.astimezone(timezone('America/New_York'))
+
         buy_in_amount=100, 
         id=2222
     )
