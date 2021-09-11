@@ -281,4 +281,4 @@ def process_results_excel(df):
     print("3", theSubscriber)
 
     print(theSubscriber, trmnt_data, x)
-    return theSubscriber, trmnt_data, x
+    return theSubscriber, trmnt_data
