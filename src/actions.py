@@ -249,7 +249,8 @@ def process_results_excel(df):
         headers["Authorization"] = "Bearer " + os.environ[api_token]
 
         resp = requests.get(url, headers=headers  )   
-    
+        print('check', resp)
+        print('check', resp.json())
         user= resp.json()
 
     # Swap Profit JSON
@@ -281,4 +282,4 @@ def process_results_excel(df):
     print("3", theSubscriber)
 
     print(theSubscriber, trmnt_data, x)
-    return theSubscriber, trmnt_data
+    return theSubscriber, trmnt_data, x
