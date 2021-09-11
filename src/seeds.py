@@ -45,6 +45,14 @@ def run():
     )
     db.session.add( oneCasino)
 
+    twoCasino = Casinos(
+        id='ONLINE0001',
+        name='Poker Bros',
+        online=True, 
+        website="https://pokerbros.net/en"
+    )
+    db.session.add( twoCasino)
+
     db.session.add( Users(
         email='techpriest.gabriel@gmail.com',
         password=sha256('casper5'),
