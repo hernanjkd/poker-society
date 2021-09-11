@@ -272,7 +272,7 @@ def process_results_excel(df):
     db.session.commit()
     print("2", 'me ')
     theSubscriber = Subscribers.query.filter_by(company_name=str(r['Subscriber'])).first()
-    print("1", 'me')
+    print("1", 'me', theSubscriber)
  
     if theSubscriber is None:
         return 'No one is a subscriber'
