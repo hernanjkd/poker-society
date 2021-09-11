@@ -253,12 +253,20 @@ def process_results_excel(df):
         print('check', resp.json())
         user= resp.json()
 
+        winnings1 = None
+        if r['Winnings'] == 'N/A':
+            winnings1 = '0.00'
+        else:
+            winnings1 = r['Winnings']
+
+
     # Swap Profit JSON
         trmnt_data['users'][user['email']] = {
             'place': r['Place'],
-            'winnings': r['Winnings'],
+            'winnings': winnings1,
             'user_id': r['User ID']
         }
+       
 
         # Add to PokerSociety database
         db.session.add( Results(
@@ -266,7 +274,7 @@ def process_results_excel(df):
             user_id = r['User ID'],
             full_name = r['Full Name'],
             place = r['Place'],
-            winnings = r['Winnings']
+            winnings = winnings1
         ))
 
     db.session.commit()
