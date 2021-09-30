@@ -249,12 +249,11 @@ def process_results_excel(df):
         headers["Authorization"] = "Bearer " + os.environ[api_token]
 
         resp = requests.get(url, headers=headers  )   
-        print('check', resp)
-        print('check', resp.json())
+
         user= resp.json()
 
         winnings1 = None
-        if r['Winnings'] == 'N/A':
+        if r['Winnings'] == 'N/A' or r['Winnings'] == None:
             winnings1 = '0.00'
         else:
             winnings1 = r['Winnings']
@@ -278,9 +277,8 @@ def process_results_excel(df):
         ))
 
     db.session.commit()
-    print("2", 'me ')
+
     theSubscriber = Subscribers.query.filter_by(company_name=str(r['Subscriber'])).first()
-    print("1", 'me', theSubscriber)
  
     if theSubscriber is None:
         return 'No one is a subscriber'

@@ -146,9 +146,6 @@ def file_upload():
 
         updated_df, error_list, trmnt_added = returned_data
 
-        # updated_df = df # DELETE, ONLY FOR TESTING
-        # error_list = [] # DELETE, ONLY FOR TESTING
-
         # Save file with added Tournament IDs, which will be downloaded in the frontend
         if trmnt_added:
             writer = pd.ExcelWriter(
@@ -164,13 +161,13 @@ def file_upload():
             })
 
         msg = 'Tournament excel processed successfully'
+        
         return jsonify({
             'message': msg+'. File downloaded' if trmnt_added else msg,
             'download': trmnt_added
         }), 200
             
     
-
     # CASINOS
     if utils.are_headers_for('casinos', headers):
         
@@ -185,13 +182,11 @@ def file_upload():
         
         subscriber, subscriber_json, log = actions.process_results_excel( df )
 
-        # swapprofit = Subscribers.query.filter_by(company_name='Swap Profit').first()
         if subscriber is None:
             return jsonify({'error': 'Swap Profit not a subscriber'})
+        
         aSub = subscriber.company_name.replace(" ","")
         api_token = aSub.upper() +'_API_TOKEN'
-
-        print('vvv', os.environ[api_token]  )
 
         if subscriber_json is not None:
             # SWAPPROFUT ENDS HERE  swapprofit.api_host
@@ -208,11 +203,8 @@ def file_upload():
                 log = resp.json()
 
             print('resp', resp, log)
-            # print('resp', resp.json())
+
         return jsonify({'message':"Successfully Uploaded Results"}), 200
-
-
-
 
     return jsonify({'error': 'Unrecognized file'}), 200
 
@@ -229,7 +221,7 @@ def get_update_user(id):
 
     if id.isnumeric():
         user = Users.query.get( int(id) )
-    else: # email
+    else: 
         user = Users.query.filter_by( email=id ).first()
     
     if user is None:
@@ -293,11 +285,9 @@ def reset_link(id):
     results = Results.query.filter_by( tournament_id=id ) \
                             .order_by( Results.place.asc() )
     for result in results:
-        db.session.delete(result)
-
-    
+        db.session.delete(result)  
     db.session.commit()
-    return 'Resutls were reset' 
+    return 'Results were reset.' 
 
 @app.route('/finish/tournament/<int:id>', methods=['PUT'])
 def finish_tournament(id):
@@ -314,7 +304,7 @@ def finish_tournament(id):
             str( x),
             '%Y-%m-%d%H:%M:%S' )
 
-    return 'Tournmanet has ended' 
+    return 'Tournament has ended' 
 
 @app.route('/results/tournament/<int:id>')
 def get_results(id):
@@ -339,8 +329,7 @@ def get_results(id):
             obj.append({
                 'place': x.place,
                 'full_name': x.full_name,
-                'winnings': x.winnings,
-                # 'nationality': x.nationality
+                'winnings': x.winnings
             })
         results = json.dumps(obj)
 
@@ -410,51 +399,28 @@ def swapprofit_update():
 
     if span not in ['hours','days','all']:
         raise APIException('Invalid span: '+ span, 400)
-    # print('a')
+
     if span == 'all':
-        csnos = Casinos.query.all()
-        trmnts = Tournaments.query.all()
+        casinos = Casinos.query.all()
+        events = Tournaments.query.all()
     else:
         time_ago = datetime.utcnow() - timedelta( minutes=5, **{span:amount} )
-        trmnts = Tournaments.query.filter( Tournaments.updated_at > time_ago )
-        csnos = Casinos.query.all()
-    # print('b')
-    d = []
+        events = Tournaments.query.filter( Tournaments.updated_at > time_ago )
+        casinos = Casinos.query.all()
+
+    updated_list = []
     
-    e=[]
-    for x in csnos:
-        e.append(x.swapprofit_serialize())
-    d.append(e)
-    f = []
-    for y in trmnts:
-        f.append(y.swapprofit_serialize())
-    d.append(f)
+    casinos_to_update = []
+    for casino in casinos:
+        casinos_to_update.append(casino.swapprofit_serialize())
+    updated_list.append(casinos_to_update)
 
-    # print('d', d)
+    events_to_update = []
+    for event in events:
+        events_to_update.append(event.swapprofit_serialize())
+    updated_list.append(events_to_update)
 
-        # print("THIIS IS WAHAT IS CIOMFU", d )
-    return jsonify(d)
-
-# @app.route('/swapprofit/casinos/update')
-# def swapprofit_casino_update():
-
-#     # Defaults to hours=1
-#     span = request.args.get('span', 'hours')
-#     amount = int( request.args.get('amount', '1') )
-
-#     if span not in ['hours','days','all']:
-#         raise APIException('Invalid span: '+ span, 400)
-    
-#     if span == 'all':
-#         csnos = Casinos.query.all()
-#     else:
-#         time_ago = datetime.utcnow() - timedelta( minutes=5, **{span:amount} )
-#         csnos = Casinos.query.filter( Casinos.updated_at > time_ago )
-    
-#     for x in csnos:
-#         d = [x.serialize() ]
-#         # print("THIIS IS WAHAT IS CIOMFU", d )
-#     return jsonify([ x.serialize() for x in csnos ])
+    return jsonify(updated_list)
 
 
 # Endpoint to get the player ids that have swaps in the trmnt
