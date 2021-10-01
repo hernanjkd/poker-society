@@ -60,15 +60,14 @@
 			        <td style="width:20%;">Winnings</td>
 			    </tr>
 		    </thead>
-			<tbody></tbody>
+			<tbody id="myTable"></tbody>
 		</table>
 	</div>
 	<script>
 
 		var results = JSON.parse('{{ results | safe }}')
-		console.log('results',results)
-		document.querySelector('tbody').innerHTML =  results.map((x, i) => (
-			`<tr style='height:50px; background-color:${i%2==0?'#282828':'#000000'}>
+ 		document.getElementById("myTable").innerHTML =  results.map((x, i) => (
+			`<tr style="height:50px; background-color:${i%2==0?'#282828':'#000000'}">
 				<td style="text-align:center; color:white">${x.place}</td>
 				<td style="text-align:center; color:white">${x.full_name}</td>
 				<td style="text-align:center; color:white">$${x.winnings.toFixed(2)}</td>
