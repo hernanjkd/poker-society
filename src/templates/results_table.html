@@ -69,9 +69,9 @@
 
 		document.querySelector('tbody').innerHTML =  results.map((x, i) => (
 			`<tr style='height:50px; background-color:${i%2==0?'#282828':'#000000'}'>
-				<td style="text-align:center">${x.place}</td>
-				<td style="text-align:center">${x.full_name}</td>
-				<td style="text-align:center">$${x.winnings.toFixed(2)}</td>
+				<td style="text-align:center; color:white">${x.place}</td>
+				<td style="text-align:center; color:white">${x.full_name}</td>
+				<td style="text-align:center; color:white">$${x.winnings.toFixed(2)}</td>
 			</tr>`)
 		)
 		.join('')
