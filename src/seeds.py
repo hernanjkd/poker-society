@@ -178,7 +178,7 @@ def run():
     gabe_past = Tournaments(
         id=1000001,
         casino=oneCasino,
-        name='Test - Results Submitted Gabe',
+        name='Test - Results Pending Gabe',
         start_at= d0,
         buy_in_amount=100, 
         results_link='',
@@ -190,6 +190,24 @@ def run():
         tournament=gabe_past,
     )
     db.session.add(flight1_gabe_past)
+
+    jose_past = Tournaments(
+        id=1000002,
+        casino=oneCasino,
+        name='Test - Results Pending Jose',
+        start_at= d0,
+        buy_in_amount=100, 
+        results_link='',
+    )
+    db.session.add(jose_past)
+    flight1_jose_past = Flights(
+        id=1000002,
+        start_at=jose_past.start_at,
+        tournament=jose_past,
+    )
+    db.session.add(flight1_jose_past)
+
+    
 
     db.session.add( Subscribers(
         company_name = 'Swap Profit',

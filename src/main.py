@@ -325,6 +325,7 @@ def get_results(id):
     
     else:
         obj = []
+        print(results)
         for x in results:
             obj.append({
                 'place': x.place,
