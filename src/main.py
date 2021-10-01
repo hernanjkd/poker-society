@@ -325,7 +325,8 @@ def get_results(id):
     
     else:
         obj = []
-        print(results)
+        for x in results:
+            print("CHECK", x.place, x.full_name, x.winnings,)
         for x in results:
             obj.append({
                 'place': x.place,
