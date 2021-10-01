@@ -175,6 +175,22 @@ def run():
     )
     db.session.add(results_jose)
 
+    gabe_past = Tournaments(
+        id=1000001,
+        casino=oneCasino,
+        name='Test - Results Submitted Gabe',
+        start_at= d0,
+        buy_in_amount=100, 
+        results_link='',
+    )
+    db.session.add(gabe_past)
+    flight1_gabe_past = Flights(
+        id=1000001,
+        start_at=gabe_past.start_at,
+        tournament=gabe_past,
+    )
+    db.session.add(flight1_gabe_past)
+
     db.session.add( Subscribers(
         company_name = 'Swap Profit',
         api_host = os.environ['SWAPPROFIT_API_HOST'],
