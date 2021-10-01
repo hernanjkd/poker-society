@@ -67,7 +67,7 @@
 
 		var results = JSON.parse('{{ results | safe }}')
  		document.getElementById("myTable").innerHTML =  results.map((x, i) => (
-			`<tr style="height:50px; background-color:${i%2==0?'#282828':'#000000'}">
+			`<tr style="height:50px; ">
 				<td style="text-align:center; color:white">${x.place}</td>
 				<td style="text-align:center; color:white">${x.full_name}</td>
 				<td style="text-align:center; color:white">$${x.winnings.toFixed(2)}</td>
