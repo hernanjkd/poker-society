@@ -252,18 +252,18 @@ def process_results_excel(df):
         resp = requests.get(url, headers=headers  )   
 
         user= resp.json()
-        'N/a'
-        'xx'
-        "-3"
-        "$100"
-        "-300"
+        # 'N/a'
+        # 'xx'
+        # "-3"
+        # "$100"
+        # "-300"
         
         winnings1 = float(r['Winnings'])
         re.sub('\D', '', 'aas30dsa20')
         if r['Winnings'] == None or (type(r['Winnings']) != int  and type(r['Winnings']) != float):
             winnings1 = '0.00'
         else:
-            winnings1 = float(r['Winnings'])
+            winnings1 = "{:.2f}".format(float(r['Winnings']))
 
 
     # Swap Profit JSON
