@@ -9,6 +9,7 @@ from flask import ( Flask, request, jsonify, render_template, send_file,
     make_response, redirect )
 import requests
 from requests.structures import CaseInsensitiveDict
+import re
 
 def process_tournament_excel(df):
 
@@ -251,12 +252,18 @@ def process_results_excel(df):
         resp = requests.get(url, headers=headers  )   
 
         user= resp.json()
-
-        winnings1 = None
-        if r['Winnings'] == 'N/A' or r['Winnings'] == None:
+        'N/a'
+        'xx'
+        "-3"
+        "$100"
+        "-300"
+        
+        winnings1 = float(r['Winnings'])
+        re.sub('\D', '', 'aas30dsa20')
+        if r['Winnings'] == None or (type(r['Winnings']) != int  and type(r['Winnings']) != float):
             winnings1 = '0.00'
         else:
-            winnings1 = r['Winnings']
+            winnings1 = float(r['Winnings'])
 
 
     # Swap Profit JSON

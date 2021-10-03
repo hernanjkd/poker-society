@@ -135,6 +135,7 @@ class Tournaments(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     custom = db.Column(db.Boolean, default=False)
+    profit_model = db.Column(db.Boolean, default='original')
 
     casino = db.relationship('Casinos', back_populates='tournaments')
     flights = db.relationship('Flights', back_populates='tournament')
@@ -178,7 +179,8 @@ class Tournaments(db.Model):
             'start_at': self.start_at,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
-            'flights': [x.serialize() for x in self.flights]
+            'flights': [x.serialize() for x in self.flights],
+            'profit_model': self.profit_model
         }
 
 
