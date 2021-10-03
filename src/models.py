@@ -135,7 +135,7 @@ class Tournaments(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     custom = db.Column(db.Boolean, default=False)
-    profit_model = db.Column(db.Boolean, default='original')
+    profit_model = db.Column(db.String(20), default='original')
 
     casino = db.relationship('Casinos', back_populates='tournaments')
     flights = db.relationship('Flights', back_populates='tournament')
