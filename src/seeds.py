@@ -207,7 +207,21 @@ def run():
     )
     db.session.add(flight1_jose_past)
 
-    
+    gabe_past2 = Tournaments(
+        id=1000003,
+        casino=oneCasino,
+        name='Test - Results Pending Gabe 2',
+        start_at= d0,
+        buy_in_amount=100, 
+        results_link='',
+    )
+    db.session.add(gabe_past2)
+    flight1_gabe_past2 = Flights(
+        id=1000003,
+        start_at=gabe_past2.start_at,
+        tournament=gabe_past2,
+    )
+    db.session.add(flight1_gabe_past2)
 
     db.session.add( Subscribers(
         company_name = 'Swap Profit',
