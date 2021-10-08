@@ -187,6 +187,7 @@ def file_upload():
         
         aSub = subscriber.company_name.replace(" ","")
         api_token = aSub.upper() +'_API_TOKEN'
+        print('eee', api_token)
 
         if subscriber_json is not None:
             # SWAPPROFUT ENDS HERE  swapprofit.api_host
