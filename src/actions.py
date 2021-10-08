@@ -210,7 +210,7 @@ def process_results_excel(df):
     for index, r in df.iterrows():
         currentSubscriber = str( r['Subscriber'] ).strip()
         if currentSubscriber == 'SwapProfit' or currentSubscriber == 'Swap Profit':
-            currentSubscriber= 'Swap Profit'
+            currentSubscriber= 'SwapProfit'
         # print('SUBSCRIBER', subscriber)
 
         # subscriber = subscriber.replace(" ","")
