@@ -175,6 +175,54 @@ def run():
     )
     db.session.add(results_jose)
 
+    confirmed_past_gabe = Tournaments(
+        id=7778,
+        casino=oneCasino,
+        name='Gabe Test - Results Submitted',
+        start_at= d0,
+        buy_in_amount=100, 
+        results_link='http://poker-society.herokuapp.com/results/tournament/7778',
+    )
+    db.session.add(confirmed_past)
+    flight1_confirmed_past_gabe = Flights(
+        id=7778,
+        start_at=confirmed_past_gabe.start_at,
+        tournament=confirmed_past_gabe,
+    )
+    db.session.add(flight1_confirmed_past_gabe)
+    results_alice = Results(
+        full_name = "Allison Avery",
+        tournament=confirmed_past_gabe,
+        user_id=2,
+        winnings='5.00',
+        place="10th",
+        created_at = datetime.utcnow(),
+        updated_at = datetime.utcnow(),
+    )
+    db.session.add(results_alice)
+
+    results_bob = Results(
+        full_name = "Bob Benderson",
+        tournament=confirmed_past_gabe,
+        user_id=3,
+        winnings='1000.00',
+        place="1st",
+        created_at = datetime.utcnow(),
+        updated_at = datetime.utcnow(),
+    )
+    db.session.add(results_bob)
+
+    results_gabe = Results(
+        full_name = "Gabriel Herndon",
+        tournament=confirmed_past_gabe,
+        user_id=1,
+        winnings='500.00',
+        place="3rd",
+        created_at = datetime.utcnow(),
+        updated_at = datetime.utcnow(),
+    )
+    db.session.add(results_gabe)
+
     db.session.add( Subscribers(
         company_name = 'Swap Profit',
         api_host = os.environ['SWAPPROFIT_API_HOST'],
