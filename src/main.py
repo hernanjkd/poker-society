@@ -187,6 +187,7 @@ def file_upload():
         
         aSub = subscriber.company_name.replace(" ","")
         api_token = aSub.upper() +'_API_TOKEN'
+        print('eee', api_token)
 
         if subscriber_json is not None:
             # SWAPPROFUT ENDS HERE  swapprofit.api_host
@@ -325,6 +326,8 @@ def get_results(id):
     
     else:
         obj = []
+        for x in results:
+            print("CHECK", x.place, x.full_name, x.winnings,)
         for x in results:
             obj.append({
                 'place': x.place,

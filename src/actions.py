@@ -9,6 +9,7 @@ from flask import ( Flask, request, jsonify, render_template, send_file,
     make_response, redirect )
 import requests
 from requests.structures import CaseInsensitiveDict
+import re
 
 def process_tournament_excel(df):
 
@@ -32,11 +33,12 @@ def process_tournament_excel(df):
             if msg not in error_list:
                 error_list.append(msg)
             continue
-
-
+        currentSubscriber = str( r['Subscriber'] ).strip()
+        if currentSubscriber == 'SwapProfit' or currentSubscriber == 'Swap Profit':
+            currentSubscriber= 'SwapProfit'
         # Used for new tournaments and for updating existing ones
         trmntjson = {
-            'subscriber': str( r['Subscriber'] ).strip(),
+            'subscriber': currentSubscriber,
             'name': trmnt_name,
             'start_at': start_at,
             'casino_id': casino_id,
@@ -49,7 +51,7 @@ def process_tournament_excel(df):
             'structure_link': r['Structure Link'].strip()
         }
         flightjson = {
-            'subscriber': str( r['Subscriber'] ).strip(),
+            'subscriber': currentSubscriber,
             'day': flight_day,
             'start_at': start_at, 
             'notes': r['NOTES - LOU'].strip()
@@ -129,6 +131,9 @@ def process_casinos_excel(df):
         
         if '' in [ r['CASINO'].strip()]:
             continue
+        currentSubscriber =r['SUBSCRIBER'].strip()
+        if currentSubscriber == 'Swap Profit' or currentSubscriber=='SwapProfit':
+            currentSubscriber = 'SwapProfit'
 
         casino = Casinos.query.get( r['ID'] )    
 
@@ -141,7 +146,7 @@ def process_casinos_excel(df):
         if isOnline == False:
             casinojson = {
                 'id': r['ID'].strip(),
-                'subscriber': r['SUBSCRIBER'].strip(),
+                'subscriber': currentSubscriber,
                 'name': r['CASINO'].strip(),
                 'address': r['ADDRESS'].strip(),
                 'city': r['CITY'].strip(),
@@ -161,7 +166,7 @@ def process_casinos_excel(df):
         else:
             casinojson = {
                 'id': r['ID'].strip(),
-                'subscriber': r['SUBSCRIBER'].strip(),
+                'subscriber': currentSubscriber,
                 'name': r['CASINO'].strip(),
                 'online': isOnline,
                 'website': r['WEBSITE'].strip(),
@@ -182,7 +187,7 @@ def process_casinos_excel(df):
             
         db.session.commit()
         xxc = Casinos.query.get(r['ID'].strip())
-        print('xx', xxc)
+         
     return
 
 
@@ -203,14 +208,16 @@ def process_results_excel(df):
     trmnt_data = {}
     
     for index, r in df.iterrows():
-        subscriber = str(r['Subscriber'])
-        print('SUBSCRIBER', subscriber)
+        currentSubscriber = str( r['Subscriber'] ).strip()
+        if currentSubscriber == 'SwapProfit' or currentSubscriber == 'Swap Profit':
+            currentSubscriber= 'SwapProfit'
+        # print('SUBSCRIBER', subscriber)
 
-        subscriber = subscriber.replace(" ","")
-        api_token = subscriber.upper() + '_API_TOKEN'
-        api_host = subscriber.upper() + '_API_HOST'
+        # subscriber = subscriber.replace(" ","")
+        api_token = currentSubscriber.upper() + '_API_TOKEN'
+        api_host = currentSubscriber.upper() + '_API_HOST'
 
-        print('api_host', api_host)
+        # print('api_host', api_host)
 
         # Get the trmnt data that's in the first row
         if index == 0:
@@ -251,12 +258,18 @@ def process_results_excel(df):
         resp = requests.get(url, headers=headers  )   
 
         user= resp.json()
-
-        winnings1 = None
-        if r['Winnings'] == 'N/A' or r['Winnings'] == None:
+        # 'N/a'
+        # 'xx'
+        # "-3"
+        # "$100"
+        # "-300"
+        
+        winnings1 = float(r['Winnings'])
+        # re.sub('\D', '', 'aas30dsa20')
+        if r['Winnings'] == None or (type(r['Winnings']) != int  and type(r['Winnings']) != float):
             winnings1 = '0.00'
         else:
-            winnings1 = r['Winnings']
+            winnings1 = "{:.2f}".format(float(r['Winnings']))
 
 
     # Swap Profit JSON
