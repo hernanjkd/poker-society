@@ -223,6 +223,56 @@ def run():
     )
     db.session.add(results_gabe)
 
+    pending_past_2 = Tournaments(
+        casino=oneCasino,
+        id=1000001,
+        name='Test - Pending Results Tournament - Gabe 2',
+        start_at= d0,
+        buy_in_amount=100, 
+        results_link='http://poker-society.herokuapp.com/results/tournament/1000001',
+        profit_model='original',
+    )
+    db.session.add(pending_past_2)
+    flight1_pending_past_2 = Flights(
+        id=1000001,
+        start_at=pending_past_2.start_at,
+        tournament=pending_past_2,
+    )
+    db.session.add(flight1_pending_past_2)
+
+    results_alice = Results(
+        full_name = "Allison Avery",
+        tournament=pending_past_2,
+        user_id=2,
+        winnings='5.00',
+        place="10th",
+        created_at = datetime.utcnow(),
+        updated_at = datetime.utcnow(),
+    )
+    db.session.add(results_alice)
+
+    results_bob = Results(
+        full_name = "Bob Benderson",
+        tournament=pending_past_2,
+        user_id=3,
+        winnings='1000.00',
+        place="1st",
+        created_at = datetime.utcnow(),
+        updated_at = datetime.utcnow(),
+    )
+    db.session.add(results_bob)
+
+    results_gabe = Results(
+        full_name = "Gabriel Herndon",
+        tournament=pending_past_2,
+        user_id=1,
+        winnings='500.00',
+        place="3rd",
+        created_at = datetime.utcnow(),
+        updated_at = datetime.utcnow(),
+    )
+    db.session.add(results_gabe)
+
 
     pending_past_2 = Tournaments(
         casino=oneCasino,
@@ -230,7 +280,7 @@ def run():
         name='Test - Pending Results Tournament - Gabe 2',
         start_at= d0,
         buy_in_amount=100, 
-        results_link='',
+        results_link='http://poker-society.herokuapp.com/results/tournament/1000002',
         profit_model='original',
     )
     db.session.add(pending_past_2)
