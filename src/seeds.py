@@ -226,7 +226,7 @@ def run():
     pending_past_2 = Tournaments(
         casino=oneCasino,
         id=1000001,
-        name='Test - Pending Results Tournament - Gabe 2',
+        name='Test - Pending Results Tournament - Gabe',
         start_at= d0,
         buy_in_amount=100, 
         results_link='http://poker-society.herokuapp.com/results/tournament/1000001',
