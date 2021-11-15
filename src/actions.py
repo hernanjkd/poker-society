@@ -255,8 +255,10 @@ def process_results_excel(df):
         url =  os.environ[api_host] + '/profiles/' + str(user_id)
         headers["Authorization"] = "Bearer " + os.environ[api_token]
 
-        resp = requests.get(url, headers=headers  )   
-
+        resp = requests.get(url, headers=headers  )  
+        print(url)
+        print(headers) 
+        print(resp)
         user= resp.json()
         # 'N/a'
         # 'xx'

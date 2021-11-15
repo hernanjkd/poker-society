@@ -146,7 +146,7 @@ def run():
         full_name = "Allison Avery",
         tournament=confirmed_past,
         user_id=2,
-        winnings='500.00',
+        winnings='0.00',
         place="2nd",
         created_at = datetime.utcnow(),
         updated_at = datetime.utcnow(),
