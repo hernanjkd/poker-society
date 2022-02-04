@@ -68,8 +68,8 @@
 		var results = JSON.parse('{{ results | safe }}')
 
 		
-		var newResults = results.sort((a, b) => { parseFloat(a.winnings.replace('$',''))- parseFloat(b.winnings.replace('$','')) } )
-		console.log('results', newResults)
+		var newResults = results.sort((a, b) => { parseFloat(a.winnings)- parseFloat(b.winnings) } )
+		console.log('new results', newResults)
 
 		document.getElementById("myTable").innerHTML =  newResults.map((x, i) => (
 			`<tr style="height:50px; background-color:${i%2==0?'#282828':'#000000'}">
