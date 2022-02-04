@@ -45,7 +45,7 @@
 <body >
 {% if results %}
 	<div style="margin: 5% 0px 5% 0px">
-		<h1 style="text-align:center">Tournament Results</h1>
+		<h1 style="text-align:center">Event Results</h1>
 
 		<h2 style="text-align:center">{{ casino }}</h2>
 		<h2 style="text-align:center">{{ trmnt_name }}</h2>
@@ -67,6 +67,8 @@
 
 		var results = JSON.parse('{{ results | safe }}')
 		print('results', results)
+
+		var newResults = results.sort((a, b) => { int(a.place.replace('$',''))- int(b.place.replace('$','')) } )
  		document.getElementById("myTable").innerHTML =  results.map((x, i) => (
 			`<tr style="height:50px; background-color:${i%2==0?'#282828':'#000000'}">
 				<td style="text-align:center; color:white">${x.place}</td>
