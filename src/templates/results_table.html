@@ -68,10 +68,11 @@
 		var results = JSON.parse('{{ results | safe }}')
 
 		
-		var newResults = results.sort((a, b) => { return parseFloat(a.winnings)- parseFloat(b.winnings) } )
-		console.log('new results', newResults)
+		results.sort((a, b) => { return parseFloat(a.winnings)- parseFloat(b.winnings) } )
+		results.reverse()
+		// console.log('new results', newResults)
 
-		document.getElementById("myTable").innerHTML =  newResults.map((x, i) => (
+		document.getElementById("myTable").innerHTML =  results.map((x, i) => (
 			`<tr style="height:50px; background-color:${i%2==0?'#282828':'#000000'}">
 				<td style="text-align:center; color:white">${x.place}</td>
 				<td style="text-align:center; color:white">${x.full_name}</td>
