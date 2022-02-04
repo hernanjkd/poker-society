@@ -69,7 +69,7 @@
 		print('results', results)
 
 		var newResults = results.sort((a, b) => { int(a.place.replace('$',''))- int(b.place.replace('$','')) } )
- 		document.getElementById("myTable").innerHTML =  results.map((x, i) => (
+ 		document.getElementById("myTable").innerHTML =  newResults.map((x, i) => (
 			`<tr style="height:50px; background-color:${i%2==0?'#282828':'#000000'}">
 				<td style="text-align:center; color:white">${x.place}</td>
 				<td style="text-align:center; color:white">${x.full_name}</td>
