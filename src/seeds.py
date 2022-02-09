@@ -85,13 +85,13 @@ def run():
         name='Test - Unentered Tournament',
         start_at= d3,
         buy_in_amount=100, 
-        id=2222
+        id=22222
     )
     db.session.add(design_unentered)
     flight1_design_unentered= Flights(
         start_at=design_unentered.start_at,
         tournament=design_unentered,
-        id=2222
+        id=22222
     )
     db.session.add(flight1_design_unentered)
 

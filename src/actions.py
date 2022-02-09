@@ -208,19 +208,28 @@ def process_results_excel(df):
     trmnt_data = {}
     
     for index, r in df.iterrows():
-        currentSubscriber = str( r['Subscriber'] ).strip()
-        if currentSubscriber == 'SwapProfit' or currentSubscriber == 'Swap Profit':
-            currentSubscriber= 'SwapProfit'
-        # print('SUBSCRIBER', subscriber)
+        # currentSubscriber = str( r['Subscriber'] ).strip()
+        # if currentSubscriber == 'SwapProfit' or currentSubscriber == 'Swap Profit':
+        #     currentSubscriber= 'SwapProfit'
+        # # print('SUBSCRIBER', subscriber)
 
-        # subscriber = subscriber.replace(" ","")
-        api_token = currentSubscriber.upper() + '_API_TOKEN'
-        api_host = currentSubscriber.upper() + '_API_HOST'
+        # # subscriber = subscriber.replace(" ","")
+        # api_token = currentSubscriber.upper() + '_API_TOKEN'
+        # api_host = currentSubscriber.upper() + '_API_HOST'
 
         # print('api_host', api_host)
 
         # Get the trmnt data that's in the first row
         if index == 0:
+
+            currentSubscriber = str( r['Subscriber'] ).strip()
+            if currentSubscriber == 'SwapProfit' or currentSubscriber == 'Swap Profit':
+                currentSubscriber= 'SwapProfit'
+            # print('SUBSCRIBER', subscriber)
+
+            # subscriber = subscriber.replace(" ","")
+            api_token = currentSubscriber.upper() + '_API_TOKEN'
+            api_host = currentSubscriber.upper() + '_API_HOST'
             
             # Check trmnt existance
             trmnt = Tournaments.query.get( r['Tournament ID'] )
