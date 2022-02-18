@@ -69,9 +69,13 @@ def are_headers_for(table, file_headers):
             'Residence','User ID','Tournament ID'],
         'casinos': ['SUBSCRIBER','CASINO','STATE (ABB.)','STATE (FULL)','REGION', 'ONLINE',
             'TIME ZONE','ADDRESS','CITY','ZIP CODE','LAT','LONG','WEBSITE'],
-        'tournaments': ['Subscriber','Date','Day','Time','Where','Tournament','Buy-in',
+        'tournaments': ['Subscriber','Date',
+            # 'Day',
+            'Time','Where','Tournament','Buy-in',
             'Starting Stack','Blinds','Structure Link','Casino ID','Multi ID',
-            'Tournament ID','H1','NOTES - LOU','Results Link','Entrants']
+            'Tournament ID','H1',
+            # 'NOTES - LOU',
+            'Results Link','Entrants']
     }
 
     for header in switch[table]:
