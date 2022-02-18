@@ -74,7 +74,7 @@ def are_headers_for(table, file_headers):
             'Time','Where','Tournament','Buy-in',
             'Starting Stack','Blinds','Structure Link','Casino ID','Multi ID',
             'Tournament ID','H1',
-            # 'NOTES - LOU',
+            'NOTES',
             'Results Link','Entrants']
     }
 
