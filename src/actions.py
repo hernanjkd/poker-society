@@ -22,6 +22,7 @@ def process_tournament_excel(df):
             continue
 
         trmnt_name, flight_day = utils.resolve_name_day( r['Tournament'] )
+        print('flight_day', flight_day)
         start_at = datetime.strptime( 
             str(r['Date'])[:10] + str(r['Time']),
             '%Y-%m-%d%H:%M:%S' )
